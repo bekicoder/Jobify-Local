@@ -5,7 +5,9 @@ import jwt from "jsonwebtoken"
 
 export async function POST(req:NextRequest){
     try{
-      const { fname,lname,email, password, type:role ,location,flag} = await req.json();
+      const fd = await req.formData()
+      const fdObj = Object.fromEntries(fd.entries())
+      const { fname,lname,email, password, type:role ,location,flag} = fdObj
       if(!fname || !lname || !email || !password || !role || !location || !flag){
     return NextResponse.json({error:"Invalid credentials"}, { status: 401 })
       }
@@ -34,7 +36,9 @@ export async function POST(req:NextRequest){
             process.env.JWT_SECRET!,{expiresIn:"7d"}
       )
 
-      const response = NextResponse.json({message:"user created"})
+      const response = NextResponse.redirect(
+      new URL("/", req.nextUrl.origin)
+      );
 
       response.cookies.set({
         name:"jobify-token",

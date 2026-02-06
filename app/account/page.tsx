@@ -112,15 +112,16 @@ const countries:locations[] = [
     const data =await res.json()
     console.log("error",data)
     if(data.message == "user created"){
+      console.log(data.message)
       router.replace("/")
-      router.refresh();
-    }
+      window.reload()
+        }
   }
   
   return(
     <div className='w-full max-w-xl h-full md:h-124 md:rounded-2xl flex flex-col items-center bg-white md:px-28 px-10 md:mt-4 pt-4'>
       <strong className='text-2xl text-[#0a2540]'>Sign up</strong>
-      <form onSubmit={handleSibmit} action="/api/signup" method='POST' className='flex flex-col pt-7 gap-4 w-full'>
+      <form action="/api/signup" method='POST' className='flex flex-col pt-7 gap-4 w-full'>
         <div className='flex border border-gray-400 rounded p-1 px-2'>
           <input type="text" name="fname" className='w-full focus:outline-0' placeholder='First Name' required/>
           <span><i className='fa-solid fa-user text-gray-600 px-2'></i></span>
