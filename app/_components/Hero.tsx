@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Contents from "./Contents";
-
+import { ContentType } from "./Contents";
 const Hero = () => {
   const [user, setUser] = useState();
   const [contents,setContent] = useState<ContentType>()
