@@ -1,7 +1,7 @@
 import Hero from "./_components/Hero"
 import Stats from "./_components/stats";
 import About from "./_components/about";
-import Community from "./_components/community";
+import Community from "./_components/stafs";
 import Footer from './_components/footer';
 
 export default function Home() {

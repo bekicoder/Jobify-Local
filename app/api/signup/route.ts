@@ -5,16 +5,15 @@ import jwt from "jsonwebtoken"
 
 export async function POST(req:NextRequest){
     try{
-      const fd = await req.formData()
-      const fdObj = Object.fromEntries(fd.entries())
-      const { fname,lname,email, password, type:role ,location,flag} = fdObj
-      if(!fname || !lname || !email || !password || !role || !location || !flag){
+      const { fname,lname,orgname,email, password, type:role ,location,flag} =await req.json();
+      if(role == "employee" && (!fname || !lname) || role == "employer" && !orgname || !email || !password || !role || !location || !flag){
     return NextResponse.json({error:"Invalid credentials"}, { status: 401 })
       }
-
-      const {rows:doseExist} = await db.query("select 1 from users where email = $1",[email])
+      const tableName = role == "employee" ? "users" : role == "employer" && "organizations";
+      console.log(tableName)
+      const {rows:doseExist} = await db.query(`select 1 from ${tableName}  where email = $1`,[email])
       if(doseExist.length > 0){
-        return NextResponse.json({error:"user already exist"},{status:400});
+        return NextResponse.json({message:`already exist`},{status:400});
       }
 
       const profileColors = [
@@ -24,20 +23,22 @@ export async function POST(req:NextRequest){
   "#D32F2F", "#388E3C", "#303F9F", "#FBC02D", "#5D4037"
 ];
       const hashedPass = await bcrypt.hash(password,10)
-      const name = fname + " " + lname
+      const name = role == "employee" ? fname + " " + lname : role == "employer" && orgname
+      const column_name = role == "employee" ? "name" : role == "employer" && "orgname"
       const randomColor = profileColors[Math.floor(Math.random() * profileColors.length)]
-      console.log(randomColor)
-      const result =await db.query("INSERT INTO users (name, email, password, role,profile,location,flag) values($1,$2,$3,$4,$5,$6,$7) RETURNING *",[name,email,hashedPass,role,randomColor,location,flag])
+      const sql = `INSERT INTO ${tableName} (${column_name},email, password,profile,location,flag) values($1,$2,$3,$4,$5,$6) RETURNING *`
+      const result =await db.query(sql,[name,email,hashedPass,randomColor,location,flag])
 
       const user = result.rows[0]
-
+      console.log(user)
       const token = jwt.sign(
-        {id:user.id,name:user.name,email:user.email,role:user.role,profile:user.profile,location:user.location,flag:user.flag},
+        {id:user.id,name:user[column_name],email:user.email,role:user.role,profile:user.profile,location:user.location,flag:user.flag},
             process.env.JWT_SECRET!,{expiresIn:"7d"}
       )
 
-      const response = NextResponse.redirect(
-      new URL("/", req.nextUrl.origin)
+      const response = NextResponse.json(
+      {message:"successful"},
+      {status:200}
       );
 
       response.cookies.set({

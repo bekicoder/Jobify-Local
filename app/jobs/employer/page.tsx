@@ -53,7 +53,7 @@ const JobDetailsPanel = ({
               placeholder="Enter proposal details..."
               className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5 outline-sky-500"
             ></textarea>
-            <button className="px-6 py-2 rounded-full bg-sky-500 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto">
+            <button className="px-6 py-2 rounded-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto">
               Send
             </button>
           </div>
@@ -198,10 +198,10 @@ const CreateJobs = ({
     const data = await res.json();
     const data_res = data.data;
     if (data.status == "successful") {
-      console.log("edit is true",edit,data_res)
+      console.log("edit is true", edit, data_res);
       setFd({ jobType: "", catagory: "", range: "", detail: "", title: "" });
       setEdit(null);
-      console.log(data.data)
+      console.log(data.data);
       /*const fetchMyjobs = async () => {
         console.log(data.message);
         const job_res = await fetch(`/api/myJobs?id=${data.message}`);
@@ -220,19 +220,18 @@ const CreateJobs = ({
         setPage("myJobs");
       };
       fetchMyjobs();*/
-    
-       if(edit){
+
+      if (edit) {
         setMyjobs((prev) =>
           prev.map((j, i) =>
             j.id === data_res.id ? { ...j, ...data_res } : j,
           ),
-        ) 
-      }else{
-        setMyjobs((prev:[]) =>[...prev,data_res])
+        );
+      } else {
+        setMyjobs((prev: []) => [...prev, data_res]);
       }
-      setPage("myJobs")
+      setPage("myJobs");
     }
-    
   }
 
   return (
@@ -392,7 +391,7 @@ const CreateJobs = ({
       ></textarea>
       <button
         type="submit"
-        className="px-6 py-2 rounded-full bg-sky-500 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
+        className="px-6 py-2 rounded-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
       >
         {!edit ? "Create" : "Edit"}
       </button>
@@ -437,7 +436,9 @@ const Employer = () => {
       });
       const props = await prop_res.json();
       const fullProposal = props.data.map((p) => {
-      const proposed_job = _Myjobs.data.filter((j)=>{return j.id == p.career_id})
+        const proposed_job = _Myjobs.data.filter((j) => {
+          return j.id == p.career_id;
+        });
         return {
           id: p.career_id,
           career_owner: p.career_owner,
@@ -465,11 +466,11 @@ const Employer = () => {
     fetchProposals() */
 
     fetchData();
-  },[]);
+  }, []);
   return (
     <div className="w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-[#f6f9fc] md:fixed">
       <aside className="w-full h-full md:w-70 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 bg-white ">
-        <h1 className="w-full py-3 h-fit bg-sky-500 text-white text-2xl text-center font-bold md:rounded-t">
+        <h1 className="w-full py-3 h-fit bg-sky-600 text-white text-2xl text-center font-bold md:rounded-t">
           {" "}
           Land Your Job
         </h1>
@@ -559,7 +560,7 @@ const Employer = () => {
                 <a>1</a>
                 <a>2</a>
                 <a>3</a>
-                <a className=" w-8 bg-sky-500 text-white h-8 rounded-full flex pt-0.5 justify-center">4</a>
+                <a className=" w-8 bg-sky-600 text-white h-8 rounded-full flex pt-0.5 justify-center">4</a>
                 <a>5</a>
                 <a>6</a>
                 <a>7</a>
@@ -629,8 +630,6 @@ const Employer = () => {
                     ))}
                   </tbody>
                 </table>
-
-                
               </>
             )}
           </div>

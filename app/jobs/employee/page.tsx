@@ -13,7 +13,7 @@ const JobDetailsPanel = ({
   setProposal_ids,
   saved_ids,
   setSaved_ids,
-  setSavedJobs
+  setSavedJobs,
 }) => {
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
@@ -42,26 +42,34 @@ const JobDetailsPanel = ({
     }
   }
 
-  const [isSaved,setSaved] = useState<boolean>(saved_ids.some((s) => s == job.id));
+  const [isSaved, setSaved] = useState<boolean>(
+    saved_ids.some((s) => s == job.id),
+  );
   const handleSave = async () => {
     const save = await fetch("/api/saveJob", {
       method: "POST",
-      body: JSON.stringify({ jobId: job.id,saved:isSaved }),
+      body: JSON.stringify({ jobId: job.id, saved: isSaved }),
       headers: { "Content-Type": "application/json" },
     });
-    const {msg,id:savedId,savedJob} =await save.json();
-    
+    const { msg, id: savedId, savedJob } = await save.json();
+
     if (msg == "successful") {
-      setSaved_ids(prev => prev.includes(savedId) ? prev.filter(id => id !== savedId) : [...prev, savedId]);
-      setSavedJobs((prev)=>isSaved ? prev.filter(p=>p.id !== job.id) : [...prev,savedJob])
-      setSaved(!isSaved)
-      console.log(msg,savedId,savedJob);
+      setSaved_ids((prev) =>
+        prev.includes(savedId)
+          ? prev.filter((id) => id !== savedId)
+          : [...prev, savedId],
+      );
+      setSavedJobs((prev) =>
+        isSaved ? prev.filter((p) => p.id !== job.id) : [...prev, savedJob],
+      );
+      setSaved(!isSaved);
+      console.log(msg, savedId, savedJob);
     }
   };
   const isApplied = proposal_ids.some((p) => {
     return p == job.id;
   });
-  
+
   return (
     <div className="w-full pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl bg-white overflow-y-auto">
       {/*proposal form */}
@@ -94,7 +102,7 @@ const JobDetailsPanel = ({
             ></textarea>
             <button
               type="submit"
-              className="px-6 py-2 rounded-full bg-sky-500  text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
+              className="px-6 py-2 rounded-full bg-sky-600  text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
             >
               Send
             </button>
@@ -120,7 +128,7 @@ const JobDetailsPanel = ({
         <button
           disabled={isApplied ? true : false}
           onClick={(e) => setOpend(true)}
-          className={`px-6 rounded-full bg-sky-500 ${!isApplied && "hover:bg-[#0a2540]"} text-white font-medium`}
+          className={`px-6 rounded-full bg-sky-600 ${!isApplied && "hover:bg-[#0a2540]"} text-white font-medium`}
           style={{ cursor: isApplied ? "not-allowed" : "pointer" }}
         >
           {isApplied ? "Applied" : "Apply"}
@@ -141,8 +149,7 @@ const JobDetailsPanel = ({
           &nbsp;&nbsp;• {job.jobtype}
         </span>
         <span className="text-sm">
-          <i className="fa-solid fa-calendar-day text-gray-500" />{" "}
-          {date[0]}
+          <i className="fa-solid fa-calendar-day text-gray-500" /> {date[0]}
         </span>
       </div>
 
@@ -173,7 +180,6 @@ const SideBar = () => {
     details: string;
   };
   const [_jobs, setJobs] = useState([]);
-  
 
   type JobCategory = {
     id: number;
@@ -367,16 +373,16 @@ const SideBar = () => {
 
       setProposals(fullProposal);
     };
-    const fetchSaved =async()=>{
-      const savedRes =await fetch("/api/saveJob")
-      const {savedJobs,data} = await savedRes.json()
-      savedJobs.forEach(s => {
-        setSaved_ids((prev)=>[...prev,s.career_id])
+    const fetchSaved = async () => {
+      const savedRes = await fetch("/api/saveJob");
+      const { savedJobs, data } = await savedRes.json();
+      savedJobs.forEach((s) => {
+        setSaved_ids((prev) => [...prev, s.career_id]);
       });
 
-      setSavedJobs([...data])
-    }
-    fetchSaved()
+      setSavedJobs([...data]);
+    };
+    fetchSaved();
     fethJobs();
   }, []);
 
@@ -385,7 +391,7 @@ const SideBar = () => {
       <aside
         className={`w-full h-full md:w-70 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 bg-white ${(route == "appliedJobs" || route == "savedJobs") && "hidden"}`}
       >
-        <h1 className="w-full py-3 h-fit bg-sky-500 text-white text-2xl text-center font-bold md:rounded-t">
+        <h1 className="w-full py-3 h-fit bg-sky-600 text-white text-2xl text-center font-bold md:rounded-t">
           {" "}
           Land Your Job
         </h1>
@@ -423,7 +429,7 @@ const SideBar = () => {
                       value={job.title}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90"></i>
                     </span>
                     {job.title}
@@ -457,7 +463,7 @@ const SideBar = () => {
                       value={c.name}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
                     <Image
@@ -498,7 +504,7 @@ const SideBar = () => {
                       value={t.title}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
                     {t.name}
@@ -532,7 +538,7 @@ const SideBar = () => {
                       value={range.label}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
                     {range.label}
@@ -548,7 +554,7 @@ const SideBar = () => {
         <div className="w-full h-full">
           {selectedJob ? (
             <JobDetailsPanel
-             setSavedJobs={setSavedJobs}
+              setSavedJobs={setSavedJobs}
               setSaved_ids={setSaved_ids}
               saved_ids={saved_ids}
               setProposal_ids={setProposal_ids}
@@ -560,7 +566,9 @@ const SideBar = () => {
             />
           ) : (
             <>
-              <table className={`w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden`}>
+              <table
+                className={`w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden`}
+              >
                 <thead className="border-b border-b-gray-300 px-7">
                   <tr>
                     <th className="text-left text-sm font-medium px-4 py-2">
@@ -630,7 +638,7 @@ const SideBar = () => {
                         </td>
                       </tr>
                     ))}
-                  {route == 'savedJobs' &&
+                  {route == "savedJobs" &&
                     savedJobs.map((p, i) => (
                       <tr
                         onClick={() => setJobdetail(p.id)}
@@ -657,7 +665,6 @@ const SideBar = () => {
                         </td>
                       </tr>
                     ))}
-                  
                 </tbody>
               </table>
             </>

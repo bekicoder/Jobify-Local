@@ -31,7 +31,6 @@ export async function GET(req: nextRequest) {
 export async function POST(req: nextRequest) {
   try {
     const { jobId: id, saved } = await req.json();
-    console.log(id);
     const token = req.cookies.get("jobify-token")?.value;
     if (!id) {
       return NextResponse.json({ msg: `id is required` }, { status: 401 });
@@ -43,9 +42,8 @@ export async function POST(req: nextRequest) {
     const sql = !saved
       ? "insert into savedJobs (career_id,user_id) values($1,$2) RETURNING career_id;"
       : "delete from savedJobs where career_id=$1;";
-      console.log(!saved,"delete from savedJobs where career_id=$1",id)
-    const values = [decoded.id];
-    !saved && values.unshift(id);
+    console.log(!saved,"delete from savedJobs where career_id=$1",id)
+    const values = !saved ? [id,decoded.id] : [id];
     const { rows } = await db.query(sql, values);
     let savedJob;
     if (!saved) {

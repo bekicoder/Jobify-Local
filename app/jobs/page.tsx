@@ -6,42 +6,52 @@ import { useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 const JobDetailsPanel = ({
   proposal_ids,
-  job,
+  job: jobDetail,
   setJobdetail,
   setProposals,
   proposals,
   setProposal_ids,
   saved_ids,
   setSaved_ids,
-  setSavedJobs
+  setSavedJobs,
 }) => {
+  const job = jobDetail();
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
-  const [isSaved,setSaved] = useState<boolean>(saved_ids.some((s) => s == job.id));
+  const [isSaved, setSaved] = useState<boolean>(
+    saved_ids.some((s) => s == job.id),
+  );
+  const proposal = proposals.find((p) => {
+    return p.id == job.id;
+  });
+  const [approved, setApproved] = useState<string>(proposal?.approval);
   const handleSave = async () => {
     const save = await fetch("/api/saveJob", {
       method: "POST",
-      body: JSON.stringify({ jobId: job.id,saved:isSaved }),
+      body: JSON.stringify({ jobId: job.id, saved: isSaved }),
       headers: { "Content-Type": "application/json" },
     });
-    const {msg,id:savedId,savedJob} =await save.json();
-    console.log(job,msg,job.id)
+    const { msg, id: savedId, savedJob } = await save.json();
 
     if (msg == "successful") {
-      setSaved_ids(prev => prev.includes(savedId) ? prev.filter(id => id !== savedId) : [savedId,...prev]);
-      setSavedJobs((prev)=>isSaved ? prev.filter(p=>p.id !== job.id) : [savedJob,...prev])
-      setSaved(!isSaved)
+      setSaved_ids((prev) =>
+        isSaved ? prev.filter((id) => id != job.id) : [savedId, ...prev],
+      );
+      setSavedJobs((prev) =>
+        isSaved ? prev.filter((p) => p.id != job.id) : [savedJob, ...prev],
+      );
+      setSaved(!isSaved);
     }
   };
-  
-  const [isApplied,setApplied] = useState();
+
+  const [isApplied, setApplied] = useState();
   const appliedId = proposal_ids.some((p) => {
     return p == job.id;
-  })
-  useEffect(()=>{
-    setApplied(appliedId)
-  },[])
-   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  });
+  useEffect(() => {
+    setApplied(appliedId);
+  }, []);
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.target);
     const article = fd.get("article");
@@ -62,8 +72,10 @@ const JobDetailsPanel = ({
       setOpend(false);
       const data = await fetch(`/api/proposal?id=${_res.id}`);
       const updatedData = await data.json();
-      setProposal_ids((prev) => [_res.id,...prev]);
-      setApplied(_res.id)
+      setProposal_ids((prev) => [_res.id, ...prev]);
+      setApplied(_res.id);
+      console.log(updatedData);
+      setApproved(updatedData.data.approval);
     }
   }
   return (
@@ -89,8 +101,18 @@ const JobDetailsPanel = ({
               <i className="fa-solid fa-times"></i>
             </button>
             <input name="id" readOnly value={job.id} className="sr-only" />
-            <input name="location" readOnly value={job.location} className="sr-only" />
-            <input name="posted_by" readOnly value={job.posted_by} className="sr-only" />
+            <input
+              name="location"
+              readOnly
+              value={job.location}
+              className="sr-only"
+            />
+            <input
+              name="posted_by"
+              readOnly
+              value={job.posted_by}
+              className="sr-only"
+            />
             <textarea
               placeholder="Enter proposal details..."
               name="article"
@@ -98,7 +120,7 @@ const JobDetailsPanel = ({
             ></textarea>
             <button
               type="submit"
-              className="px-6 py-2 rounded-full bg-sky-500  text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
+              className="px-6 py-2 rounded-full bg-sky-600  text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
             >
               Send
             </button>
@@ -121,14 +143,27 @@ const JobDetailsPanel = ({
             className={`fa-bookmark ${isSaved ? "fa-solid" : "fa-regular"}`}
           ></i>
         </button>
-        <button
-          disabled={isApplied ? true : false}
-          onClick={(e) => setOpend(true)}
-          className={`px-6 rounded-full bg-sky-500 ${!isApplied && "hover:bg-[#0a2540]"} text-white font-medium`}
-          style={{ cursor: isApplied ? "not-allowed" : "pointer" }}
-        >
-          {isApplied ? "Applied" : "Apply"}
-        </button>
+        {isApplied && (
+          <button
+            disabled={isApplied ? true : false}
+            onClick={(e) => setOpend(true)}
+            className={`w-10 h-10 rounded-full bg-${approved == "approved" ? "green-500" : approved == "declined" ? "red-500" : approved == "pending" && "yellow-500"} ${!isApplied && "hover:bg-[#0a2540]"} text-white font-medium`}
+          >
+            <i
+              className={`fa-solid fa-${approved == "approved" ? "thumbs-up" : approved == "declined" ? "thumbs-down" : approved == "pending" && "hourglass-half"}`}
+            />
+          </button>
+        )}
+
+        {!isApplied && (
+          <button
+            disabled={isApplied ? true : false}
+            onClick={(e) => setOpend(true)}
+            className={`px-6 rounded-full bg-sky-600 && "hover:bg-[#0a2540]" text-white font-medium`}
+          >
+            Apply
+          </button>
+        )}
       </div>
       {/* job title */}
       <h1 className="text-2xl font-medium mb-2">{job.title}</h1>
@@ -136,22 +171,23 @@ const JobDetailsPanel = ({
         <span className=" text-sm flex items-center font-medium text-gray-600">
           {job.salary_range} • {job.location}&nbsp;&nbsp;&nbsp;{" "}
           <div className="aspect-video w-6 relative">
-                            {
-                            <Image
-                              src={job.flag}
-                              alt={job.location + " flag"}
-                              fill
-                              sizes="20px"
-                              className={`object-contain ${opend && "hidden"}`}
-                              
-                            />
-                          }
-                            </div>{" "}
-          &nbsp;&nbsp;• {job.jobtype}
+            {
+              <Image
+                src={job.flag}
+                alt={job.location + " flag"}
+                fill
+                sizes="20px"
+                className={`object-contain ${opend && "hidden"}`}
+              />
+            }
+          </div>
+          &nbsp;&nbsp;• {job.jobtype} &nbsp;&nbsp;
+          <span
+            className={`w-2 h-2 rounded-full block ${!proposal?.seenStatus && approved ? "bg-red-500" : approved && "bg-green-500"} my-auto mt-2 `}
+          ></span>
         </span>
         <span className="text-sm">
-          <i className="fa-solid fa-calendar-day text-gray-500" />{" "}
-          {date[0]}
+          <i className="fa-solid fa-calendar-day text-gray-500" /> {date[0]}
         </span>
       </div>
 
@@ -182,7 +218,6 @@ const Employee = () => {
     details: string;
   };
   const [_jobs, setJobs] = useState([]);
-  
 
   type JobCategory = {
     id: number;
@@ -319,10 +354,9 @@ const Employee = () => {
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
   const [savedJobs, setSavedJobs] = useState([]);
-  const [filteredJob, setFilteredJob] = useState([]);
-  const [fillteredIds,setFiltereIds] = useState<number[]>([])
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [saved_ids, setSaved_ids] = useState<number[]>([]);
-  
+
   function toggleMenu(menu: string) {
     if (openedMenu == menu) {
       setOpenedMenu(null);
@@ -330,9 +364,9 @@ const Employee = () => {
       setOpenedMenu(menu);
     }
   }
-  useEffect(()=>{
-    if(route == "appliedJobs" || route == "savedJobs" ) setJobdetail(null);
-  },[route])
+  useEffect(() => {
+    setJobdetail(null);
+  }, [route]);
 
   function toggleCheckbox(type: string, id: number) {
     if (type == "catagory") {
@@ -342,91 +376,92 @@ const Employee = () => {
 
   useEffect(() => {
     const fethJobs = async () => {
-  const jobCount = await fetch("/api/jobs");
-  const { count } = await jobCount.json();
-  const jobs_: any[] = [];
-  for (let i = 1; i <= count; i++) {
-    const res = await fetch("/api/jobs", {
-      method: "POST",
-      body: JSON.stringify({ id: i }),
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
+      const jobCount = await fetch("/api/jobs");
+      const { count } = await jobCount.json();
+      const jobs_: any[] = [];
+      for (let i = 1; i <= count; i++) {
+        const res = await fetch("/api/jobs", {
+          method: "POST",
+          body: JSON.stringify({ id: i }),
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+        });
 
-    const job = await res.json();
-    jobs_.unshift(job);
-  }
+        const job = await res.json();
+        jobs_.unshift(job);
+      }
 
-  // ✅ set once
-  setJobs(jobs_);
-  const prop_res = await fetch("/api/proposal/?role=employee", {
-    cache: "no-store",
-  });
-
-  const props = await prop_res.json();
-
-  const proposalIds: number[] = [];
-
-  const fullProposal = props.data.map((p) => {
-    proposalIds.unshift(p.career_id);
-    
-    const career = jobs_.find((j) => j.id == p.career_id);
-    return {
-      id: p.career_id,
-      career_owner: p.career_owner,
-      created_at: p.created_at,
-      name: p.name,
-      detail: p.proposal,
-      sender: p.sender,
-      location: p.sender_location,
-      flag: career?.flag,
-      title: career?.title,
-    };
-  });
-
-  // ✅ set once
-  setProposal_ids(proposalIds);
-  setProposals(fullProposal);
-};
-
-    const fetchSaved =async()=>{
-      const savedRes =await fetch("/api/saveJob")
-      const {savedJobs,data} = await savedRes.json()
-      console.log(savedJobs,"hi bekam ",data)
-      savedJobs.forEach(s => {
-        setSaved_ids((prev)=>[...prev,s.career_id])
+      // ✅ set once
+      setJobs(jobs_);
+      const prop_res = await fetch("/api/proposal/?role=employee", {
+        cache: "no-store",
       });
 
-      setSavedJobs([...data])
-    }
-    fetchSaved()
+      const props = await prop_res.json();
+      const proposalIds: number[] = [];
+
+      const fullProposal = props.data.map((p) => {
+        proposalIds.unshift(p.career_id);
+
+        const career = jobs_.find((j) => j.id == p.career_id);
+        return {
+          id: p.career_id,
+          career_owner: p.career_owner,
+          created_at: p.created_at,
+          name: p.name,
+          detail: p.proposal,
+          sender: p.sender,
+          location: career?.location,
+          flag: career?.flag,
+          title: career?.title,
+          approval: p.approval,
+          seenStatus: p.seenstatus,
+        };
+      });
+
+      // ✅ set once
+      setProposal_ids(proposalIds);
+      setProposals(fullProposal);
+    };
+
+    const fetchSaved = async () => {
+      const savedRes = await fetch("/api/saveJob");
+      const { savedJobs, data } = await savedRes.json();
+      savedJobs.forEach((s) => {
+        setSaved_ids((prev) => [...prev, s.career_id]);
+      });
+
+      setSavedJobs([...data]);
+    };
+    fetchSaved();
     fethJobs();
-  },[]);
-      const filterd = []
-  function handleFilter(filterType:string,option:string,status:boolean){
-    console.log(status)
-    if(!option || !filterType) return console.log("Invalid filter options");
-     _jobs.forEach((j)=>{
+  }, []);
+  function handleFilter(filterType: string, option: string, status: boolean) {
+    if (!option || !filterType) return;
 
-        const isFiltered = fillteredIds.some((i)=>{ return i==j.id })
-        if(!status){
-        if(isFiltered || j[filterType] != option) return;
-        console.log(j)
-        setFiltereIds((prev)=>{return[j.id,...prev]})
-        setFilteredJob((prev)=>{return [j,...prev]})
-        filterd.push(j)
-     } else {
+    setFilteredJobs((prev) => {
+      if (status) {
+        // ADD filter
 
-     }
-  })
+        return [
+          ..._jobs.filter((j) => j[filterType] === option && !prev.includes(j)),
+          ...prev,
+        ];
+      } else {
+        // REMOVE filter
+
+        return prev.filter((j) => j[filterType] !== option);
+      }
+    });
   }
 
+  const jobsToRender = filteredJobs.length > 0 ? filteredJobs : _jobs;
   return (
     <div className="w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-[#f6f9fc] md:fixed">
       <aside
         className={`w-full h-full md:w-70 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 bg-white ${(route == "appliedJobs" || route == "savedJobs") && "hidden"}`}
       >
-        <h1 className="w-full py-3 h-fit bg-sky-500 text-white text-2xl text-center font-bold md:rounded-t">
+        <h1 className="w-full py-3 h-fit bg-sky-600 text-white text-2xl text-center font-bold md:rounded-t">
           {" "}
           Land Your Job
         </h1>
@@ -457,15 +492,17 @@ const Employee = () => {
                   <label
                     key={i}
                     className="flex cursor-pointer items-center gap-2 text-sm font-medium"
-                    onClick={()=>{handleFilter("catagory",job.title)}}
                   >
                     <input
-                      onChange={(e) =>{ toggleCheckbox("catagory", job.id); handleFilter("catagory",job.title,e.target.checked)}}
+                      onChange={(e) => {
+                        toggleCheckbox("catagory", job.id);
+                        handleFilter("catagory", job.title, e.target.checked);
+                      }}
                       type="checkbox"
                       value={job.title}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90"></i>
                     </span>
                     {job.title}
@@ -494,12 +531,15 @@ const Employee = () => {
                     className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                   >
                     <input
-                      onChange={() => toggleCheckbox("catagory", c.id)}
+                      onChange={(e) => {
+                        toggleCheckbox("catagory", c.id);
+                        handleFilter("location", c.name, e.target.checked);
+                      }}
                       type="checkbox"
                       value={c.name}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
                     <Image
@@ -535,12 +575,15 @@ const Employee = () => {
                     className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                   >
                     <input
-                      onChange={() => toggleCheckbox("catagory", t.id)}
+                      onChange={(e) => {
+                        toggleCheckbox("catagory", t.id);
+                        handleFilter("jobtype", t.name, e.target.checked);
+                      }}
                       type="checkbox"
                       value={t.title}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
                     {t.name}
@@ -569,12 +612,15 @@ const Employee = () => {
                     className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                   >
                     <input
-                      onChange={() => toggleCheckbox("catagory", range.id)}
+                      onChange={(e) => {
+                        toggleCheckbox("catagory", range.id);
+                        handleFilter("jobtype", range.label, e.target.checked);
+                      }}
                       type="checkbox"
                       value={range.label}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
-                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-500 flex items-center justify-center">
+                    <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
                     {range.label}
@@ -590,19 +636,25 @@ const Employee = () => {
         <div className="w-full h-full">
           {selectedJob ? (
             <JobDetailsPanel
-             setSavedJobs={setSavedJobs}
+              setSavedJobs={setSavedJobs}
               setSaved_ids={setSaved_ids}
               saved_ids={saved_ids}
               setProposal_ids={setProposal_ids}
               proposals={proposals}
               setProposals={setProposals}
               proposal_ids={proposal_ids}
-              job={()=>_jobs.find((j)=>j.id==selectedJob)}
+              job={() =>
+                _jobs.find((j) => {
+                  return j.id == selectedJob;
+                })
+              }
               setJobdetail={setJobdetail}
             />
           ) : (
             <>
-              <table className={`w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden`}>
+              <table
+                className={`w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden`}
+              >
                 <thead className="border-b border-b-gray-300 px-7">
                   <tr>
                     <th className="text-left text-sm font-medium px-4 py-2">
@@ -618,30 +670,29 @@ const Employee = () => {
                 </thead>
                 <tbody>
                   {route == null &&
-                  
-                    _jobs.map((p, i) => (
-                        
+                    jobsToRender.map((p, i) => (
                       <tr
-                        onClick={() => setJobdetail(p.id)}
+                        onClick={() => {
+                          setJobdetail(p.id);
+                        }}
                         key={i}
                         className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
-                      >{console.log(p,p.id)}
+                      >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
                           {p.title}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
                             {
-                            <Image
-                              src={p.flag}
-                              alt={p.location + " flag"}
-                              fill
-                              sizes="20px"
-                              className="object-contain"
-                            />
-                          }
-                            </div>
-                            {" "}
+                              <Image
+                                src={p.flag}
+                                alt={p.location + " flag"}
+                                fill
+                                sizes="20px"
+                                className="object-contain"
+                              />
+                            }
+                          </div>{" "}
                           {p.location}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -663,16 +714,15 @@ const Employee = () => {
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
                             {
-                                
-                            <Image
-                              src={p.flag}
-                              alt={p.location + " flag"}
-                              fill
-                              sizes="20px"
-                              className="object-contain"
-                            />
-                          }
-                            </div>{" "}
+                              <Image
+                                src={p.flag}
+                                alt={p.location + " flag"}
+                                fill
+                                sizes="20px"
+                                className="object-contain"
+                              />
+                            }
+                          </div>{" "}
                           {p.location}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -680,7 +730,7 @@ const Employee = () => {
                         </td>
                       </tr>
                     ))}
-                  {route == 'savedJobs' &&
+                  {route == "savedJobs" &&
                     savedJobs.map((p, i) => (
                       <tr
                         onClick={() => setJobdetail(p.id)}
@@ -693,15 +743,15 @@ const Employee = () => {
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
                             {
-                            <Image
-                              src={p.flag}
-                              alt={p.location + " flag"}
-                              fill
-                              sizes="20px"
-                              className="object-contain"
-                            />
-                          }
-                            </div>
+                              <Image
+                                src={p.flag}
+                                alt={p.location + " flag"}
+                                fill
+                                sizes="20px"
+                                className="object-contain"
+                              />
+                            }
+                          </div>
                           {p.location}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -709,7 +759,6 @@ const Employee = () => {
                         </td>
                       </tr>
                     ))}
-                  
                 </tbody>
               </table>
             </>

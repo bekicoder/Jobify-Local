@@ -5,29 +5,30 @@ import jwt from "jsonwebtoken"
 
 export async function POST(req:NextRequest){
     try{
-    const fd =await req.formData()
-    const email = fd.get("email")
-    const password = fd.get("password")
+    const {email,password,type} =await req.json()
     const hashePass = await bcrypt.hash(password,10)
-    const {rows} =await db.query("select * from users where email = $1;",[email])
+    const tableName = type == "employer" ? "organizations" : type == "employee" && "users";
+    const {rows} =await db.query(`select * from ${tableName} where email = $1;`,[email])
+    const column_name = type == "employee" ? "name" : type == "employer" && "orgname"
     const user = rows[0]
-        if(rows.length = 0){
-        return NextResponse.json({message:"user don't exist"},{status:401})
+        if(rows.length == 0 ){
+        return NextResponse.json({message:`don't exist`},{status:500})
     }
     
-    const isMatch =await bcrypt.compare(password,user.password)
+    const isMatch = await bcrypt.compare(password,user.password)
 
     if(!isMatch){
         return NextResponse.json({message:"Unauthorized"},{status:401})
     }
     
-    const response = NextResponse.redirect(
-    new URL("/", req.nextUrl.origin)
-  );
+    const response = NextResponse.json(
+      {message:"successful"},
+      {status:200}
+      );
   
   
  const token = jwt.sign(
-         {id:user.id,name:user.name,email:user.email,role:user.role,profile:user.profile,location:user.location,flag:user.flag},
+         {id:user.id,name:user[column_name],email:user.email,profile:user.profile,location:user.location,flag:user.flag},
              process.env.JWT_SECRET!,{expiresIn:"7d"}
        )
 

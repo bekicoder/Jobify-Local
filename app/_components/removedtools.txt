@@ -1,0 +1,10 @@
+<p className="text-center mt-1">Or</p>
+      <button className="w-full rounded-full mt-1 border py-2 flex hover:bg-[#0a2540] hover:text-white cursor-pointer justify-center items-center gap-3">
+        Google
+        <Image
+          src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
+          width={20}
+          height={20}
+          alt="google logo"
+        />
+      </button>

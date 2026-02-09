@@ -1498,7 +1498,7 @@ export default Jobs;
                   <a>1</a>
                   <a>2</a>
                   <a>3</a>
-                  <a className=" w-8 bg-sky-500 text-white h-8 rounded-full flex pt-0.5 justify-center">
+                  <a className=" w-8 bg-sky-600 text-white h-8 rounded-full flex pt-0.5 justify-center">
                     4
                   </a>
                   <a>5</a>
