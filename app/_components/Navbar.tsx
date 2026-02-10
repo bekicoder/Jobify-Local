@@ -12,44 +12,60 @@ export default function NavBar() {
     email: string;
     role: string;
     profile: string;
+    location:string;
+    flag:string;
   }
+  type Language = {
+  id: number;
+  language: string;
+  short_name: string;
+};
+
   const pathname = usePathname();
   const [hovered, setHovered] = useState<boolean>(false);
   const [user, setUser] = useState<accountType | null>(null);
   const [profileShow, setprofileShow] = useState<boolean>(false);
   const [contents,setContent] = useState<ContentType>()
-  const [languages,setLanguages] = useState()
-  const [lang,setLang] = useState<string>("english")
+  const [languages,setLanguages] = useState([])
+  const [lang,setLang] = useState<number>(1)
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
+  const loadContent = async () => {
     const selectedLang = localStorage.getItem("lang");
-    if(!selectedLang){
-      setContent(Contents(35))
-      setLang("english")
-      return localStorage.setItem("lang",35)
+
+    if (!selectedLang) {
+      const content = await Contents(1); // ✅ await the Promise
+      setContent(content);               // now it's ContentType
+      setLang(1);
+      localStorage.setItem("lang", "1");
+    } else {
+      const content = await Contents(Number(selectedLang));
+      setContent(content);
     }
-    setContent(Contents(selectedLang))
 
-    console.log(selectedLang,"became how old are you",Contents(selectedLang))
-
+    // Fetch other data
     const fetchData = async () => {
       const resL = await fetch("/api/languages");
       const langs = await resL.json();
-      setLanguages(langs)
-      console.log(langs);
+      setLanguages(langs);
 
       const res = await fetch("/api/users/");
       const data = await res.json();
-      if (data.message == "Unauthorized") return;
+      if (data.message === "Unauthorized") return;
       setUser(data);
     };
     fetchData();
-  }, []);
+  };
 
-  const dropdownRef = useRef();
+  loadContent(); // call the async wrapper
+}, []);
+
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
    useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event:MouseEvent) => {
+      const target = event.target as Node
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setIsOpen(false);
       }
     };
@@ -57,9 +73,9 @@ export default function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleTranslation(lang){
+  function handleTranslation(lang:number){
     console.log("the selected language is",lang)
-    localStorage.setItem("lang",lang)
+    localStorage.setItem("lang",String(lang))
     return window.location.reload()
   }
   return (
@@ -120,7 +136,7 @@ export default function NavBar() {
       {/* Dropdown list */}
       {isOpen && (
         <ul className="absolute mt-2 w-56 bg-white shadow-lg border rounded z-50 max-h-60 overflow-auto">
-          {languages.map((language) => (
+          {languages && languages.map((language:Language) => (
             <li
               key={language.id}
               className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"

@@ -1,16 +1,30 @@
 "use client"
 import Contents from "./Contents";
 import { useState,useEffect } from "react";
+import { ContentType } from "./Contents";
 export default function Footer() {
   const [contents,setContent] = useState<ContentType>()
-    
-  useEffect(()=>{
-    const selectedLang = localStorage.setItem("lang", "english");
-    if(!selectedLang){
-      setContent(Contents("english"))
-      localStorage.setItem("lang",35)
-    }
-  },[])
+  const [lang, setLang] = useState<string>("english");
+  
+  // Load language content
+
+  useEffect(() => {
+    const loadContent = async () => {
+      const selectedLang = localStorage.getItem("lang");
+
+      if (!selectedLang) {
+        const content = await Contents(1); // default language
+        setContent(content);
+        setLang("english");
+        localStorage.setItem("lang", "1");
+      } else {
+        const content = await Contents(Number(selectedLang));
+        setContent(content);
+      }
+    };
+
+    loadContent();
+  }, []);
   return (
     <footer className="bg-[#0a2540] text-white mt-24">
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">

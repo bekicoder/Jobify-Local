@@ -24,7 +24,7 @@ export async function POST(req:NextRequest){
 ];
       const hashedPass = await bcrypt.hash(password,10)
       const name = role == "employee" ? fname + " " + lname : role == "employer" && orgname
-      const column_name = role == "employee" ? "name" : role == "employer" && "orgname"
+      const column_name = role == "employer" ? "orgname" : "name"
       const randomColor = profileColors[Math.floor(Math.random() * profileColors.length)]
       const sql = `INSERT INTO ${tableName} (${column_name},email, password,profile,location,flag) values($1,$2,$3,$4,$5,$6) RETURNING *`
       const result =await db.query(sql,[name,email,hashedPass,randomColor,location,flag])

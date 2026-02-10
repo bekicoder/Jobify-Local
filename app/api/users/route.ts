@@ -1,5 +1,5 @@
 import { NextResponse,NextRequest } from "next/server";
-import jwt  from "jsonwebtoken";
+import jwt,{JwtPayload}  from "jsonwebtoken";
  
 export async function GET(req:NextRequest) {
   try{
@@ -7,7 +7,8 @@ export async function GET(req:NextRequest) {
   if(!token){
     return NextResponse.json({message:"Unauthorized"},{status:401})
   }
-    const decoded = jwt.verify(token,process.env.JWT_SECRET!)
+    const userData = jwt.verify(token,process.env.JWT_SECRET!);
+   const decoded = userData as JwtPayload
       const {id,...data} = decoded;
       console.log(decoded)
     return NextResponse.json({...data});

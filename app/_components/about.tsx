@@ -5,14 +5,28 @@ import Image from "next/image";
 import { ContentType } from "./Contents";
 const About = () => {
   const [contents,setContent] = useState<ContentType>()
-    
-  useEffect(()=>{
-    const selectedLang = localStorage.setItem("lang", "english");
-    if(!selectedLang){
-      setContent(Contents("english"))
-      localStorage.setItem("lang",35)
-    }
-  },[])
+  const [lang, setLang] = useState<string>("english");
+  
+  // Load language content
+
+  useEffect(() => {
+    const loadContent = async () => {
+      const selectedLang = localStorage.getItem("lang");
+
+      if (!selectedLang) {
+        const content = await Contents(1); // default language
+        setContent(content);
+        setLang("english");
+        localStorage.setItem("lang", "1");
+      } else {
+        const content = await Contents(Number(selectedLang));
+        setContent(content);
+      }
+    };
+
+    loadContent();
+  }, []);
+
   return (
     <div>
       <div className="bg-[url('/cubes.png')] bg-sky-50 bg-repeat bg-gray-5 ">

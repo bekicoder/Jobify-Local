@@ -1,22 +1,49 @@
 "use client";
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
+import React,{ FormEvent, useEffect, useState,SetStateAction } from "react";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { proposalType } from "../dashboard/page";
+type jobType = {
+    id: number;
+    catagory: string;
+    created_at: string;
+    detail: string;
+    flag: string;
+    jobtype: string;
+    location: string;
+    posted_by: string;
+    salary_range: string;
+    title:string;
+    updated_at:string;
+
+  };
+  
+interface DetailsPanelType{
+  proposal_ids:number[];
+  job:()=>jobType;
+  setJobdetail:React.Dispatch<SetStateAction<number | null>>
+  proposals:proposalType[]
+  setProposal_ids:React.Dispatch<SetStateAction<number[]>>
+  saved_ids:number[];
+  setSaved_ids:React.Dispatch<SetStateAction<number[]>>
+  setSavedJobs:React.Dispatch<SetStateAction<jobType[]>>
+}
+
+
 const JobDetailsPanel = ({
   proposal_ids,
-  job: jobDetail,
+  job:jobDetail,
   setJobdetail,
-  setProposals,
   proposals,
   setProposal_ids,
   saved_ids,
   setSaved_ids,
   setSavedJobs,
-}) => {
-  const job = jobDetail();
+}:DetailsPanelType) => {
+  const job = jobDetail()
   const [opend, setOpend] = useState<boolean>(false);
+  console.log(job)
   const date = job.created_at.split(" ");
   const [isSaved, setSaved] = useState<boolean>(
     saved_ids.some((s) => s == job.id),
@@ -24,7 +51,9 @@ const JobDetailsPanel = ({
   const proposal = proposals.find((p) => {
     return p.id == job.id;
   });
-  const [approved, setApproved] = useState<string>(proposal?.approval);
+  console.log(proposal,"hi beki")
+  const [approved, setApproved] = useState<string | undefined>(proposal?.approval);
+  
   const handleSave = async () => {
     const save = await fetch("/api/saveJob", {
       method: "POST",
@@ -44,16 +73,16 @@ const JobDetailsPanel = ({
     }
   };
 
-  const [isApplied, setApplied] = useState();
+  
   const appliedId = proposal_ids.some((p) => {
     return p == job.id;
   });
-  useEffect(() => {
-    setApplied(appliedId);
-  }, []);
+  const [isApplied,setApplied] = useState<boolean>(appliedId);
+  
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.target);
+    const target = e.target as HTMLFormElement
+    const fd = new FormData(target);
     const article = fd.get("article");
     const res = await fetch("/api/proposal", {
       method: "POST",
@@ -68,13 +97,12 @@ const JobDetailsPanel = ({
     });
     const _res = await res.json();
     if (_res.msg === "successful") {
-      e.target.reset();
+      target.reset();
       setOpend(false);
       const data = await fetch(`/api/proposal?id=${_res.id}`);
       const updatedData = await data.json();
       setProposal_ids((prev) => [_res.id, ...prev]);
       setApplied(_res.id);
-      console.log(updatedData);
       setApproved(updatedData.data.approval);
     }
   }
@@ -183,7 +211,7 @@ const JobDetailsPanel = ({
           </div>
           &nbsp;&nbsp;• {job.jobtype} &nbsp;&nbsp;
           <span
-            className={`w-2 h-2 rounded-full block ${!proposal?.seenStatus && approved ? "bg-red-500" : approved && "bg-green-500"} my-auto mt-2 `}
+            className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-red-500" : approved && "bg-green-500"} my-auto mt-2 `}
           ></span>
         </span>
         <span className="text-sm">
@@ -206,18 +234,8 @@ const JobDetailsPanel = ({
 const Employee = () => {
   const searchParams = useSearchParams();
   const route = searchParams.get("route");
-  type _jobs = {
-    id: number;
-    career: string;
-    location: string;
-    jobType: string;
-    flag: string;
-    releaseDate: string;
-    category: string;
-    income: string;
-    details: string;
-  };
-  const [_jobs, setJobs] = useState([]);
+  
+  const [_jobs, setJobs] = useState<jobType[]>([]);
 
   type JobCategory = {
     id: number;
@@ -352,8 +370,8 @@ const Employee = () => {
   const [selectedJob, setJobdetail] = useState<number | null>();
   const [account, setAccount] = useState<accountType | null>(null);
   const [proposals, setProposals] = useState([]);
-  const [proposal_ids, setProposal_ids] = useState([]);
-  const [savedJobs, setSavedJobs] = useState([]);
+  const [proposal_ids, setProposal_ids] = useState<number[]>([]);
+  const [savedJobs, setSavedJobs] = useState<jobType[]>([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [saved_ids, setSaved_ids] = useState<number[]>([]);
 
@@ -378,7 +396,7 @@ const Employee = () => {
     const fethJobs = async () => {
       const jobCount = await fetch("/api/jobs");
       const { count } = await jobCount.json();
-      const jobs_: any[] = [];
+      const jobs_: jobType[] = [];
       for (let i = 1; i <= count; i++) {
         const res = await fetch("/api/jobs", {
           method: "POST",
@@ -390,8 +408,6 @@ const Employee = () => {
         const job = await res.json();
         jobs_.unshift(job);
       }
-
-      // ✅ set once
       setJobs(jobs_);
       const prop_res = await fetch("/api/proposal/?role=employee", {
         cache: "no-store",
@@ -400,7 +416,7 @@ const Employee = () => {
       const props = await prop_res.json();
       const proposalIds: number[] = [];
 
-      const fullProposal = props.data.map((p) => {
+      const fullProposal = props.data.map((p:proposalType) => {
         proposalIds.unshift(p.career_id);
 
         const career = jobs_.find((j) => j.id == p.career_id);
@@ -419,16 +435,15 @@ const Employee = () => {
         };
       });
 
-      // ✅ set once
       setProposal_ids(proposalIds);
       setProposals(fullProposal);
     };
 
     const fetchSaved = async () => {
       const savedRes = await fetch("/api/saveJob");
-      const { savedJobs, data } = await savedRes.json();
-      savedJobs.forEach((s) => {
-        setSaved_ids((prev) => [...prev, s.career_id]);
+      const { savedJobs:savedJobs_, data } = await savedRes.json();
+      savedJobs_.forEach((s:{id:number;career_id:string;}) => {
+        setSaved_ids((prev) => [...prev, Number(s.career_id)]);
       });
 
       setSavedJobs([...data]);

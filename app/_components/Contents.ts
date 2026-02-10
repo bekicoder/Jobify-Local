@@ -173,6 +173,7 @@ const Contents = async (lang:number) => {
     console.log("it is not english",lang,targetLang,typeof(targetLang))
      const translatedContent = await translateContent(content, targetLang);
      console.log(translatedContent)
+     return content
   }
 };
 

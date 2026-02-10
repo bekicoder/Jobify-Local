@@ -1,8 +1,6 @@
 import { NextResponse,NextRequest } from "next/server";
 import {pool as db } from "@/lib/db"
-import jwt from "jsonwebtoken"
-import { decode } from "punycode";
-import { error } from "console";
+import jwt, { JwtPayload } from "jsonwebtoken"
 
 export async function POST(req:NextRequest) {
     const token = req.cookies.get("jobify-token")?.value
@@ -17,7 +15,8 @@ export async function POST(req:NextRequest) {
     )
    }
   try{
-    const decoded =await jwt.verify(token,process.env.JWT_SECRET!);
+    const data = jwt.verify(token,process.env.JWT_SECRET!);
+    const decoded = data as JwtPayload
     if(decoded.role !=="employer"){
     return NextResponse.json({error:"Unauthorized"},{status:401})
     }

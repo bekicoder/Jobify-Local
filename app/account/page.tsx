@@ -1,9 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import React,{ FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-const SignUp = ({ setOpen }) => {
+interface propType{
+  setOpen:React.Dispatch<React.SetStateAction<string>>
+}
+const SignUp = ({ setOpen}:propType) => {
   type locations = {
     id: number;
     name: string;
@@ -115,9 +118,10 @@ const SignUp = ({ setOpen }) => {
       setOpenedMenu(menu);
     }
   }
-  async function handleSibmit(e) {
+  async function handleSibmit(e:FormEvent) {
     e.preventDefault();
-    const fd = new FormData(e.target);
+    const target = e.target as HTMLFormElement
+    const fd = new FormData(target);
     const fdObj = Object.fromEntries(fd.entries());
     console.log(fdObj);
     const res = await fetch("/api/signup", {
@@ -329,41 +333,7 @@ const SignUp = ({ setOpen }) => {
             </label>
           </div>
         </div>
-        {/*
-        <div className="flex justify-between">
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
-            <input
-              name="type"
-              onChange={() => toggleRoleCheckbox("employer")}
-              type="checkbox"
-              value={type.role}
-              className="peer sr-only"
-              required={type.role === "employer" || type == null}
-            />
-            <span
-              className={`w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 rounded block ${type.role == "employer" && "bg-sky-600 text-white"} flex items-center justify-center`}
-            >
-              <i className="fa-solid fa-check scale-90"></i>
-            </span>
-            Emloyer
-          </label>
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
-            <input
-              name="type"
-              onChange={() => toggleRoleCheckbox("employee")}
-              type="checkbox"
-              value={type.role}
-              className="peer sr-only"
-              required={type.role === "employee" || type == null}
-            />
-            <span
-              className={`w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 ${type.role == "employee" && "text-white"} rounded block ${type.role == "employee" && "bg-sky-600"} flex items-center justify-center`}
-            >
-              <i className="fa-solid fa-check scale-90"></i>
-            </span>
-            Emloyee
-          </label>
-        </div>*/}
+  
         {warring === "already exist" && (
           <p>
             allready &nbsp;
@@ -396,7 +366,8 @@ const SignUp = ({ setOpen }) => {
   );
 };
 
-const SignIn = ({ setOpen }) => {
+
+const SignIn = ({ setOpen }:propType) => {
   const [type, setType] = useState<string>();
   const [eye, setEye] = useState(false);
   const [warring, setWarrning] = useState<string>();
@@ -419,9 +390,10 @@ const SignIn = ({ setOpen }) => {
       setOpenedMenu(menu);
     }
   }
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:FormEvent) => {
     e.preventDefault();
-    const fd = new FormData(e.target);
+    const target = e.target as HTMLFormElement
+    const fd = new FormData(target);
     const fdObj = Object.fromEntries(fd.entries());
     console.log(fdObj, type);
     const res = await fetch("/api/signin", {

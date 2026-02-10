@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from "next/server";
 import { pool as db } from "@/lib/db";
-import  jwt  from "jsonwebtoken";
+import  jwt,{JwtPayload}  from "jsonwebtoken";
 
 export async function GET(req:NextRequest){
     try{
@@ -15,7 +15,8 @@ export async function GET(req:NextRequest){
         const { rows } = await db.query("select * from proposals where id = $1;",[id])
         return NextResponse.json({data:rows[0]},{status:200})
     }
-    const decoded = await jwt.verify(token,process.env.JWT_SECRET!)
+    const data = jwt.verify(token,process.env.JWT_SECRET!);
+    const decoded = data as JwtPayload;
     console.log(decoded)
     const sql = `select * from proposals where ${role == "employer" ? "career_owner" : "sender" } = $1 order by id desc;`
     const {rows} = await db.query(sql,[decoded.email])
@@ -40,7 +41,8 @@ export async function POST(req:NextRequest){
     if(!token){
         return NextResponse.json({error:"Unauthorized"},{status:401})
     }
-    const decoded = await jwt.verify(token,process.env.JWT_SECRET!)
+    const data = jwt.verify(token,process.env.JWT_SECRET!);
+    const decoded = data as JwtPayload;
     const values = [decoded.name,decoded.email,decoded.location,proposal.id,proposal.article,proposal.owner,decoded.flag]
     console.log(values)
     const {rows} = await db.query("insert into proposals (name,sender,sender_location,career_id,proposal,career_owner,sender_flag) values($1,$2,$3,$4,$5,$6,$7) RETURNING id;",values)

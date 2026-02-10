@@ -3,16 +3,28 @@ import {useState,useEffect} from "react"
 import Contents from "./Contents";
 import { ContentType } from "./Contents";
 
-const Stats = () => {
-  const [contents,setContent] = useState<ContentType>()
-    
-  useEffect(()=>{
-    const selectedLang = localStorage.setItem("lang", "english");
-    if(!selectedLang){
-      setContent(Contents("english"))
-      localStorage.setItem("lang",35)
+const Stats = () => {    
+  const [contents, setContent] = useState<ContentType | null>(null);
+  const [lang, setLang] = useState<string>("english");
+
+  // Load language content
+  useEffect(() => {
+  const loadContent = async () => {
+    const selectedLang = localStorage.getItem("lang");
+
+    if (!selectedLang) {
+      const content = await Contents(1); // default language
+      setContent(content);
+      setLang("english");
+      localStorage.setItem("lang", "1");
+    } else {
+      const content = await Contents(Number(selectedLang));
+      setContent(content); // now safe, always ContentType
     }
-  },[])
+  };
+
+  loadContent();
+}, []);
   return (
     <div className=" flex flex-col md:flex-row justify-center items-center gap-8 px-4">
       {/* Jobs Posted */}

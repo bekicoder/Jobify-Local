@@ -1,8 +1,78 @@
 "use client";
-import { FormEvent, use, useEffect, useState } from "react";
+import React,{ FormEvent, use, useEffect, useState ,SetStateAction} from "react";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { Route } from "next/";
+interface _Fd{
+      jobType: string;
+      catagory: string;
+      range: string;
+      detail: string;
+      title: string;
+}
+
+interface _myjobsType{
+  id:string;
+  location:string;
+  jobtype:string;
+  flag:string;
+  created_at:string;
+  catagory:string;
+  salary_range:string;
+  detail:string;
+  title:string;
+  posted_by:string;
+  updated_at:string;
+  approval:string;
+  name:string;
+  career_owner:string;
+  seenStatus:boolean;
+  sender:string;
+  career_id:string;
+}
+interface DetailsPanelType{
+  option:string;
+  job:_myjobsType;
+  setJobdetail:React.Dispatch<SetStateAction<number | null>>;
+  setPage:React.Dispatch<SetStateAction<string | null>>;
+  setFd:React.Dispatch<SetStateAction<_Fd>>;
+  setEdit:React.Dispatch<SetStateAction<number | null>>;
+}
+interface _jobs {
+    id: number;
+    title: string;
+    location: string;
+    jobType: string;
+    flag: string;
+    created_at: string;
+    category: string;
+    salary_range: string;
+    detail: string;
+  };
+interface createJobsParamsType{
+  setjobs:React.Dispatch<SetStateAction<_jobs[]>>;
+  setPage:React.Dispatch<SetStateAction<string | null>>;
+  setFd:React.Dispatch<SetStateAction<_Fd>>;
+  setEdit:React.Dispatch<SetStateAction<number | null>>;
+  fd:_Fd
+  edit:number | null
+  setMyjobs:React.Dispatch<SetStateAction<_myjobsType[]>>
+  setJobdetail:React.Dispatch<SetStateAction<number | null>>
+}
+export interface proposalType{
+  id:number;
+  name:string;
+  approval:string;
+  career_id:string;
+  career_owner:string;
+  created_at:string;
+  detail:string;
+  seenstatus:string;
+  sender:string;
+  flag:string;
+  location:string;
+  title:string
+}
 const JobDetailsPanel = ({
   option,
   job,
@@ -10,7 +80,8 @@ const JobDetailsPanel = ({
   setPage,
   setFd,
   setEdit,
-}) => {
+}:DetailsPanelType) => {
+  console.log("cheack this job",job)
   const [approval, setApproval] = useState<string>(job.approval);
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
@@ -25,7 +96,7 @@ const JobDetailsPanel = ({
     });
     setPage("createJob");
     setJobdetail(null);
-    setEdit(job.id);
+    setEdit(Number(job.id));
   };
   async function handleApproval(status: boolean) {
     const res = await fetch("/api/approval", {
@@ -145,17 +216,14 @@ const JobDetailsPanel = ({
 };
 
 const CreateJobs = ({
-  setjobs,
   fd,
   setFd,
   edit,
   setEdit,
   setMyjobs,
   setPage,
-  setJobdetail,
-  myJobs,
-}) => {
-  let [openedMenu, setOpenedMenu] = useState<string | null>();
+}:createJobsParamsType) => {
+  const [openedMenu, setOpenedMenu] = useState<string | null>();
 
   //job types
   type job_types = {
@@ -209,20 +277,13 @@ const CreateJobs = ({
     { id: 7, label: "$7,000 – $10,000" },
     { id: 8, label: "$10,000+" },
   ];
-  function toggleMenu(e: React.MouseEvent<HTMLElement>, menu: string) {
+  function toggleMenu(e: React.FocusEvent<HTMLDivElement, Element> | React.MouseEvent<HTMLDivElement, MouseEvent>, menu: string) {
     if (e.type == "blur" || openedMenu == menu) {
       setOpenedMenu(null);
     } else {
       setOpenedMenu(menu);
     }
   }
-  type _fd = {
-    jobType: string;
-    catagory: string;
-    range: string;
-    detail: string;
-    title: string;
-  };
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const res = await fetch("/api/createJob", {
@@ -262,7 +323,7 @@ const CreateJobs = ({
           ),
         );
       } else {
-        setMyjobs((prev: []) => [...prev, data_res]);
+        setMyjobs((prev) => [...prev, data_res]);
       }
       setPage("myJobs");
     }
@@ -435,24 +496,14 @@ const CreateJobs = ({
 
 const Employer = () => {
   const [selectedJob, setJobdetail] = useState<number | null>(0);
-  type _jobs = {
-    id: number;
-    title: string;
-    location: string;
-    jobType: string;
-    flag: string;
-    created_at: string;
-    category: string;
-    salary_range: string;
-    detail: string;
-  };
+  
   const [page, setPage] = useState<string | null>("proposals");
   const [jobs, setJobs] = useState<_jobs[]>([]);
-  const [myJobs, setMyjobs] = useState([]);
+  const [myJobs, setMyjobs] = useState<_myjobsType[]>([]);
   const [edit, setEdit] = useState<number | null>(null);
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
-  const [fd, setFd] = useState<_fd>({
+  const [fd, setFd] = useState({
     jobType: "",
     catagory: "",
     range: "",
@@ -469,9 +520,23 @@ const Employer = () => {
         cache: "no-store",
       });
       const props = await prop_res.json();
-      const fullProposal = props.data.map((p) => {
-        const proposed_job = _Myjobs.data.filter((j) => {
-          return j.id == p.career_id;
+      const fullProposal = props.data.map((p:{
+  id:number;
+  name:string;
+  approval:string;
+  career_id:string;
+  career_owner:string;
+  created_at:string;
+  proposal:string;
+  seenstatus:string;
+  sender:string;
+  sender_flag:string;
+  sender_location:string;
+  title:string
+}) => {
+        console.log(p)
+        const proposed_job = _Myjobs.data.filter((j:proposalType) => {
+          return j.id == Number(p.career_id);
         });
         return {
           id: p.id,
@@ -504,7 +569,7 @@ const Employer = () => {
     fetchData();
   }, []);
 
-  async function handleSeen(jobid_, status) {
+  async function handleSeen(jobid_:number, status:proposalType) {
     if (!status) {
       const seenRes = await fetch("/api/seenStatus", {
         method: "POST",
@@ -567,7 +632,6 @@ const Employer = () => {
       <div className="md:px-5 pb-5 w-full md:px-24 overflow-auto relative bg-gray-100 overflow-auto">
         {page == "createJob" && (
           <CreateJobs
-            myJobs={myJobs}
             setJobdetail={setJobdetail}
             setPage={setPage}
             setMyjobs={setMyjobs}
@@ -578,49 +642,7 @@ const Employer = () => {
             setEdit={setEdit}
           />
         )}
-        {/*page == "proposals" && <div className="w-full">
-    
-               {selectedJob ? <JobDetailsPanel job={jobs[selectedJob-1]} setJobdetail={setJobdetail}/> : (
-                <>
-                <table className="w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden">
-                
-                <thead className="border-b border-b-gray-300 px-7">
-                    <tr>
-                        <th className="text-left text-sm font-medium px-4 py-2">Careers</th>
-                        <th className="text-left text-sm font-medium px-4 py-2">Location</th>
-                        <th className="text-left text-sm font-medium px-4 py-2">Job Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        jobs.map((p,i)=>(
-                            <tr onClick={()=>setJobdetail(p.id)} key={i} className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer">
-                               <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">{p.career}</td>
-                               <td className="text-left text-sm px-4 py-2 flex items-center gap-2">{<Image width={20} height={20} src={p.flag} alt={p.location + " flag"} className="h-fit aspect-video"/>} {p.location}</td>
-                               <td className="text-left text-sm px-4 py-1">{p.jobType}</td>
-                            </tr>
-                        ))
-                    }
-                    
-                </tbody>
-                </table>
-    
-                <div className="flex justify-center mt-5 text-[18px] font-medium text-indigo-500 gap-4 cursor-pointer">
-                <a>1</a>
-                <a>2</a>
-                <a>3</a>
-                <a className=" w-8 bg-sky-600 text-white h-8 rounded-full flex pt-0.5 justify-center">4</a>
-                <a>5</a>
-                <a>6</a>
-                <a>7</a>
-                <a>8</a>
-                <button className="text-black">Next</button>
-                </div>
-                </>
-                
-               )
-                }
-                </div> */}
+
         {page == "myJobs" && (
           <div className="w-full h-full">
             {selectedJob ? (
@@ -629,8 +651,7 @@ const Employer = () => {
                 job={myJobs[selectedJob - 1]}
                 setJobdetail={setJobdetail}
                 setPage={setPage}
-                setFd={setFd}
-              />
+                setFd={setFd} option={""}              />
             ) : (
               <>
                 <table className="w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden">
@@ -648,7 +669,7 @@ const Employer = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {myJobs.map((p, i) => (
+                    {myJobs.map((p:_myjobsType, i) => (
                       <tr
                         onClick={() => {
                           setJobdetail(i + 1);
@@ -691,6 +712,8 @@ const Employer = () => {
                 job={proposals[selectedJob - 1]}
                 setJobdetail={setJobdetail}
                 setPage={setPage}
+                setFd={setFd}
+                setEdit={setEdit}
               />
             ) : (
               <>
@@ -709,7 +732,7 @@ const Employer = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {proposals.map((p, i) => (
+                    {proposals.map((p:proposalType, i) => (
                       <tr
                         onClick={() => {
                           setJobdetail(i + 1);

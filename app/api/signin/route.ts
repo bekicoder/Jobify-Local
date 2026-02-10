@@ -9,7 +9,7 @@ export async function POST(req:NextRequest){
     const hashePass = await bcrypt.hash(password,10)
     const tableName = type == "employer" ? "organizations" : type == "employee" && "users";
     const {rows} =await db.query(`select * from ${tableName} where email = $1;`,[email])
-    const column_name = type == "employee" ? "name" : type == "employer" && "orgname"
+    const column_name = type == "employer" ? "orgname" :  "name"
     const user = rows[0]
         if(rows.length == 0 ){
         return NextResponse.json({message:`don't exist`},{status:500})
@@ -28,7 +28,7 @@ export async function POST(req:NextRequest){
   
   
  const token = jwt.sign(
-         {id:user.id,name:user[column_name],email:user.email,profile:user.profile,location:user.location,flag:user.flag},
+         {id:user.id,name:user[column_name],email:user.email,profile:user.profile,role:type,location:user.location,flag:user.flag},
              process.env.JWT_SECRET!,{expiresIn:"7d"}
        )
 

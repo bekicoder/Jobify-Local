@@ -11,22 +11,23 @@ const Hero = () => {
 
   // Load language content
   useEffect(() => {
-    const loadContent = async () => {
-      const selectedLang = localStorage.getItem("lang");
+  const loadContent = async () => {
+    const selectedLang = localStorage.getItem("lang");
 
-      if (!selectedLang) {
-        const content = await Contents(1); // default language
-        setContent(content);
-        setLang("english");
-        localStorage.setItem("lang", "1");
-      } else {
-        const content = await Contents(Number(selectedLang));
-        setContent(content);
-      }
-    };
+    if (!selectedLang) {
+      const content = await Contents(1); // default language
+      setContent(content);
+      setLang("english");
+      localStorage.setItem("lang", "1");
+    } else {
+      const content = await Contents(Number(selectedLang));
+      setContent(content); // now safe, always ContentType
+    }
+  };
 
-    loadContent();
-  }, []);
+  loadContent();
+}, []);
+
 
   // Load user info
   useEffect(() => {

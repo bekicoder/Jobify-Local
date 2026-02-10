@@ -1,13 +1,14 @@
-import { NextResponse, nextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { pool as db } from "@/lib/db";
-import jwt from "jsonwebtoken";
-export async function GET(req: nextRequest) {
+import jwt,{JwtPayload} from "jsonwebtoken";
+export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("jobify-token")?.value;
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET!);
+    const data = jwt.verify(token,process.env.JWT_SECRET!);
+    const decoded = data as JwtPayload
 
     const { rows } = await db.query(
       "select * from savedJobs where user_id = $1 order by id desc",
@@ -28,7 +29,7 @@ export async function GET(req: nextRequest) {
   }
 }
 
-export async function POST(req: nextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const { jobId: id, saved } = await req.json();
     const token = req.cookies.get("jobify-token")?.value;
@@ -38,8 +39,9 @@ export async function POST(req: nextRequest) {
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET!);
-    const sql = !saved
+const data = jwt.verify(token,process.env.JWT_SECRET!);
+    const decoded = data as JwtPayload   
+     const sql = !saved
       ? "insert into savedJobs (career_id,user_id) values($1,$2) RETURNING career_id;"
       : "delete from savedJobs where career_id=$1;";
     console.log(!saved,"delete from savedJobs where career_id=$1",id)

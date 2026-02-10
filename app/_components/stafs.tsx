@@ -4,17 +4,30 @@ import { title } from "process";
 import Contents from "./Contents";
 import { useState,useEffect } from "react";
 import { Stafs as StafsData } from "./Contents";
+import { ContentType } from "./Contents";
 const Stafs = () => {
   const stafs = StafsData();
-   const [contents,setContent] = useState<ContentType>()
-    
-  useEffect(()=>{
-    const selectedLang = localStorage.setItem("lang", "english");
-    if(!selectedLang){
-      setContent(Contents("english"))
-      localStorage.setItem("lang",35)
+   const [contents, setContent] = useState<ContentType | null>(null);
+  const [lang, setLang] = useState<string>("english");
+
+  // Load language content
+  useEffect(() => {
+  const loadContent = async () => {
+    const selectedLang = localStorage.getItem("lang");
+
+    if (!selectedLang) {
+      const content = await Contents(1); // default language
+      setContent(content);
+      setLang("english");
+      localStorage.setItem("lang", "1");
+    } else {
+      const content = await Contents(Number(selectedLang));
+      setContent(content); // now safe, always ContentType
     }
-  },[])
+  };
+
+  loadContent();
+}, []);
   return (
     <div>
       <strong className="w-full text-center block text-3xl text-[#0a2540] mb-16">
