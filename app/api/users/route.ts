@@ -8,9 +8,8 @@ export async function GET(req:NextRequest) {
     return NextResponse.json({message:"Unauthorized"},{status:401})
   }
     const userData = jwt.verify(token,process.env.JWT_SECRET!);
-   const decoded = userData as JwtPayload
+    const decoded = userData as JwtPayload;
       const {id,...data} = decoded;
-      console.log(decoded)
     return NextResponse.json({...data});
   } catch(err){
     console.log(err)

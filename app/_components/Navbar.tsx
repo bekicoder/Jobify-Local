@@ -3,52 +3,32 @@ import Image from "next/image";
 import { useEffect, useState,useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Acount from "../account/page";
-import Contents from "./Contents";
-import { ContentType } from "./Contents";
+import { useSharedState } from '../SharedStateContext';
 export default function NavBar() {
-  interface accountType {
-    name: string;
-    email: string;
-    role: string;
-    profile: string;
-    location:string;
-    flag:string;
-  }
   type Language = {
   id: number;
   language: string;
-  short_name: string;
+  short_name:string;
 };
 
   const pathname = usePathname();
   const [hovered, setHovered] = useState<boolean>(false);
-  const [user, setUser] = useState<accountType | null>(null);
+  const [user, setUser] = useState<Record<string,string> | null>(null);
   const [profileShow, setprofileShow] = useState<boolean>(false);
-  const [contents,setContent] = useState<ContentType>()
-  const [languages,setLanguages] = useState([])
-  const [lang,setLang] = useState<number>(1)
+  const {content} = useSharedState()
+  const [languages] = useState([{id:1,language:"English",short_name:"En"},{id:2,language:"Français",short_name:"Fr"},{id:3,language:"العربية",short_name:"Ar"},{id:4,language:"አማርኛ",short_name:"Am"}])
+  const {lang,setLang} = useSharedState()
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
-  const loadContent = async () => {
+  const loadcontent = async () => {
     const selectedLang = localStorage.getItem("lang");
-
-    if (!selectedLang) {
-      const content = await Contents(1); // ✅ await the Promise
-      setContent(content);               // now it's ContentType
-      setLang(1);
-      localStorage.setItem("lang", "1");
-    } else {
-      const content = await Contents(Number(selectedLang));
-      setContent(content);
+    if(!selectedLang){
+        localStorage.setItem(lang,lang)
+      }
+    else if(selectedLang){
+      setLang(selectedLang)
     }
-
-    // Fetch other data
     const fetchData = async () => {
-      const resL = await fetch("/api/languages");
-      const langs = await resL.json();
-      setLanguages(langs);
-
       const res = await fetch("/api/users/");
       const data = await res.json();
       if (data.message === "Unauthorized") return;
@@ -57,11 +37,12 @@ export default function NavBar() {
     fetchData();
   };
 
-  loadContent(); // call the async wrapper
+  loadcontent();
 }, []);
 
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
    useEffect(() => {
     const handleClickOutside = (event:MouseEvent) => {
       const target = event.target as Node
@@ -73,11 +54,11 @@ export default function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleTranslation(lang:number){
-    console.log("the selected language is",lang)
+  async function handleTranslation(lang:string){
     localStorage.setItem("lang",String(lang))
-    return window.location.reload()
+    setLang(lang)
   }
+
   return (
     <nav
       className={`fixed z-10000 p-0 w-full bg-white h-12 items-center justify-between ${pathname == "/account" ? "hidden" : "flex"}`}
@@ -90,14 +71,14 @@ export default function NavBar() {
         <span className="font-medium">Jobify</span>
       </Link>
       <ul
-        className={`text-black flex p-2 pt-4 md:p-0 md:pr- bg-white md:bg-transparent gap-3 w-full h-screen md:h-fit items-start absolute top-full flex-col  transition-transform duration-300 font-medium ${hovered ? "translate-x-0" : "translate-x-full"} md:w-[60%] md:flex-row md:right-0 md:translate-x-0 md:top-0 md:gap-2 md:relative`}
+        className={`text-black flex p-2 pt-4 md:p-0 md:pr- bg-white md:bg-transparent gap-3 w-full h-screen md:h-fit items-start absolute top-full flex-col  transition-transform duration-300 font-medium ${hovered ? "translate-x-0" : "translate-x-full"} md:w-[80%] md:flex-row md:right-0 md:translate-x-0 md:top-0 md:gap-2 md:relative`}
       >
         <Link
           href="/"
           className="cursor-pointer w-full px-2 py-4 hover:bg-gray-100 transition duration-200 gap-2 flex items-center group md:flex md:justify-center h-12"
         >
           <i className="fas fa-home text-gray-500 group-hover:text-gray-900 overflow-hidden md:w-0"></i>
-          {contents?.home_link}{" "}
+          {content?.home_link}{" "}
           <span className="md:hidden ml-auto">
             <i className="fas fa-arrow-right ml-auto scale-0 group-hover:scale-100 transition overflow-hidden md:w-0 md: hidden"></i>
           </span>
@@ -107,7 +88,7 @@ export default function NavBar() {
           className="cursor-pointer w-full px-2 py-4 hover:bg-gray-100 transition duration-200 flex items-center hover:text-gray-900 group md:flex md:justify-center h-12"
         >
           <i className="fa-solid fa-briefcase text-gray-500 group-hover:text-gray-900 overflow-hidden md:w-0 mr-2"></i>
-          {contents?.sent_link}
+          {content?.sent_link}
           <span className="md:hidden ml-auto">
             <i className="fas fa-arrow-right ml-auto scale-0 group-hover:scale-100 transition overflow-hidden md:w-0 md: hidden"></i>
           </span>
@@ -118,7 +99,7 @@ export default function NavBar() {
             className="cursor-pointer w-full px-2 py-4 hover:bg-gray-100 transition duration-200  gap-2 flex items-center hover:text-gray-900 group md:flex md:justify-center h-12"
           >
             <i className="fa-solid fa-bookmark text-gray-500 group-hover:text-gray-900 overflow-hidden md:w-0"></i>
-            {contents?.saved_link}
+            {content?.saved_link}
             <span className="md:hidden ml-auto mr-3 ">
               <i className="fas fa-arrow-right scale-0 group-hover:scale-100 transition"></i>
             </span>
@@ -130,7 +111,7 @@ export default function NavBar() {
         onClick={() => setIsOpen(!isOpen)}
         className="cursor-pointer w-full px-2 py-4 hover:bg-gray-100 transition duration-200  gap-2 flex items-center hover:text-gray-900 group md:flex md:justify-center h-12"
       >
-        {lang && languages && "Language"}{lang && languages && <i className="fa-solid fa-chevron-down mt-1"></i>}
+         {content.language}<i className="fa-solid fa-chevron-down mt-1"></i>
       </button>
 
       {/* Dropdown list */}
@@ -141,14 +122,13 @@ export default function NavBar() {
               key={language.id}
               className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
-                setLang(language.id);
                 setIsOpen(false);
-                handleTranslation(language.id)
+                handleTranslation(language.short_name)
               }}
             >
               <input
                 type="radio"
-                checked={lang === language.id}
+                checked={lang === language.short_name}
                 readOnly
                 className="accent-blue-600"
               />
@@ -166,8 +146,8 @@ export default function NavBar() {
             className={`fa-solid fa-${user?.role == "employee" ? "building" : "gauge"} text-gray-500 group-hover:text-gray-900 overflow-hidden md:w-0`}
           ></i>
           {user?.role == "employer"
-            ? contents?.dashboard_link
-            : contents?.explore_link}
+            ? content?.dashboard_link
+            : content?.explore_link}
           <span className="md:hidden ml-auto mr-3 ">
             <i className="fas fa-arrow-right scale-0 group-hover:scale-100 transition"></i>
           </span>
@@ -192,16 +172,23 @@ export default function NavBar() {
                 <i className="fa-solid fa-envelope text-gray-600 px-2"></i>{" "}
                 {user.email}
               </p>
-              <p className="flex">
+              <p className="flex items-center">
                 <i className="fa-solid fa-map-marker-alt text-gray-600 pl-2 mr-3" />{" "}
-                {user.location} <img src={user.flag} className="w-5 h-5 flex" />
+                <Image
+                                  width={20}
+                                  height={20}
+                                  src={user.flag}
+                                  alt={user[`${lang.toLowerCase()}Location`]}
+                                  className="h-fit aspect-video mr-2"
+                                />
+                                {user[`${lang.toLowerCase()}Location`]} 
               </p>
               <a
                 href="/api/signout/"
                 className="text-purple-600 mt-2 block font-sans"
               >
                 <i className="fa-solid fa-arrow-left text-gray-600 pl-2 mr-3" />{" "}
-                Sign out
+                {content.signOut}
               </a>
             </div>
           </div>
@@ -210,7 +197,7 @@ export default function NavBar() {
         {!user && pathname != "/account" && (
           <div className="bg-[#f1f5f9] w-full h-20 flex items-center justify-center rounded-xl md:hidden">
             <a className="px-2 py-0 hidden flex-none rounded-full bg-sky-600 text-white font-normal cursor-pointer hover:bg-[#0a2540]">
-              Log In&nbsp;
+              {content.logIn}&nbsp;
               <i className="fa-solid fa-chevron-right scale-75 my-auto"></i>
             </a>
           </div>
@@ -221,7 +208,7 @@ export default function NavBar() {
           href="/account"
           className={`max-md:hidden mr-4 flex-none my-auto px-3 py-1 rounded-full bg-sky-600 text-white font-normal cursor-pointer hover:bg-[#0a2540] ${pathname == "/account" && "opacity-0 pointer-events-none"}`}
         >
-          Log In&nbsp;
+          {content.logIn}&nbsp;
           <i className="fa-solid fa-chevron-right scale-75 my-auto"></i>
         </Link>
       )}

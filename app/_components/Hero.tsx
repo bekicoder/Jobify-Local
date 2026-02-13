@@ -2,32 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Contents, { ContentType } from "./Contents";
-
+import { useSharedState } from "../SharedStateContext";
 const Hero = () => {
   const [user, setUser] = useState<{ role?: string } | null>(null);
-  const [contents, setContent] = useState<ContentType | null>(null);
-  const [lang, setLang] = useState<string>("english");
-
-  // Load language content
-  useEffect(() => {
-  const loadContent = async () => {
-    const selectedLang = localStorage.getItem("lang");
-
-    if (!selectedLang) {
-      const content = await Contents(1); // default language
-      setContent(content);
-      setLang("english");
-      localStorage.setItem("lang", "1");
-    } else {
-      const content = await Contents(Number(selectedLang));
-      setContent(content); // now safe, always ContentType
-    }
-  };
-
-  loadContent();
-}, []);
-
+  const {content} = useSharedState();
+  const {lang,setLang} = useSharedState();
 
   // Load user info
   useEffect(() => {
@@ -49,16 +28,16 @@ const Hero = () => {
     <div className="w-full flex flex-col md:flex-row overflow-auto">
       <div className="px-10 pt-24 wrap-break-word flex flex-1 flex-col gap-5">
         <h1 className="font-bold text-5xl text-[#0a2540] leading-tight">
-          {contents?.hero_header}
+          {content?.hero_header}
         </h1>
-        <p>{contents?.hero_paragraph}</p>
+        <p>{content?.hero_paragraph}</p>
         <Link
           href={user?.role !== "employer" ? "/jobs" : "/dashboard"}
           className="w-fit px-4 py-2 rounded-full bg-sky-600 text-white font-bold cursor-pointer hover:bg-[#0a2540]"
         >
           {user?.role !== "employer"
-            ? contents?.find_job
-            : contents?.dashboard_link}
+            ? content?.find_job
+            : content?.dashboard_link}
           &nbsp;
           <i className="fa-solid fa-chevron-right scale-75 my-auto"></i>
         </Link>

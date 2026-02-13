@@ -6,7 +6,6 @@ const CAMB_API_KEY = process.env.CAMB_API_KEY;
 export async function POST(req: NextRequest) {
   try {
     const { text, targetLang } = await req.json();
-    console.log(text,targetLang,"is it fine")
     if (!text || !targetLang) {
       return NextResponse.json(
         { error: "Missing required fields" },

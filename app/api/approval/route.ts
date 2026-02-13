@@ -5,7 +5,6 @@ export async function  POST(req:NextRequest) {
     const {status,jobId} =await req.json()
     const values = [status ? 'approved' : "declined",jobId]
     const {rows} = await db.query("update proposals set approval = $1 where id=$2 RETURNING id",values)
-    console.log(values,status,rows)
     return NextResponse.json({msg:"successful"}, { status: 200 });
     }catch(err){
     console.log(err);

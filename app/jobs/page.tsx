@@ -3,35 +3,9 @@ import Image from "next/image";
 import React,{ FormEvent, useEffect, useState,SetStateAction, Suspense } from "react";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "next/navigation";
-import { proposalType } from "../dashboard/page";
-type jobType = {
-    [key:string]:unknown
-    id: number;
-    catagory: string;
-    created_at: string;
-    detail: string;
-    flag: string;
-    jobtype: string;
-    location: string;
-    posted_by: string;
-    salary_range: string;
-    title:string;
-    updated_at:string;
-
-  };
-  
-interface DetailsPanelType{
-  proposal_ids:number[];
-  job:jobType;
-  setJobdetail:React.Dispatch<SetStateAction<number | null>>
-  proposals:proposalType[]
-  setProposal_ids:React.Dispatch<SetStateAction<number[]>>
-  saved_ids:number[];
-  setSaved_ids:React.Dispatch<SetStateAction<number[]>>
-  setSavedJobs:React.Dispatch<SetStateAction<jobType[]>>
-}
-
-
+import { proposalType } from "../interfaces"; 
+import { job_detailsPanel,jobType } from "../interfaces";
+import { useSharedState } from "../SharedStateContext";
 const JobDetailsPanel = ({
   proposal_ids,
   job,
@@ -41,20 +15,21 @@ const JobDetailsPanel = ({
   saved_ids,
   setSaved_ids,
   setSavedJobs,
-}:DetailsPanelType) => {
+}:job_detailsPanel) => {
   const [opend, setOpend] = useState<boolean>(false);
-  console.log(job)
-  const date = job.created_at.split(" ");
-  const [isSaved, setSaved] = useState<boolean>(
-    saved_ids.some((s) => s == job.id),
-  );
+  const {lang} = useSharedState()
+const {content} = useSharedState()
+  const date = job.created_at.split("T");
+  const [isSaved, setSaved] = useState<boolean>(false);
   const proposal = proposals.find((p) => {
     return p.id == job.id;
   });
-  console.log(proposal,"hi beki")
-  const [approved, setApproved] = useState<string | undefined>(proposal?.approval);
-  
+      console.log(job,proposal,"this is the job",job.id,saved_ids,saved_ids.some((s) => s == job.id))
+    const [approved, setApproved] = useState<string | undefined>(undefined);
+    const [isApplied,setApplied] = useState<boolean>(false);
   const handleSave = async () => {
+    console.log("dose this saved")
+
     const save = await fetch("/api/saveJob", {
       method: "POST",
       body: JSON.stringify({ jobId: job.id, saved: isSaved }),
@@ -72,26 +47,35 @@ const JobDetailsPanel = ({
       setSaved(!isSaved);
     }
   };
-
-  
-  const appliedId = proposal_ids.some((p) => {
+  useEffect(()=>{
+    const saved = saved_ids.some((s) => s == job.id)
+    const appliedId = proposal_ids.some((p) => {
     return p == job.id;
   });
-  const [isApplied,setApplied] = useState<boolean>(appliedId);
+  console.log(appliedId,"I am the owner of this",proposal?.approval)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setApproved(proposal?.approval)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if(saved)setSaved(true)
+    setApplied(appliedId)
+  },[job,proposal_ids,saved_ids,proposals])
   
+  function handleClose(){
+    setJobdetail(null);
+    setApplied(false)
+    setApproved(undefined)
+    setSaved(false)
+  }
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const target = e.target as HTMLFormElement
     const fd = new FormData(target);
+    const data = Object.fromEntries(fd.entries())
+     console.log(data,"This is the proposal data")
     const article = fd.get("article");
     const res = await fetch("/api/proposal", {
       method: "POST",
-      body: JSON.stringify({
-        id: job.id,
-        location: job.location,
-        owner: job.posted_by,
-        article: article,
-      }),
+      body: JSON.stringify(data),
       headers: { "Content-Type": "application" },
       cache: "no-store",
     });
@@ -117,14 +101,14 @@ const JobDetailsPanel = ({
         >
           <div className="w-full p-4 h-full bg-white rounded-2xl max-w-2xl flex flex-col relative">
             <h1 className="text-2xl font-bold text-center mb-1">
-              Write Proposal
+              {content.write_proposal}
             </h1>{" "}
             <p className="text-center text-sm text-gray-600 mb-4">
-              Markdown formatting supported
+              {content.markdown_suport}
             </p>
             <button
               onClick={() => setOpend(false)}
-              className="absolute top-6 right-6 hover:bg-gray-300 w-8 h-8 rounded-full"
+              className="absolute top-1 right-4 hover:bg-gray-300 w-8 h-8 rounded-full"
             >
               <i className="fa-solid fa-times"></i>
             </button>
@@ -132,7 +116,7 @@ const JobDetailsPanel = ({
             <input
               name="location"
               readOnly
-              value={job.location}
+              value={job['EnLocation']}
               className="sr-only"
             />
             <input
@@ -144,13 +128,13 @@ const JobDetailsPanel = ({
             <textarea
               placeholder="Enter proposal details..."
               name="article"
-              className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5 outline-sky-500"
+              className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus:outline-[1px]"
             ></textarea>
             <button
               type="submit"
               className="px-6 py-2 rounded-full bg-sky-600  text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto"
             >
-              Send
+              {content.send}
             </button>
           </div>
         </form>
@@ -158,14 +142,14 @@ const JobDetailsPanel = ({
 
       <div className="w-full flex justify-between pr-4 pt-4">
         <button
-          onClick={() => setJobdetail(null)}
-          className="py-2 cursor-pointer"
+          onClick={handleClose}
+          className="py-2 cursor-pointer text-black w-10 h-10 flex justify-start"
         >
           <i className="fa-solid fa-arrow-left" />
         </button>
         <button
           onClick={handleSave}
-          className="ml-auto mr-5 text-[18px] cursor-pointer"
+          className="ml-auto mr-5 text-[18px] cursor-pointer fa-solid fa-regular"
         >
           <i
             className={`fa-bookmark ${isSaved ? "fa-solid" : "fa-regular"}`}
@@ -174,7 +158,7 @@ const JobDetailsPanel = ({
         {isApplied && (
           <button
             disabled={isApplied ? true : false}
-            onClick={(e) => setOpend(true)}
+            onClick={() => setOpend(true)}
             className={`w-10 h-10 rounded-full bg-${approved == "approved" ? "green-500" : approved == "declined" ? "red-500" : approved == "pending" && "yellow-500"} ${!isApplied && "hover:bg-[#0a2540]"} text-white font-medium`}
           >
             <i
@@ -189,7 +173,7 @@ const JobDetailsPanel = ({
             onClick={(e) => setOpend(true)}
             className={`px-6 rounded-full bg-sky-600 && "hover:bg-[#0a2540]" text-white font-medium`}
           >
-            Apply
+            {content.apply}
           </button>
         )}
       </div>
@@ -197,21 +181,21 @@ const JobDetailsPanel = ({
       <h1 className="text-2xl font-medium mb-2">{job.title}</h1>
       <div className="w-full flex justify-between pr-4">
         <span className=" text-sm flex items-center font-medium text-gray-600">
-          {job.salary_range} • {job.location}&nbsp;&nbsp;&nbsp;{" "}
+          {job.salary_range} • {job[`${lang}Location`]}&nbsp;&nbsp;&nbsp;{" "}
           <div className="aspect-video w-6 relative">
             {
               <Image
                 src={job.flag}
-                alt={job.location + " flag"}
+                alt={job[`${lang}Location`] + " flag"}
                 fill
                 sizes="20px"
                 className={`object-contain ${opend && "hidden"}`}
               />
             }
           </div>
-          &nbsp;&nbsp;• {job.jobtype} &nbsp;&nbsp;
+          &nbsp;&nbsp;• {job[`${lang}Jobtype`]} &nbsp;&nbsp;
           <span
-            className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-red-500" : approved && "bg-green-500"} my-auto mt-2 `}
+            className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-yellow-600" : approved && "bg-green-500"} my-auto mt-2 `}
           ></span>
         </span>
         <span className="text-sm">
@@ -220,10 +204,10 @@ const JobDetailsPanel = ({
       </div>
 
       <h3 className="text-xl font-medium mt-8 mb-1 text-slate-800">
-        About the Job
+        {content.aboutJob}
       </h3>
       <article className="prose lg:prose-l prose-slate max-h-full flex-1 mb-16">
-        <ReactMarkdown>{job.detail}</ReactMarkdown>
+        <ReactMarkdown>{job[`detail${lang}`]}</ReactMarkdown>
         {/*bottom space */}
         <div className="w-full h-12"></div>
       </article>
@@ -234,96 +218,21 @@ const JobDetailsPanel = ({
 const EmployeePage = () => {
   const searchParams = useSearchParams();
   const route = searchParams.get("route");
-  
+  const {content} = useSharedState()
   const [_jobs, setJobs] = useState<jobType[]>([]);
 
   type JobCategory = {
     id: number;
     title: string;
   };
-  const jobCategories: JobCategory[] = [
-    { id: 1, title: "Healthcare & Medical" },
-    { id: 2, title: "Information Technology (IT) & Software" },
-    { id: 3, title: "Education & Teaching" },
-    { id: 4, title: "Engineering & Technical" },
-    { id: 5, title: "Finance & Accounting" },
-    { id: 6, title: "Sales & Marketing" },
-    { id: 7, title: "Human Resources & Administration" },
-    { id: 8, title: "Creative & Design" },
-    { id: 9, title: "Hospitality & Tourism" },
-    { id: 10, title: "Manufacturing & Trades" },
-  ];
+  const {jobCategories}=useSharedState()
 
   type locations = {
     id: number;
     name: string;
     flag: string;
   };
-  const countries: locations[] = [
-    { id: 1, name: "Argentina", flag: "https://flagcdn.com/w40/ar.png" },
-    { id: 2, name: "Australia", flag: "https://flagcdn.com/w40/au.png" },
-    { id: 3, name: "Austria", flag: "https://flagcdn.com/w40/at.png" },
-    { id: 4, name: "Belgium", flag: "https://flagcdn.com/w40/be.png" },
-    { id: 5, name: "Brazil", flag: "https://flagcdn.com/w40/br.png" },
-
-    { id: 6, name: "Canada", flag: "https://flagcdn.com/w40/ca.png" },
-    { id: 7, name: "China", flag: "https://flagcdn.com/w40/cn.png" },
-    { id: 8, name: "Colombia", flag: "https://flagcdn.com/w40/co.png" },
-    { id: 9, name: "Czech Republic", flag: "https://flagcdn.com/w40/cz.png" },
-    { id: 10, name: "Denmark", flag: "https://flagcdn.com/w40/dk.png" },
-
-    { id: 11, name: "Egypt", flag: "https://flagcdn.com/w40/eg.png" },
-    { id: 12, name: "Ethiopia", flag: "https://flagcdn.com/w40/et.png" },
-    { id: 13, name: "Finland", flag: "https://flagcdn.com/w40/fi.png" },
-    { id: 14, name: "France", flag: "https://flagcdn.com/w40/fr.png" },
-    { id: 15, name: "Germany", flag: "https://flagcdn.com/w40/de.png" },
-
-    { id: 16, name: "Ghana", flag: "https://flagcdn.com/w40/gh.png" },
-    { id: 17, name: "Greece", flag: "https://flagcdn.com/w40/gr.png" },
-    { id: 18, name: "India", flag: "https://flagcdn.com/w40/in.png" },
-    { id: 19, name: "Indonesia", flag: "https://flagcdn.com/w40/id.png" },
-    { id: 20, name: "Ireland", flag: "https://flagcdn.com/w40/ie.png" },
-
-    { id: 21, name: "Israel", flag: "https://flagcdn.com/w40/il.png" },
-    { id: 22, name: "Italy", flag: "https://flagcdn.com/w40/it.png" },
-    { id: 23, name: "Japan", flag: "https://flagcdn.com/w40/jp.png" },
-    { id: 24, name: "Kenya", flag: "https://flagcdn.com/w40/ke.png" },
-    { id: 25, name: "Malaysia", flag: "https://flagcdn.com/w40/my.png" },
-
-    { id: 26, name: "Mexico", flag: "https://flagcdn.com/w40/mx.png" },
-    { id: 27, name: "Morocco", flag: "https://flagcdn.com/w40/ma.png" },
-    { id: 28, name: "Netherlands", flag: "https://flagcdn.com/w40/nl.png" },
-    { id: 29, name: "New Zealand", flag: "https://flagcdn.com/w40/nz.png" },
-    { id: 30, name: "Nigeria", flag: "https://flagcdn.com/w40/ng.png" },
-
-    { id: 31, name: "Norway", flag: "https://flagcdn.com/w40/no.png" },
-    { id: 32, name: "Pakistan", flag: "https://flagcdn.com/w40/pk.png" },
-    { id: 33, name: "Philippines", flag: "https://flagcdn.com/w40/ph.png" },
-    { id: 34, name: "Poland", flag: "https://flagcdn.com/w40/pl.png" },
-    { id: 35, name: "Portugal", flag: "https://flagcdn.com/w40/pt.png" },
-
-    { id: 36, name: "Qatar", flag: "https://flagcdn.com/w40/qa.png" },
-    { id: 37, name: "Romania", flag: "https://flagcdn.com/w40/ro.png" },
-    { id: 38, name: "Saudi Arabia", flag: "https://flagcdn.com/w40/sa.png" },
-    { id: 39, name: "South Africa", flag: "https://flagcdn.com/w40/za.png" },
-    { id: 40, name: "South Korea", flag: "https://flagcdn.com/w40/kr.png" },
-
-    { id: 41, name: "Spain", flag: "https://flagcdn.com/w40/es.png" },
-    { id: 42, name: "Sweden", flag: "https://flagcdn.com/w40/se.png" },
-    { id: 43, name: "Switzerland", flag: "https://flagcdn.com/w40/ch.png" },
-    { id: 44, name: "Thailand", flag: "https://flagcdn.com/w40/th.png" },
-    { id: 45, name: "Turkey", flag: "https://flagcdn.com/w40/tr.png" },
-
-    { id: 46, name: "Ukraine", flag: "https://flagcdn.com/w40/ua.png" },
-    {
-      id: 47,
-      name: "United Arab Emirates",
-      flag: "https://flagcdn.com/w40/ae.png",
-    },
-    { id: 48, name: "United Kingdom", flag: "https://flagcdn.com/w40/gb.png" },
-    { id: 49, name: "United States", flag: "https://flagcdn.com/w40/us.png" },
-    { id: 50, name: "Vietnam", flag: "https://flagcdn.com/w40/vn.png" },
-  ];
+  const {countries} = useSharedState()
 
   type job_types = {
     id: number;
@@ -368,13 +277,13 @@ const EmployeePage = () => {
   const [catagories, setCatagories] = useState<{ [key: number]: boolean }>({});
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const [selectedJob, setJobdetail] = useState<number | null>(null);
-  const [account, setAccount] = useState<accountType | null>(null);
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState<number[]>([]);
   const [savedJobs, setSavedJobs] = useState<jobType[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<jobType[]>([]);
   const [saved_ids, setSaved_ids] = useState<number[]>([]);
-  let selectedJ = {
+  const {lang} = useSharedState()
+  const [selectedJ,setSelectedJ] =useState({
     id: 0,
     catagory: "",
     created_at: "",
@@ -386,7 +295,7 @@ const EmployeePage = () => {
     salary_range: "",
     title:"",
     updated_at:"",
-  }
+  })
   function toggleMenu(menu: string) {
     if (openedMenu == menu) {
       setOpenedMenu(null);
@@ -413,25 +322,23 @@ const EmployeePage = () => {
       for (let i = 1; i <= count; i++) {
         const res = await fetch("/api/jobs", {
           method: "POST",
-          body: JSON.stringify({ id: i }),
+          body: JSON.stringify({ id: i }), 
           headers: { "Content-Type": "application/json" },
           cache: "no-store",
         });
-
         const job = await res.json();
-        jobs_.unshift(job);
+        console.log(job)
+        jobs_.unshift(job.jobData);
       }
       setJobs(jobs_);
       const prop_res = await fetch("/api/proposal/?role=employee", {
         cache: "no-store",
-      });
+      })
 
       const props = await prop_res.json();
       const proposalIds: number[] = [];
-
       const fullProposal = props.data.map((p:proposalType) => {
         proposalIds.unshift(Number(p.career_id));
-
         const career = jobs_.find((j) => j.id == Number(p.career_id));
         return {
           id: p.career_id,
@@ -454,16 +361,18 @@ const EmployeePage = () => {
 
     const fetchSaved = async () => {
       const savedRes = await fetch("/api/saveJob");
-      const { savedJobs:savedJobs_, data } = await savedRes.json();
-      savedJobs_.forEach((s:{id:number;career_id:string;}) => {
-        setSaved_ids((prev) => [...prev, Number(s.career_id)]);
+      const { data } = await savedRes.json();
+      console.log(data,"dose this work")
+      if(!data)return;
+      data.forEach((d:Record<string,string | number>) => {
+        console.log(d.id,"check for reality")
+        setSaved_ids((prev) => [...prev, Number(d.id)]);
       });
-
-      setSavedJobs([...data]);
+      setSavedJobs(data);
     };
     fetchSaved();
     fethJobs();
-  }, []);
+  },[]);
   function handleFilter(filterType: string, option: string, status: boolean) {
     if (!option || !filterType) return;
 
@@ -483,28 +392,36 @@ const EmployeePage = () => {
   }
 
   const jobsToRender = filteredJobs.length > 0 ? filteredJobs : _jobs;
+  useEffect(()=>{
+    const selected =_jobs.find((j) => {
+                  return j.id == selectedJob;
+                })
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+       if(selected) setSelectedJ(selected)
+  },[selectedJob])
+
+  
   return (
     <div className="w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-[#f6f9fc] md:fixed">
       <aside
         className={`w-full h-full md:w-70 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 bg-white ${(route == "appliedJobs" || route == "savedJobs") && "hidden"}`}
       >
         <h1 className="w-full py-3 h-fit bg-sky-600 text-white text-2xl text-center font-bold md:rounded-t">
-          {" "}
-          Land Your Job
+          {content.headline}          
         </h1>
         <div className="px-3 flex gap-5 flex-col text-gray-700">
           <div className="flex rounded-2xl shadow-lg shadow-gray-300 overflow-hidden items-center pl-2 bg-[#f6f9fc]">
             <i className="fa-solid fa-search " />
             <input
               type="text"
-              placeholder="Search for job"
+              placeholder={content.jobSearchPlaceholder}
               className="w-full h-full py-2 px-3 focus:outline-0"
             />
           </div>
           {/*catagories filter */}
           <div className="relative flex rounded-xl item-center px-2 hover:bg-green-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2">
             <i className="fas fa-layer-group text-gray-500"></i>
-            Catagories
+            {content.categories}
             <button
               onClick={() => toggleMenu("Catagories")}
               className="cursor-pointer px-12 ml-auto"
@@ -523,16 +440,16 @@ const EmployeePage = () => {
                     <input
                       onChange={(e) => {
                         toggleCheckbox("catagory", job.id);
-                        handleFilter("catagory", job.title, e.target.checked);
+                        handleFilter("catagory", job.name, e.target.checked);
                       }}
                       type="checkbox"
-                      value={job.title}
+                      value={job.name}
                       className="accent-sky-500 text-amber-50 peer sr-only"
                     />
                     <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90"></i>
                     </span>
-                    {job.title}
+                    {job.name}
                   </label>
                 ))}
               </div>
@@ -541,7 +458,7 @@ const EmployeePage = () => {
 
           <div className="relative flex rounded-xl item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2">
             <i className="fa-solid fa-map-marker-alt text-gray-500" />
-            Location
+            {content.location}
             <button
               onClick={() => toggleMenu("Location")}
               className="cursor-pointer px-12 ml-auto"
@@ -585,7 +502,7 @@ const EmployeePage = () => {
 
           <div className="relative cursor-pointer flex rounded-xl item-center px-2 hover:bg-red-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2">
             <i className="fa-solid fa-briefcase text-gray-500" />
-            Job Type
+            {content.jobType}
             <button
               onClick={() => toggleMenu("Job_type")}
               className="cursor-pointer px-12 ml-auto"
@@ -622,7 +539,7 @@ const EmployeePage = () => {
 
           <div className="relative cursor-pointer flex rounded-xl item-center px-2 hover:bg-cyan-100 bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2">
             <i className="fa-solid fa-dollar text-gray-500" />
-            Income
+            {content.salary}
             <button
               onClick={() => toggleMenu("Income")}
               className="cursor-pointer px-12 ml-auto"
@@ -680,13 +597,13 @@ const EmployeePage = () => {
                 <thead className="border-b border-b-gray-300 px-7">
                   <tr>
                     <th className="text-left text-sm font-medium px-4 py-2">
-                      Careers
+                      {content.careers}
                     </th>
                     <th className="text-left text-sm font-medium px-4 py-2">
-                      Location
+                      {content.location}
                     </th>
                     <th className="text-left text-sm font-medium px-4 py-2">
-                      Job Type
+                      {content.jobType}
                     </th>
                   </tr>
                 </thead>
@@ -696,16 +613,12 @@ const EmployeePage = () => {
                       <tr
                         onClick={() => {
                           setJobdetail(p.id);
-                          const selected =_jobs.find((j) => {
-                  return j.id == selectedJob;
-                })
-                if(selected){selectedJ = selected}
                         }}
                         key={i}
                         className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
-                          {p.title}
+                          {p[`title${lang}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
@@ -719,10 +632,10 @@ const EmployeePage = () => {
                               />
                             }
                           </div>{" "}
-                          {p.location}
+                          {p[`${lang}Location`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
-                          {p.jobtype}
+                          {p[`${lang}Jobtype`]}
                         </td>
                       </tr>
                     ))}
@@ -735,7 +648,7 @@ const EmployeePage = () => {
                         className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
-                          {p.title}
+                          {p[`title${lang}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
@@ -749,10 +662,10 @@ const EmployeePage = () => {
                               />
                             }
                           </div>{" "}
-                          {p.location}
+                          {p[`${lang}Location`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
-                          {p.jobtype}
+                          {p[`${lang}Jobtype`]}
                         </td>
                       </tr>
                     ))}

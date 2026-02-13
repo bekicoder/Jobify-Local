@@ -1,6 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from './_components/Navbar';
+import { SharedStateProvider } from './SharedStateContext';
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,8 +24,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <Navbar />
-        {children}
+        <SharedStateProvider>
+          <Navbar />
+          {children}
+        </SharedStateProvider>
       </body>
     </html>
   );

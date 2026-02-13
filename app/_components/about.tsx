@@ -1,31 +1,10 @@
-"use client"
-import Contents from "./Contents";
-import {useState,useEffect} from "react"
+"use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ContentType } from "./Contents";
+import { useSharedState } from "../SharedStateContext";
 const About = () => {
-  const [contents,setContent] = useState<ContentType>()
+  const { content } = useSharedState();
   const [lang, setLang] = useState<string>("english");
-  
-  // Load language content
-
-  useEffect(() => {
-    const loadContent = async () => {
-      const selectedLang = localStorage.getItem("lang");
-
-      if (!selectedLang) {
-        const content = await Contents(1); // default language
-        setContent(content);
-        setLang("english");
-        localStorage.setItem("lang", "1");
-      } else {
-        const content = await Contents(Number(selectedLang));
-        setContent(content);
-      }
-    };
-
-    loadContent();
-  }, []);
 
   return (
     <div>
@@ -40,17 +19,17 @@ const About = () => {
           />
           <div className=" flex flex-col items-center">
             <h1 className="text-2xl font-medium text-[#0a2540] text-center mb-2">
-              {contents?.motive_header}
+              {content?.motive_header}
             </h1>
-            <p className="w-[50%] text-center">{contents?.motive_paragraph}</p>
+            <p className="w-[50%] text-center">{content?.motive_paragraph}</p>
           </div>
         </div>
       </div>
       <div className="flex flex-col items-center gap-7 mt-16">
         <strong className="w-full text-center block text-3xl text-[#0a2540]">
-          {contents?.about_us}
+          {content?.about_us}
         </strong>
-        <p className="w-[70%]">{contents?.about_paragrap}</p>
+        <p className="w-[70%]">{content?.about_paragraph}</p>
       </div>
     </div>
   );

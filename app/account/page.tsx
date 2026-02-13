@@ -3,6 +3,7 @@ import React,{ FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSharedState } from "../SharedStateContext";
 interface propType{
   setOpen:React.Dispatch<React.SetStateAction<string>>
 }
@@ -12,75 +13,10 @@ const SignUp = ({ setOpen}:propType) => {
     name: string;
     flag: string;
   };
-  // locations for filter
-  const countries: locations[] = [
-    { id: 1, name: "Argentina", flag: "https://flagcdn.com/w40/ar.png" },
-    { id: 2, name: "Australia", flag: "https://flagcdn.com/w40/au.png" },
-    { id: 3, name: "Austria", flag: "https://flagcdn.com/w40/at.png" },
-    { id: 4, name: "Belgium", flag: "https://flagcdn.com/w40/be.png" },
-    { id: 5, name: "Brazil", flag: "https://flagcdn.com/w40/br.png" },
-
-    { id: 6, name: "Canada", flag: "https://flagcdn.com/w40/ca.png" },
-    { id: 7, name: "China", flag: "https://flagcdn.com/w40/cn.png" },
-    { id: 8, name: "Colombia", flag: "https://flagcdn.com/w40/co.png" },
-    { id: 9, name: "Czech Republic", flag: "https://flagcdn.com/w40/cz.png" },
-    { id: 10, name: "Denmark", flag: "https://flagcdn.com/w40/dk.png" },
-
-    { id: 11, name: "Egypt", flag: "https://flagcdn.com/w40/eg.png" },
-    { id: 12, name: "Ethiopia", flag: "https://flagcdn.com/w40/et.png" },
-    { id: 13, name: "Finland", flag: "https://flagcdn.com/w40/fi.png" },
-    { id: 14, name: "France", flag: "https://flagcdn.com/w40/fr.png" },
-    { id: 15, name: "Germany", flag: "https://flagcdn.com/w40/de.png" },
-
-    { id: 16, name: "Ghana", flag: "https://flagcdn.com/w40/gh.png" },
-    { id: 17, name: "Greece", flag: "https://flagcdn.com/w40/gr.png" },
-    { id: 18, name: "India", flag: "https://flagcdn.com/w40/in.png" },
-    { id: 19, name: "Indonesia", flag: "https://flagcdn.com/w40/id.png" },
-    { id: 20, name: "Ireland", flag: "https://flagcdn.com/w40/ie.png" },
-
-    { id: 21, name: "Israel", flag: "https://flagcdn.com/w40/il.png" },
-    { id: 22, name: "Italy", flag: "https://flagcdn.com/w40/it.png" },
-    { id: 23, name: "Japan", flag: "https://flagcdn.com/w40/jp.png" },
-    { id: 24, name: "Kenya", flag: "https://flagcdn.com/w40/ke.png" },
-    { id: 25, name: "Malaysia", flag: "https://flagcdn.com/w40/my.png" },
-
-    { id: 26, name: "Mexico", flag: "https://flagcdn.com/w40/mx.png" },
-    { id: 27, name: "Morocco", flag: "https://flagcdn.com/w40/ma.png" },
-    { id: 28, name: "Netherlands", flag: "https://flagcdn.com/w40/nl.png" },
-    { id: 29, name: "New Zealand", flag: "https://flagcdn.com/w40/nz.png" },
-    { id: 30, name: "Nigeria", flag: "https://flagcdn.com/w40/ng.png" },
-
-    { id: 31, name: "Norway", flag: "https://flagcdn.com/w40/no.png" },
-    { id: 32, name: "Pakistan", flag: "https://flagcdn.com/w40/pk.png" },
-    { id: 33, name: "Philippines", flag: "https://flagcdn.com/w40/ph.png" },
-    { id: 34, name: "Poland", flag: "https://flagcdn.com/w40/pl.png" },
-    { id: 35, name: "Portugal", flag: "https://flagcdn.com/w40/pt.png" },
-
-    { id: 36, name: "Qatar", flag: "https://flagcdn.com/w40/qa.png" },
-    { id: 37, name: "Romania", flag: "https://flagcdn.com/w40/ro.png" },
-    { id: 38, name: "Saudi Arabia", flag: "https://flagcdn.com/w40/sa.png" },
-    { id: 39, name: "South Africa", flag: "https://flagcdn.com/w40/za.png" },
-    { id: 40, name: "South Korea", flag: "https://flagcdn.com/w40/kr.png" },
-
-    { id: 41, name: "Spain", flag: "https://flagcdn.com/w40/es.png" },
-    { id: 42, name: "Sweden", flag: "https://flagcdn.com/w40/se.png" },
-    { id: 43, name: "Switzerland", flag: "https://flagcdn.com/w40/ch.png" },
-    { id: 44, name: "Thailand", flag: "https://flagcdn.com/w40/th.png" },
-    { id: 45, name: "Turkey", flag: "https://flagcdn.com/w40/tr.png" },
-
-    { id: 46, name: "Ukraine", flag: "https://flagcdn.com/w40/ua.png" },
-    {
-      id: 47,
-      name: "United Arab Emirates",
-      flag: "https://flagcdn.com/w40/ae.png",
-    },
-    { id: 48, name: "United Kingdom", flag: "https://flagcdn.com/w40/gb.png" },
-    { id: 49, name: "United States", flag: "https://flagcdn.com/w40/us.png" },
-    { id: 50, name: "Vietnam", flag: "https://flagcdn.com/w40/vn.png" },
-  ];
+ 
   type checkbox = {
     role: string;
-    location: string;
+    location: number;
     flag: string;
   };
   const [type, setType] = useState<checkbox>({
@@ -93,6 +29,7 @@ const SignUp = ({ setOpen}:propType) => {
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const [eye, setEye] = useState(false);
   const [warring, setWarrning] = useState<string>();
+  const {countries,content} = useSharedState()
 
   function toggleRoleCheckbox(value: string) {
     setType((prev) => ({ ...prev, role: value }));
@@ -100,7 +37,7 @@ const SignUp = ({ setOpen}:propType) => {
       setOpenedMenu(null);
     }, 300);
   }
-  function toggleLocationCheckbox(location: string, flag: string) {
+  function toggleLocationCheckbox(location: number, flag: string) {
     setType((prev) => ({ ...prev, location: location, flag: flag }));
     setTimeout(() => {
       setOpenedMenu(null);
@@ -115,6 +52,7 @@ const SignUp = ({ setOpen}:propType) => {
         setOpenedMenu(null);
       }, 300);
     } else {
+
       setOpenedMenu(menu);
     }
   }
@@ -123,7 +61,6 @@ const SignUp = ({ setOpen}:propType) => {
     const target = e.target as HTMLFormElement
     const fd = new FormData(target);
     const fdObj = Object.fromEntries(fd.entries());
-    console.log(fdObj);
     const res = await fetch("/api/signup", {
       method: "POST",
       body: JSON.stringify(fdObj),
@@ -138,10 +75,9 @@ const SignUp = ({ setOpen}:propType) => {
       setWarrning("already exist");
     }
   }
-  console.log(openedMenu);
   return (
     <div className="w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col items-center bg-white md:px-18 px-10 pt-4">
-      <strong className="text-2xl text-[#0a2540] mb-2">Sign up</strong>
+      <strong className="text-2xl text-[#0a2540] mb-2">{content.signUp}</strong>
       <form
         onSubmit={(e) => handleSibmit(e)}
         className="flex flex-col gap-4 w-full"
@@ -152,7 +88,7 @@ const SignUp = ({ setOpen}:propType) => {
               type="text"
               name="fname"
               className="w-full focus:outline-0"
-              placeholder="First Name"
+              placeholder={content.fname}
               required
             />
             <span>
@@ -167,7 +103,7 @@ const SignUp = ({ setOpen}:propType) => {
               name="lname"
               required
               className="w-full focus:outline-0"
-              placeholder="Last Name"
+              placeholder={content.lname}
             />
             <span>
               <i className="fa-solid fa-user text-gray-600 px-2"></i>
@@ -181,7 +117,7 @@ const SignUp = ({ setOpen}:propType) => {
               name="orgname"
               required
               className="w-full focus:outline-0"
-              placeholder="Organiizatiion Name"
+              placeholder={content.organizationName}
             />
             <span>
               <i className="fa-solid fa-user text-gray-600 px-2"></i>
@@ -194,7 +130,7 @@ const SignUp = ({ setOpen}:propType) => {
             name="email"
             required
             className="w-full focus:outline-0"
-            placeholder="Email"
+            placeholder={content.email}
           />
           <span>
             <i className="fa-solid fa-envelope text-gray-600 px-2"></i>
@@ -206,7 +142,7 @@ const SignUp = ({ setOpen}:propType) => {
             name="password"
             required
             className="w-full focus:outline-0"
-            placeholder="Password"
+            placeholder={content.password}
           />
           <span
             onClick={() =>
@@ -229,7 +165,7 @@ const SignUp = ({ setOpen}:propType) => {
             className="relative cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
           >
             <i className="fa-solid fa-map-marker-alt text-gray-500" />
-            Location
+            {content.location}
             <input
               name="location"
               value={type.location}
@@ -248,7 +184,7 @@ const SignUp = ({ setOpen}:propType) => {
             {countries.map((c, i) => (
               <div
                 onClick={(e) => {
-                  toggleLocationCheckbox(c.name, c.flag);
+                  toggleLocationCheckbox(c.id, c.flag);
                 }}
                 key={i}
                 className="flex cursor-pointer items-center gap-2 text-sm font-medium"
@@ -257,12 +193,12 @@ const SignUp = ({ setOpen}:propType) => {
                   className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 rounded block peer-checked:bg-sky-600 flex items-center justify-center"
                   style={{
                     backgroundColor:
-                      type.location === c.name ? "#0ea5e9" : undefined,
+                      type.location == c.id ? "#0ea5e9" : undefined,
                   }}
                 >
                   <i
                     className="fa-solid fa-check scale-90 "
-                    style={{ opacity: type.location === c.name ? 1 : 0 }}
+                    style={{ opacity: type.location === c.id ? 1 : 0 }}
                   ></i>
                 </span>
                 <Image
@@ -286,7 +222,7 @@ const SignUp = ({ setOpen}:propType) => {
             className="cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
           >
             <i className="fa-solid fa-map-marker-alt text-gray-500" />
-            Role
+            {content.role}
             <i
               className={`fa-solid ${openedMenu == "role" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto mr-2.5`}
             />
@@ -311,7 +247,7 @@ const SignUp = ({ setOpen}:propType) => {
               >
                 <i className="fa-solid fa-check scale-90"></i>
               </span>
-              Emloyer
+              {content.employer}
             </label>
             {/*emloyee label */}
             <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
@@ -329,19 +265,19 @@ const SignUp = ({ setOpen}:propType) => {
               >
                 <i className="fa-solid fa-check scale-90"></i>
               </span>
-              Emloyee
+              {content.employee}
             </label>
           </div>
         </div>
   
         {warring === "already exist" && (
           <p>
-            allready &nbsp;
+            {content.alreadySignedInMessage} &nbsp;
             <span
               className="text-indigo-700 cursor-pointer"
-              onClick={() => setOpen("signUp")}
+              onClick={() => setOpen("signIn")}
             >
-              Create account
+              {content.logIn}
             </span>
           </p>
         )}
@@ -349,17 +285,17 @@ const SignUp = ({ setOpen}:propType) => {
           type="submit"
           className="px-6 py-2 rounded-full w-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit mx-auto"
         >
-          Sign up
+          {content.signUp}
         </button>
       </form>
       <span>
-        Already have an account ?{" "}
+        {content.haveAccount} {" "}
         <span
           className="text-indigo-700 cursor-pointer"
           onClick={() => setOpen("signIn")}
         >
           {" "}
-          Log in
+          {content.logIn}
         </span>{" "}
       </span>
     </div>
@@ -373,6 +309,7 @@ const SignIn = ({ setOpen }:propType) => {
   const [warring, setWarrning] = useState<string>();
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const router = useRouter();
+  const {countries,content} = useSharedState()
 
   function toggleCheckbox(type: string) {
     setType(type);
@@ -395,7 +332,6 @@ const SignIn = ({ setOpen }:propType) => {
     const target = e.target as HTMLFormElement
     const fd = new FormData(target);
     const fdObj = Object.fromEntries(fd.entries());
-    console.log(fdObj, type);
     const res = await fetch("/api/signin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -403,7 +339,6 @@ const SignIn = ({ setOpen }:propType) => {
     });
     const data = await res.json();
     if (data.message == "successful") {
-      console.log(data.message);
       location.assign("/");
     } else if (data.message == `don't exist`) {
       setWarrning("don't exist");
@@ -413,7 +348,7 @@ const SignIn = ({ setOpen }:propType) => {
     <div
       className="w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col items-center bg-white  md:px-18 px-10 pt-4"
     >
-      <strong className="text-2xl text-[#0a2540]">Log in</strong>
+      <strong className="text-2xl text-[#0a2540]">{content.logIn}</strong>
       <form
         onSubmit={(e) => handleSubmit(e)}
         className="flex flex-col pt-7 gap-4 w-full"
@@ -423,7 +358,7 @@ const SignIn = ({ setOpen }:propType) => {
             type="email"
             name="email"
             className="w-full focus:outline-0"
-            placeholder="Email"
+            placeholder={content.email}
             required
           />
           <span>
@@ -436,7 +371,7 @@ const SignIn = ({ setOpen }:propType) => {
             name="password"
             required
             className="w-full focus:outline-0"
-            placeholder="Password"
+            placeholder={content.password}
           />
           <span
             onClick={() =>
@@ -458,7 +393,7 @@ const SignIn = ({ setOpen }:propType) => {
             className="cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
           >
             <i className="fa-solid fa-map-marker-alt text-gray-500" />
-            Role
+            {content.role}
             <i
               className={`fa-solid ${openedMenu == "role" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto`}
             />
@@ -482,7 +417,7 @@ const SignIn = ({ setOpen }:propType) => {
               >
                 <i className="fa-solid fa-check scale-90"></i>
               </span>
-              Emloyer
+              {content.employer}
             </label>
             {/*emloyee label */}
             <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
@@ -499,7 +434,7 @@ const SignIn = ({ setOpen }:propType) => {
               >
                 <i className="fa-solid fa-check scale-90"></i>
               </span>
-              Emloyee
+              {content.employee}
             </label>
           </div>
         </div>
@@ -540,26 +475,26 @@ const SignIn = ({ setOpen }:propType) => {
         </div>*/}
         {warring === "don't exist" && (
           <p>
-            You don&apos;t have an account &nbsp;
+            {content.donhave}&nbsp;
             <span
               className="text-indigo-700 cursor-pointer"
               onClick={() => setOpen("signUp")}
             >
-              Create one
+              {content.createOne}
             </span>
           </p>
         )}
         <button className="px-6 py-2 rounded-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit mb-4  mx-auto w-full">
-          Sign in
+          {content.logIn}
         </button>
       </form>
       <button>
-        Not member?&nbsp;
+        {content.notMemeber}&nbsp;
         <span
           className="text-indigo-700 cursor-pointer"
           onClick={() => setOpen("signUp")}
         >
-          Sign up
+          {content.signUp}
         </span>
       </button>
     </div>

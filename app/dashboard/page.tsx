@@ -1,78 +1,34 @@
 "use client";
-import React,{ FormEvent, use, useEffect, useState ,SetStateAction} from "react";
+import React, {
+  FormEvent,
+  use,
+  useEffect,
+  useState,
+  SetStateAction,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { Route } from "next/";
-interface _Fd{
-      jobType: string;
-      catagory: string;
-      range: string;
-      detail: string;
-      title: string;
-}
-
-interface _myjobsType{
-  id:string;
-  location:string;
-  jobtype:string;
-  flag:string;
-  created_at:string;
-  catagory:string;
-  salary_range:string;
-  detail:string;
-  title:string;
-  posted_by:string;
-  updated_at:string;
-  approval:string;
-  name:string;
-  career_owner:string;
-  seenStatus:boolean;
-  sender:string;
-  career_id:string;
-}
-interface DetailsPanelType{
-  option:string;
-  job:_myjobsType;
-  setJobdetail:React.Dispatch<SetStateAction<number | null>>;
-  setPage:React.Dispatch<SetStateAction<string | null>>;
-  setFd:React.Dispatch<SetStateAction<_Fd>>;
-  setEdit:React.Dispatch<SetStateAction<number | null>>;
-}
-interface _jobs {
-    id: number;
-    title: string;
-    location: string;
-    jobType: string;
-    flag: string;
-    created_at: string;
-    category: string;
-    salary_range: string;
-    detail: string;
-  };
-interface createJobsParamsType{
-  setjobs:React.Dispatch<SetStateAction<_jobs[]>>;
-  setPage:React.Dispatch<SetStateAction<string | null>>;
-  setFd:React.Dispatch<SetStateAction<_Fd>>;
-  setEdit:React.Dispatch<SetStateAction<number | null>>;
-  fd:_Fd
-  edit:number | null
-  setMyjobs:React.Dispatch<SetStateAction<_myjobsType[]>>
-  setJobdetail:React.Dispatch<SetStateAction<number | null>>
-}
-export interface proposalType{
-  id:number;
-  name:string;
-  approval:string;
-  career_id:string;
-  career_owner:string;
-  created_at:string;
-  detail:string;
-  seenstatus:string;
-  sender:string;
-  flag:string;
-  location:string;
-  title:string
-}
+import { useSharedState } from "../SharedStateContext";
+import {
+  income_range,
+  _Fd,
+  _myjobsType,
+  DetailsPanelType,
+  _jobs,
+  proposalType,
+  createJobsParamsType,
+} from "../interfaces";
+import {
+  categoriesEn,
+  jobTypesEn,
+  categoriesAm,
+  jobTypesAm,
+  categoriesAr,
+  jobTypesAr,
+  categoriesFr,
+  jobTypesFr,
+} from "../_components/contents";
 const JobDetailsPanel = ({
   option,
   job,
@@ -80,16 +36,15 @@ const JobDetailsPanel = ({
   setPage,
   setFd,
   setEdit,
-}:DetailsPanelType) => {
-  console.log("cheack this job",job)
+}: DetailsPanelType) => {
   const [approval, setApproval] = useState<string>(job.approval);
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
   const proposal = option === "proposal";
   const handleEdit = () => {
     setFd({
-      jobType: job.jobtype,
-      catagory: job.catagory,
+      Jobtype: job.Jobtype,
+      category: job.category,
       range: job.salary_range,
       detail: job.detail,
       title: job.title,
@@ -196,7 +151,7 @@ const JobDetailsPanel = ({
             alt={job.name + " flag"}
             className="h-fit aspect-video"
           />{" "}
-          &nbsp;&nbsp;{!proposal && " • " + job.jobtype}
+          &nbsp;&nbsp;{!proposal && " • " + job.Jobtype}
         </span>
         <span className="text-sm">
           <i className="fa-solid fa-calendar-day text-gray-500" />{" "}
@@ -222,53 +177,16 @@ const CreateJobs = ({
   setEdit,
   setMyjobs,
   setPage,
-}:createJobsParamsType) => {
+}: createJobsParamsType) => {
   const [openedMenu, setOpenedMenu] = useState<string | null>();
 
-  //job types
-  type job_types = {
-    id: number;
-    name: string;
-  };
-  const jobTypes: job_types[] = [
-    { id: 1, name: "Full-time" },
-    { id: 2, name: "Part-time" },
-    { id: 3, name: "Contract" },
-    { id: 4, name: "Temporary" },
-    { id: 5, name: "Internship" },
-    { id: 6, name: "Freelance" },
-    { id: 7, name: "Remote" },
-    { id: 8, name: "Hybrid" },
-    { id: 9, name: "On-site" },
-    { id: 10, name: "Seasonal" },
-    { id: 11, name: "Volunteer" },
-    { id: 12, name: "Apprenticeship" },
-  ];
-  //job catagories
-  type JobCategory = {
-    id: number;
-    title: string;
-  };
-  const jobCategories: JobCategory[] = [
-    { id: 1, title: "Healthcare & Medical" },
-    { id: 2, title: "Information Technology (IT) & Software" },
-    { id: 3, title: "Education & Teaching" },
-    { id: 4, title: "Engineering & Technical" },
-    { id: 5, title: "Finance & Accounting" },
-    { id: 6, title: "Sales & Marketing" },
-    { id: 7, title: "Human Resources & Administration" },
-    { id: 8, title: "Creative & Design" },
-    { id: 9, title: "Hospitality & Tourism" },
-    { id: 10, title: "Manufacturing & Trades" },
-  ];
-  // job salary
-  type income_range = {
-    id: number;
-    label: string;
-  };
-  //create incomeRanges
+  const { jobTypes } = useSharedState();
+  const { jobCategories } = useSharedState();
+  const { lang } = useSharedState();
+  const { content } = useSharedState();
+  const [selectedJt, setSelectedJt] = useState("");
   const incomeRanges: income_range[] = [
-    { id: 1, label: "Below $500" },
+    { id: 1, label: `${content.below} $500` },
     { id: 2, label: "$500 – $1,000" },
     { id: 3, label: "$1,000 – $2,000" },
     { id: 4, label: "$2,000 – $3,000" },
@@ -277,7 +195,12 @@ const CreateJobs = ({
     { id: 7, label: "$7,000 – $10,000" },
     { id: 8, label: "$10,000+" },
   ];
-  function toggleMenu(e: React.FocusEvent<HTMLDivElement, Element> | React.MouseEvent<HTMLDivElement, MouseEvent>, menu: string) {
+  function toggleMenu(
+    e:
+      | React.FocusEvent<HTMLDivElement, Element>
+      | React.MouseEvent<HTMLDivElement, MouseEvent>,
+    menu: string,
+  ) {
     if (e.type == "blur" || openedMenu == menu) {
       setOpenedMenu(null);
     } else {
@@ -294,39 +217,47 @@ const CreateJobs = ({
     });
     const data = await res.json();
     const data_res = data.data;
-    if (data.status == "successful") {
-      setFd({ jobType: "", catagory: "", range: "", detail: "", title: "" });
-      setEdit(null);
-      /*const fetchMyjobs = async () => {
-        console.log(data.message);
-        const job_res = await fetch(`/api/myJobs?id=${data.message}`);
-        const _Myjobs = await job_res.json();
-        const updatedData = _Myjobs.data;
-        console.log("hi", updatedData);
-        //fetch proposals
-        setMyjobs((prev) =>
-          prev.map((j, i) =>
-            j.id === updatedData.id ? { ...j, ...updatedData } : j,
-          ),
-        );
-        const index = myJobs.findIndex((j) => j.id === updatedData.id);
-        console.log(index);
-        setJobdetail(index + 1);
-        setPage("myJobs");
-      };
-      fetchMyjobs();*/
+    console.log(data)
+  }
+  function handleChange(id: number, option: string) {
+    const languages = ["En", "Am", "Fr", "Ar"];
 
-      if (edit) {
-        setMyjobs((prev) =>
-          prev.map((j, i) =>
-            j.id === data_res.id ? { ...j, ...data_res } : j,
-          ),
-        );
-      } else {
-        setMyjobs((prev) => [...prev, data_res]);
-      }
-      setPage("myJobs");
+    interface OptionType {
+      id: number;
+      name: string;
     }
+
+    const options: { [key: string]: OptionType[] } = {
+      categoriesEn: categoriesEn,
+      jobTypesEn: jobTypesEn,
+      categoriesAm: categoriesAm,
+      jobTypesAm: jobTypesAm,
+      categoriesFr: categoriesFr,
+      jobTypesFr: jobTypesFr,
+      categoriesAr: categoriesAr,
+      jobTypesAr: jobTypesAr,
+    };
+
+    // Build all translations first
+    const newTranslations: { [key: string]: string } = {};
+
+    languages.forEach((lang) => {
+      const keyName =
+        option === "categories" ? `categories${lang}` : `jobTypes${lang}`;
+
+      const stateKey =
+        option === "categories" ? `${lang}Category` : `${lang}JobType`;
+
+      const found = options[keyName]?.find((o) => o.id === id);
+      if (lang == "En" && found) setSelectedJt(found?.name);
+
+      if (found) {
+        newTranslations[stateKey] = found.name;
+      }
+    });
+
+    // Update fd once with all translations
+    setFd((prev) => ({ ...prev, ...newTranslations }));
   }
 
   return (
@@ -351,8 +282,9 @@ const CreateJobs = ({
           <i className="fa-solid fa-chevron-down mr-3 text-gray-500 ml-auto"></i>
           <input
             name="Job_type"
-            value={fd.jobType}
+            value={fd.Jobtype}
             className="sr-only"
+            readOnly
             required
           />
           {openedMenu == "Job_type" && (
@@ -364,17 +296,12 @@ const CreateJobs = ({
                 <label
                   key={i}
                   onClick={(e) => {
-                    setFd((prev) => ({ ...prev, jobType: t.name }));
+                    handleChange(t.id, "Jobtypes");
                   }}
                   className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                 >
                   <span
-                    className={`w-4 h-4 aspect-square flex-none bg-gray-200 opacity-0  rounded flex items-center justify-cente`}
-                    style={{
-                      backgroundColor:
-                        fd.jobType === t.name ? "#0ea5e9" : undefined,
-                      opacity: fd.jobType === t.name ? 1 : 0,
-                    }}
+                    className={`w-4 h-4 aspect-square ${fd[`${lang}JobType`] == t.name.trim() ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"} flex-none rounded flex items-center justify-cente`}
                   >
                     <i className="fa-solid fa-check scale-90 ml-0.5"></i>
                   </span>
@@ -384,7 +311,7 @@ const CreateJobs = ({
             </div>
           )}
         </div>
-        {/* job catagory */}
+        {/* job category */}
         <div
           onClick={(e) => toggleMenu(e, "Job_catagories")}
           onBlur={(e) => toggleMenu(e, "Job_catagories")}
@@ -394,9 +321,10 @@ const CreateJobs = ({
           <i className="fas fa-layer-group mr-2 text-gray-500"></i>Cataory{" "}
           <i className="fa-solid fa-chevron-down mr-3 text-gray-500 ml-auto"></i>
           <input
-            name="catagory"
-            value={fd.catagory}
+            name="category"
+            value={fd.category}
             className="sr-only"
+            readOnly
             required
           />
           {openedMenu == "Job_catagories" && (
@@ -408,21 +336,16 @@ const CreateJobs = ({
                 <label
                   key={i}
                   onClick={(e) => {
-                    setFd((prev) => ({ ...prev, catagory: t.title }));
+                    handleChange(t.id, "categories");
                   }}
                   className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                 >
                   <span
-                    className={`w-4 h-4 aspect-square flex-none bg-gray-200 opacity-0  rounded flex items-center justify-cente`}
-                    style={{
-                      backgroundColor:
-                        fd.catagory === t.title ? "#0ea5e9" : undefined,
-                      opacity: fd.catagory === t.title ? 1 : 0,
-                    }}
+                    className={`w-4 h-4 aspect-square flex-none ${fd[`${lang}Category`] == t.name ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"}  rounded flex items-center justify-cente`}
                   >
                     <i className="fa-solid fa-check scale-90 ml-0.5"></i>
                   </span>
-                  {t.title}
+                  {t.name}
                 </label>
               ))}
             </div>
@@ -437,7 +360,13 @@ const CreateJobs = ({
         >
           <i className="fas fa-sack-dollar mr-2 text-gray-500"></i>Sallary Range{" "}
           <i className="fa-solid fa-chevron-down mr-3 text-gray-500 ml-auto"></i>
-          <input name="range" value={fd.range} className="sr-only" required />
+          <input
+            name="range"
+            value={fd.range}
+            className="sr-only"
+            readOnly
+            required
+          />
           {openedMenu == "Income_range" && (
             <div
               onClick={(e) => e.stopPropagation()}
@@ -447,17 +376,12 @@ const CreateJobs = ({
                 <label
                   key={i}
                   onClick={(e) => {
-                    setFd((prev) => ({ ...prev, range: t.label }));
+                    setFd((prev) => ({ ...prev, salary_range: t.label }));
                   }}
                   className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                 >
                   <span
-                    className={`w-4 h-4 aspect-square flex-none bg-gray-200 opacity-0  rounded flex items-center justify-cente`}
-                    style={{
-                      backgroundColor:
-                        fd.range === t.label ? "#0ea5e9" : undefined,
-                      opacity: fd.range === t.label ? 1 : 0,
-                    }}
+                    className={`w-4 h-4 aspect-square flex-none rounded flex items-center justify-cente ${fd.salary_range == t.label ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"}`}
                   >
                     <i className="fa-solid fa-check scale-90 ml-0.5"></i>
                   </span>
@@ -496,7 +420,7 @@ const CreateJobs = ({
 
 const Employer = () => {
   const [selectedJob, setJobdetail] = useState<number | null>(0);
-  
+
   const [page, setPage] = useState<string | null>("proposals");
   const [jobs, setJobs] = useState<_jobs[]>([]);
   const [myJobs, setMyjobs] = useState<_myjobsType[]>([]);
@@ -504,11 +428,17 @@ const Employer = () => {
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
   const [fd, setFd] = useState({
-    jobType: "",
-    catagory: "",
-    range: "",
-    detail: "",
     title: "",
+    detail: "",
+    salary_range: "",
+    EnCategory: "",
+    FrCategory: "",
+    ArCategory: "",
+    AmCategory: "",
+    EnJobType: "",
+    FrJobType: "",
+    ArJobType: "",
+    AmJobType: "",
   });
 
   useEffect(() => {
@@ -520,56 +450,57 @@ const Employer = () => {
         cache: "no-store",
       });
       const props = await prop_res.json();
-      const fullProposal = props.data.map((p:{
-  id:number;
-  name:string;
-  approval:string;
-  career_id:string;
-  career_owner:string;
-  created_at:string;
-  proposal:string;
-  seenstatus:string;
-  sender:string;
-  sender_flag:string;
-  sender_location:string;
-  title:string
-}) => {
-        console.log(p)
-        const proposed_job = _Myjobs.data.filter((j:proposalType) => {
-          return j.id == Number(p.career_id);
-        });
-        return {
-          id: p.id,
-          career_owner: p.career_owner,
-          created_at: p.created_at,
-          name: p.name,
-          detail: p.proposal,
-          sender: p.sender,
-          location: p.sender_location,
-          flag: p.sender_flag,
-          title: proposed_job[0].title,
-          approval: p.approval,
-          seenStatus: p.seenstatus,
-        };
-      });
+      const fullProposal = props.data.map(
+        (p: {
+          id: number;
+          name: string;
+          approval: string;
+          career_id: string;
+          career_owner: string;
+          created_at: string;
+          proposal: string;
+          seenstatus: string;
+          sender: string;
+          sender_flag: string;
+          sender_location: string;
+          title: string;
+        }) => {
+          const proposed_job = _Myjobs.data.filter((j: proposalType) => {
+            return j.id == Number(p.career_id);
+          });
+          return {
+            id: p.id,
+            career_owner: p.career_owner,
+            created_at: p.created_at,
+            name: p.name,
+            detail: p.proposal,
+            sender: p.sender,
+            location: p.sender_location,
+            flag: p.sender_flag,
+            title: proposed_job[0].title,
+            approval: p.approval,
+            seenStatus: p.seenstatus,
+          };
+        },
+      );
       setProposals(fullProposal);
       setMyjobs(_Myjobs.data);
     };
 
     /* const fetchProposals = async()=>{
-      const res = await fetch("/api/proposal/?role=employer",{cache:"no-store"})
-      const _res = await res.json()
-      setProposals(_res.data)
-      _res.data.forEach((p)=>{
-        setProposal_ids((prev)=>[...prev,p.career_id])
-      })
-    }
-    fetchProposals() */
+        const res = await fetch("/api/proposal/?role=employer",{cache:"no-store"})
+        const _res = await res.json()
+        setProposals(_res.data)
+        _res.data.forEach((p)=>{
+          setProposal_ids((prev)=>[...prev,p.career_id])
+        })
+      }
+      fetchProposals() */
 
     fetchData();
   }, []);
 
-  async function handleSeen(jobid_:number, status:proposalType) {
+  async function handleSeen(jobid_: number, status: proposalType) {
     if (!status) {
       const seenRes = await fetch("/api/seenStatus", {
         method: "POST",
@@ -589,22 +520,6 @@ const Employer = () => {
           Land Your Job
         </h1>
         <div className="px-3 flex gap-5 flex-col text-gray-700">
-          <div className="flex rounded-2xl shadow-lg shadow-gray-300 overflow-hidden items-center pl-2 bg-[#f6f9fc]">
-            <i className="fa-solid fa-search " />
-            <input
-              type="text"
-              placeholder="Search for job"
-              className="w-full h-full py-2 px-3 focus:outline-0"
-            />
-          </div>
-          {/*catagories filter */}
-          <div
-            onClick={() => setPage("dashboard")}
-            className="relative flex rounded-xl font-medium item-center px-2 hover:bg-green-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
-          >
-            <i className="fa-solid fa-gauge"></i>
-            Dashboard
-          </div>
           <div
             onClick={() => setPage("myJobs")}
             className="relative flex rounded-xl font-medium item-center px-2 hover:bg-green-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
@@ -651,7 +566,9 @@ const Employer = () => {
                 job={myJobs[selectedJob - 1]}
                 setJobdetail={setJobdetail}
                 setPage={setPage}
-                setFd={setFd} option={""}              />
+                setFd={setFd}
+                option={""}
+              />
             ) : (
               <>
                 <table className="w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden">
@@ -669,7 +586,7 @@ const Employer = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {myJobs.map((p:_myjobsType, i) => (
+                    {myJobs.map((p: _myjobsType, i) => (
                       <tr
                         onClick={() => {
                           setJobdetail(i + 1);
@@ -732,7 +649,7 @@ const Employer = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {proposals.map((p:proposalType, i) => (
+                    {proposals.map((p: proposalType, i) => (
                       <tr
                         onClick={() => {
                           setJobdetail(i + 1);
