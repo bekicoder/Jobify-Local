@@ -116,7 +116,7 @@ export default function NavBar() {
       </button>
 
       {isOpen && (
-        <ul className="absolute mt-2 bg-white shadow-lg border rounded z-50 overflow-auto">
+        <ul className="absolute mt-2 w-56 bg-white shadow-lg border rounded z-50 max-h-60 overflow-auto">
           {languages && languages.map((language:Language) => (
             <li
               key={language.id}
@@ -162,7 +162,7 @@ export default function NavBar() {
               {user.name.substr(0, 1)}
             </div>
             <div
-              className={`text-sm peer-hover:block md:absolute md:w-60  md:top-[130%] md:right-5 rounded-lg border border-gray-300 py-12 md:bg-[#f1f5f9] md:py-4 md:px-4 ${profileShow ? "block" : "md:hidden"}`}
+              className={`text-sm peer-hover:block md:absolute md:w-fit  md:top-[130%] md:right-5 rounded-lg border border-gray-300 py-12 md:bg-[#f1f5f9] md:py-4 md:px-4 ${profileShow ? "block" : "md:hidden"}`}
             >
               <p>
                 <i className="fa-solid fa-user text-gray-600 px-2"></i>{" "}
