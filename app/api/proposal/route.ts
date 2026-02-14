@@ -3,7 +3,15 @@ import { pool as db } from "@/lib/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { splitText, translateLargeText } from "../createJob/route";
 import { franc } from "franc";
-import { countriesEn,categoriesAm,categoriesAr,categoriesFr, countriesAm, countriesFr, countriesAr } from "@/app/_components/contents";
+import {
+  countriesEn,
+  categoriesAm,
+  categoriesAr,
+  categoriesFr,
+  countriesAm,
+  countriesFr,
+  countriesAr,
+} from "@/app/_components/contents.ts";
 import { jobData } from "../myJobs/route";
 export async function GET(req: NextRequest) {
   try {
@@ -56,32 +64,33 @@ export async function POST(req: NextRequest) {
     };
     const proposalData: Record<string, string> = {};
     const detectedLang = franc(article);
-    console.log(detectedLang,"this is the lang")
+    console.log(detectedLang, "this is the lang");
     const lang = isoMap[detectedLang] || "En";
-    const locationId = countriesEn.filter((c)=>c.name == proposal.location)
-    const countriesMap:Record<string,{id:number,name:string}[]> = {
-        En:countriesEn,
-        Am:countriesAm,
-        Fr:countriesFr,
-        Ar:countriesAr
-    }
-    languages.map((lng)=>{
-        const countrie = countriesMap[lng].filter(c=>{
-            return c.id == Number(locationId[0].id)
-        })
-        proposalData[`senderloc${lng.toLowerCase()}`] = countrie[0].name
-    })
+    const locationId = countriesEn.filter((c) => c.name == proposal.location);
+    const countriesMap: Record<string, { id: number; name: string }[]> = {
+      En: countriesEn,
+      Am: countriesAm,
+      Fr: countriesFr,
+      Ar: countriesAr,
+    };
+    languages.map((lng) => {
+      const countrie = countriesMap[lng].filter((c) => {
+        return c.id == Number(locationId[0].id);
+      });
+      proposalData[`senderloc${lng.toLowerCase()}`] = countrie[0].name;
+    });
     //     return NextResponse.json(
     //   { msg: "successful", id: proposalData },
     //   { status: 200 },
     // );
-    const values = Object.values(proposalData)
+    const values = Object.values(proposalData);
     values.unshift(
       decoded.name,
       decoded.email,
-       decoded.flag,
+      decoded.flag,
       proposal.id,
-      proposal.posted_by)
+      proposal.posted_by,
+    );
     await Promise.all(
       languages.map(async (language) => {
         const proposalKey = `${language.toLowerCase()}proposal`;

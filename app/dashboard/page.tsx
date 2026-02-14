@@ -28,7 +28,7 @@ import {
   jobTypesAr,
   categoriesFr,
   jobTypesFr,
-} from "../_components/contents";
+} from "../_components/contents.ts";
 
 const JobDetailsPanel = ({
   option,
@@ -461,9 +461,9 @@ const Employer = () => {
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
   const { content, lang } = useSharedState();
-  const [approvals, setApprovals] = useState<{ id: number; approval: string; }[]>(
-    [],
-  );
+  const [approvals, setApprovals] = useState<
+    { id: number; approval: string }[]
+  >([]);
 
   const [fd, setFd] = useState({
     title: "",
@@ -483,7 +483,7 @@ const Employer = () => {
     const fetchData = async () => {
       const job_res = await fetch("/api/myJobs");
       const { resData } = await job_res.json();
-      
+
       setMyjobs(resData);
       //fetch proposals
       const prop_res = await fetch("/api/proposal/?role=employer", {

@@ -2,13 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { pool as db } from "@/lib/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {
-  countriesAm,
-  countriesAr,
-  countriesEn,
-  countriesFr,
-} from "@/app/_components/contents";
-
+import { countriesAm } from "@/app/_components/contents.ts";
 export async function POST(req: NextRequest) {
   try {
     const {
@@ -65,23 +59,31 @@ export async function POST(req: NextRequest) {
       "#FBC02D",
       "#5D4037",
     ];
-    const EnLocation = countriesEn.filter(countrie => countrie.id == location);
-        const AmLocation = countriesAm.filter(countrie =>countrie.id == location);
-        const FrLocation = countriesFr.filter(countrie =>countrie.id == location);
-        const ArLocation = countriesAr.filter(countrie =>countrie.id == location);
-        const locationMap: Record<string, string> = {
-          EnLocation: EnLocation[0].name,
-          AmLocation: AmLocation[0].name,
-          ArLocation: ArLocation[0].name,
-          FrLocation: FrLocation[0].name,
-        }
+    const EnLocation = countriesEn.filter(
+      (countrie) => countrie.id == location,
+    );
+    const AmLocation = countriesAm.filter(
+      (countrie) => countrie.id == location,
+    );
+    const FrLocation = countriesFr.filter(
+      (countrie) => countrie.id == location,
+    );
+    const ArLocation = countriesAr.filter(
+      (countrie) => countrie.id == location,
+    );
+    const locationMap: Record<string, string> = {
+      EnLocation: EnLocation[0].name,
+      AmLocation: AmLocation[0].name,
+      ArLocation: ArLocation[0].name,
+      FrLocation: FrLocation[0].name,
+    };
     const hashedPass = await bcrypt.hash(password, 10);
     const name =
       role == "employee" ? fname + " " + lname : role == "employer" && orgname;
     const column_name = role == "employer" ? "orgname" : "name";
     const randomColor =
       profileColors[Math.floor(Math.random() * profileColors.length)];
-      
+
     const sql = `INSERT INTO ${tableName} (${column_name},email, password,profile,flag,enlocation,amlocation,arlocation,frlocation) values($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`;
     const result = await db.query(sql, [
       name,
@@ -94,7 +96,7 @@ export async function POST(req: NextRequest) {
       locationMap.ArLocation,
       locationMap.FrLocation,
     ]);
-   
+
     const user = result.rows[0];
     const token = jwt.sign(
       {
@@ -104,10 +106,10 @@ export async function POST(req: NextRequest) {
         role: user.role,
         profile: user.profile,
         flag: user.flag,
-        enLocation:locationMap.EnLocation,
-      amLocation:locationMap.AmLocation,
-      arLocation:locationMap.ArLocation,
-      frLocation:locationMap.FrLocation,
+        enLocation: locationMap.EnLocation,
+        amLocation: locationMap.AmLocation,
+        arLocation: locationMap.ArLocation,
+        frLocation: locationMap.FrLocation,
       },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" },
