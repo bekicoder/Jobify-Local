@@ -55,10 +55,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (id) {
-    const { rows:job } = await db.query("select * from jobs where id = $1;", [id]);
-    jobData.created_at = job.created_at;
-    jobData.posted_by = job.posted_by;
-    jobData.flag = job.flag;
+    const { rows:job }= await db.query("select * from jobs where id = $1;", [id]);
+    jobData.created_at = job[0].created_at;
+    jobData.posted_by = job[0].posted_by;
+    jobData.flag = job[0].flag;
     await Promise.all(
       languages.map(async (lang) => {
         const lng = lang[0].toUpperCase()+lang[1]

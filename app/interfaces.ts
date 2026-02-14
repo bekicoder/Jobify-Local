@@ -67,13 +67,14 @@ export default interface ContentType {
   right:string;
   donhave: string;
   createOne: string;
+  notMemeber:string;
 };
 export interface income_range {
   id: number;
   label: string;
 }
 export interface _Fd {
-  [key:string]:string
+  [key:string]:string | number
   title: string;
   detail: string;
   salary_range: string;
@@ -89,23 +90,36 @@ export interface _Fd {
   AmJobType: string;
 }
 export interface _myjobsType {
-  id: string;
-  location: string;
-  jobtype: string;
-  flag: string;
-  created_at: string;
-  catagory: string;
+  [key:string]:string|number,
+ id: number;
+  created_at: string; 
+  posted_by: string; 
+  flag: string;     
   salary_range: string;
-  detail: string;
-  title: string;
-  posted_by: string;
-  updated_at: string;
-  approval: string;
-  name: string;
-  career_owner: string;
-  seenStatus: boolean;
-  sender: string;
-  career_id: string;
+
+  titleEn: string;
+  detailEn: string;
+  EnLocation: string;
+  EnCategory: string;
+  EnJobtype: string;
+
+  titleAm: string;
+  detailAm: string;
+  AmLocation: string;
+  AmCategory: string;
+  AmJobtype: string;
+
+  titleAr: string;
+  detailAr: string;
+  ArLocation: string;
+  ArCategory: string;
+  ArJobtype: string;
+
+  titleFr: string;
+  detailFr: string;
+  FrLocation: string;
+  FrCategory: string;
+  FrJobtype: string;
 }
 export interface DetailsPanelType {
   option: string;
@@ -114,8 +128,8 @@ export interface DetailsPanelType {
   setPage: React.Dispatch<SetStateAction<string | null>>;
   setFd: React.Dispatch<SetStateAction<_Fd>>;
   setEdit: React.Dispatch<SetStateAction<number | null>>;
-  setApprovals:React.Dispatch<SetStateAction<Record<string,string|number>[]>>
-  approvals:Record<string,string|number>[]
+  setApprovals:React.Dispatch<SetStateAction<{ id: number; approval: string; }[]>>
+  approvals:{ id: number; approval: string; }[]
 }  
 
 export interface _jobs {
@@ -140,16 +154,35 @@ export interface createJobsParamsType {
   setJobdetail: React.Dispatch<SetStateAction<number | null>>;
 }
 export interface proposalType {
+  [key:string]:string | number | boolean
   id: number;
-  name: string;
-  approval: string;
-  career_id: string;
-  career_owner: string;
-  created_at: string;
-  seenstatus: string;
   sender: string;
+  career_owner: string;
+  name: string;
   flag: string;
-  title: string;
+  salary_range: string;
+  approval: string;
+  seenstatus: boolean;
+  created_at: string; // or Date if you parse it
+  senderlocen: string;
+  senderlocam: string;
+  senderlocar: string;
+  senderlocfr: string;
+
+  EnJobtype: string;
+  AmJobtype: string;
+  ArJobtype: string;
+  FrJobtype: string;
+
+  titleen: string;
+  titleam: string;
+  titlear: string;
+  titlefr: string;
+
+  detailEn: string;
+  detailAm: string;
+  detailAr: string;
+  detailFr: string;
 }
 
 export interface jobType {
@@ -176,6 +209,8 @@ export interface job_detailsPanel {
   saved_ids: number[];
   setSaved_ids: React.Dispatch<SetStateAction<number[]>>;
   setSavedJobs: React.Dispatch<SetStateAction<jobType[]>>;
+  approvals:{ id: number; approval: string; }[];
+  setApprovals:React.Dispatch<SetStateAction<{ id: number; approval: string; }[]>>
 }
 
 export interface countriesType {

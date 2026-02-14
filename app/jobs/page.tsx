@@ -19,7 +19,6 @@ const JobDetailsPanel = ({
   approvals,
   setApprovals
 }:job_detailsPanel) => {
-  console.log(job,"this is the job")
   const [opend, setOpend] = useState<boolean>(false);
   const {lang} = useSharedState()
 const {content} = useSharedState()
@@ -32,7 +31,6 @@ const {content} = useSharedState()
     const approved = approval?.approval
     console.log(approval?.approval,"this is the approved",approvals,approval)
     const isApplied = proposal_ids.some(p=>Number(p) == Number(job.id))
-    console.log(isApplied)
   const handleSave = async () => {
     setOpend(false)
     const save = await fetch("/api/saveJob", {
@@ -77,8 +75,7 @@ const {content} = useSharedState()
       const data = await fetch(`/api/proposal?id=${_res.id}`,{cache:"no-store"});
       const updatedData = await data.json();
       setProposal_ids((prev) => [_res.id, ...prev]);
-      setApprovals({id:job.id,approval:updatedData.data.approval});
-      
+      setApprovals(prev=>{return [{id:job.id,approval:updatedData.data.approval},...prev]});
     }
   }
   return (
@@ -92,10 +89,10 @@ const {content} = useSharedState()
         >
           <div className="w-full p-4 h-full bg-white rounded-2xl max-w-2xl flex flex-col relative">
             <h1 className="text-2xl font-bold text-center mb-1">
-              {content.write_proposal}
+              {content.writeProposal}
             </h1>{" "}
             <p className="text-center text-sm text-gray-600 mb-4">
-              {content.markdown_suport}
+              {content.markdownSupport}
             </p>
             <button
               onClick={() => setOpend(false)}
@@ -107,7 +104,7 @@ const {content} = useSharedState()
             <input
               name="location"
               readOnly
-              value={job['EnLocation']}
+              value={job['EnLocation'] as string}
               className="sr-only"
             />
             <input
@@ -172,7 +169,7 @@ const {content} = useSharedState()
       <h1 className="text-2xl font-medium mb-2">{job.title}</h1>
       <div className="w-full flex justify-between pr-4">
         <span className=" text-sm flex items-center font-medium text-gray-600">
-          {job.salary_range} • {job[`${lang}Location`]}&nbsp;&nbsp;&nbsp;{" "}
+          {job.salary_range} • {job[`${lang}Location`] as string}&nbsp;&nbsp;&nbsp;{" "}
           <div className="aspect-video w-6 relative">
             {
               <Image
@@ -184,7 +181,7 @@ const {content} = useSharedState()
               />
             }
           </div>
-          &nbsp;&nbsp;• {job[`${lang}Jobtype`]} &nbsp;&nbsp;
+          &nbsp;&nbsp;• {job[`${lang}Jobtype`] as string} &nbsp;&nbsp;
           <span
             className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-yellow-500" : approved && "bg-green-500"} my-auto mt-2 `}
           ></span>
@@ -198,7 +195,7 @@ const {content} = useSharedState()
         {content.aboutJob}
       </h3>
       <article className="prose lg:prose-l prose-slate max-h-full flex-1 mb-16">
-        <ReactMarkdown>{job[`detail${lang}`]}</ReactMarkdown>
+        <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         {/*bottom space */}
         <div className="w-full h-12"></div>
       </article>
@@ -212,38 +209,7 @@ const EmployeePage = () => {
   const {content,jobCategories,jobTypes,countries} = useSharedState()
   const [_jobs, setJobs] = useState<jobType[]>([]);
 
-  // type JobCategory = {
-  //   id: number;
-  //   title: string;
-  // };
-
-  // type locations = {
-  //   id: number;
-  //   name: string;
-  //   flag: string;
-  // };
-  // const {} = useSharedState()
-
-  // type job_types = {
-  //   id: number;
-  //   name: string;
-  // };
-
-  // const jobTypes: job_types[] = [
-  //   { id: 1, name: "Full-time" },
-  //   { id: 2, name: "Part-time" },
-  //   { id: 3, name: "Contract" },
-  //   { id: 4, name: "Temporary" },
-  //   { id: 5, name: "Internship" },
-  //   { id: 6, name: "Freelance" },
-  //   { id: 7, name: "Remote" },
-  //   { id: 8, name: "Hybrid" },
-  //   { id: 9, name: "On-site" },
-  //   { id: 10, name: "Seasonal" },
-  //   { id: 11, name: "Volunteer" },
-  //   { id: 12, name: "Apprenticeship" },
-  // ];
-
+ 
   type income_range = {
     id: number;
     label: string;
@@ -267,14 +233,14 @@ const EmployeePage = () => {
   const [catagories, setCatagories] = useState<{ [key: number]: boolean }>({});
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const [selectedJob, setJobdetail] = useState<number | null>(null);
-  const [proposals, setProposals] = useState([]);
+  const [proposals, setProposals] = useState<proposalType[]>([]);
   const [proposal_ids, setProposal_ids] = useState<number[]>([]);
   const [savedJobs, setSavedJobs] = useState<jobType[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<jobType[]>([]);
   const [saved_ids, setSaved_ids] = useState<number[]>([]);
   const {lang} = useSharedState()
-  const [approvals,setApprovals] = useState<Record<string,string|number>[]>([])
-  const [selectedJ,setSelectedJ] = useState({
+  const [approvals,setApprovals] = useState<{id:number,approval:string}[]>([])
+  const [selectedJ,setSelectedJ] = useState<jobType>({
     id: 0,
     catagory: "",
     created_at: "",
@@ -326,7 +292,7 @@ const EmployeePage = () => {
       })
       const props = await prop_res.json();
       const proposalIds: number[] = [];
-      const approved:Record<string,string | number>[] = []
+      const approved:{id:number,approval:string}[] = []
       const fullProposal = props.data.map((p: Record<string, string | number>) => {
         approved.unshift({id:Number(p.career_id),approval:String(p.approval)})
         proposalIds.unshift(Number(p.career_id));
@@ -363,6 +329,7 @@ const EmployeePage = () => {
       setProposal_ids(proposalIds);
       setProposals(fullProposal);
       setApprovals(approved)
+
     };
     const fetchSaved = async () => {
       const savedRes = await fetch("/api/saveJob",{cache:"no-store"});
@@ -380,33 +347,26 @@ const EmployeePage = () => {
     if (!option || !filterType) return;
     setFilteredJobs((prev) => {
       if (status) {
-        // ADD filter
         return [
           ..._jobs.filter((j) => j[filterType] === option && !prev.includes(j)),
           ...prev,
         ];
       } else {
-        // REMOVE filter
-
         return prev.filter((j) => j[filterType] !== option);
       }
     });
   }
-  function handleSearch(e){
-
-  }
-  const jobsToRender = filteredJobs.length > 0 ? filteredJobs : _jobs;
-
+  const jobsToRender:jobType[] = filteredJobs.length > 0 ? filteredJobs : _jobs;
   useEffect(()=>{
     let selected ;
     if(route == "appliedJobs"){
-      selected = proposals.find((j) => j.id == selectedJob)
+      selected = proposals.find((j:proposalType) => j.id == selectedJob)
     } 
     else {
       selected = _jobs.find((j) => j.id == selectedJob)
     }
        // eslint-disable-next-line react-hooks/set-state-in-effect
-       if(selected) setSelectedJ(selected)
+       if(selected) setSelectedJ(selected as jobType)
   },[selectedJob])
   return (
     <div className="w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-[#f6f9fc] md:fixed">
@@ -621,19 +581,19 @@ const EmployeePage = () => {
                     jobsToRender.map((p, i) => (
                       <tr
                         onClick={() => {
-                          setJobdetail(p.id);
+                          setJobdetail(Number(p.id));
                         }}
                         key={i}
                         className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
-                          {p[`title${lang}`]}
+                          {p[`title${lang}`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
                             {
                               <Image
-                                src={p.flag}
+                                src={p.flag as string}
                                 alt={p.location + " flag"}
                                 fill
                                 sizes="20px"
@@ -641,10 +601,10 @@ const EmployeePage = () => {
                               />
                             }
                           </div>{" "}
-                          {p[`${lang}Location`]}
+                          {p[`${lang}Location`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
-                          {p[`${lang}Jobtype`]}
+                          {p[`${lang}Jobtype`] as string}
                         </td>
                       </tr>
                     ))}
@@ -686,7 +646,7 @@ const EmployeePage = () => {
                         className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
-                          {p[`title${lang}`]}
+                          {p[`title${lang}`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
@@ -700,10 +660,10 @@ const EmployeePage = () => {
                               />
                             }
                           </div>
-                          {p[`${lang}Location`]}
+                          {p[`${lang}Location`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
-                          {p[`${lang}Jobtype`]}
+                          {p[`${lang}Jobtype`] as string}
                         </td>
                       </tr>
                     ))}

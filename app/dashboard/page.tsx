@@ -29,6 +29,7 @@ import {
   categoriesFr,
   jobTypesFr,
 } from "../_components/contents";
+
 const JobDetailsPanel = ({
   option,
   job,
@@ -37,8 +38,7 @@ const JobDetailsPanel = ({
   setFd,
   setEdit,
 }: DetailsPanelType) => {
-  console.log(job);
-  const [approval, setApproval] = useState<string>(job.approval);
+  const [approval, setApproval] = useState<string>(job.approval as string);
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
   const proposal = option === "proposal";
@@ -47,8 +47,8 @@ const JobDetailsPanel = ({
     setFd({
       Jobtype: job.Jobtype,
       category: job.category,
-      title: job[`title${lang}`],
-      detail: job[`detail${lang}`],
+      title: job[`title${lang}`] as string,
+      detail: job[`detail${lang}`] as string,
       salary_range: job.salary_range,
       EnCategory: job.EnCategory,
       FrCategory: job.FrCategory,
@@ -173,7 +173,7 @@ const JobDetailsPanel = ({
         {content.aboutJob}
       </h3>
       <article className="prose lg:prose-l prose-slate max-h-full flex-1 mb-16">
-        <ReactMarkdown>{job[`detail${lang}`]}</ReactMarkdown>
+        <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         <div className="w-full h-12"></div>
       </article>
     </div>
@@ -192,7 +192,7 @@ const CreateJobs = ({
 
   const { jobTypes } = useSharedState();
   const { jobCategories } = useSharedState();
-  const { content,lang } = useSharedState();
+  const { content, lang } = useSharedState();
   const [selectedJt, setSelectedJt] = useState("");
   const incomeRanges: income_range[] = [
     { id: 1, label: `${content.below} $500` },
@@ -216,38 +216,37 @@ const CreateJobs = ({
       setOpenedMenu(menu);
     }
   }
-  let disabled = false ;
+  let disabled = false;
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if(!disabled){
-    const res = await fetch("/api/createJob", {
-      body: JSON.stringify({ fd: fd, editId: edit }),
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-    const data = await res.json();
-    const data_res = data.data;
-    if(data_res.status == "successful"){
-      
-      setFd({
-    title: "",
-    detail: "",
-    salary_range: "",
-    EnCategory: "",
-    FrCategory: "",
-    ArCategory: "",
-    AmCategory: "",
-    EnJobType: "",
-    FrJobType: "",
-    ArJobType: "",
-    AmJobType: "",
-  })
-  // eslint-disable-next-line react-hooks/immutability
-  disabled = !disabled
+    if (!disabled) {
+      const res = await fetch("/api/createJob", {
+        body: JSON.stringify({ fd: fd, editId: edit }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      const data = await res.json();
+      const data_res = data.data;
+      if (data.status == "successful") {
+        setFd({
+          title: "",
+          detail: "",
+          salary_range: "",
+          EnCategory: "",
+          FrCategory: "",
+          ArCategory: "",
+          AmCategory: "",
+          EnJobType: "",
+          FrJobType: "",
+          ArJobType: "",
+          AmJobType: "",
+        });
+        // eslint-disable-next-line react-hooks/immutability
+        disabled = !disabled;
+      }
+      console.log(data);
     }
-    console.log(data);
-}
   }
 
   function handleChange(id: number, option: string) {
@@ -462,6 +461,10 @@ const Employer = () => {
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
   const { content, lang } = useSharedState();
+  const [approvals, setApprovals] = useState<{ id: number; approval: string; }[]>(
+    [],
+  );
+
   const [fd, setFd] = useState({
     title: "",
     detail: "",
@@ -480,6 +483,7 @@ const Employer = () => {
     const fetchData = async () => {
       const job_res = await fetch("/api/myJobs");
       const { resData } = await job_res.json();
+      
       setMyjobs(resData);
       //fetch proposals
       const prop_res = await fetch("/api/proposal/?role=employer", {
@@ -496,34 +500,34 @@ const Employer = () => {
             },
           );
 
-          console.log(proposed_job,"hi beki this is the porposed job")
+          console.log(proposed_job, "hi beki this is the porposed job");
           return {
-          id: Number(p.career_id),
-          career_owner: p.career_owner,
-          created_at: p.created_at,
-          name: p.name,
-          detailAm: p?.amproposal,
-          detailAr:p?.arproposal,
-          detailFr:p?.frproposal,
-          detailEn:p?.enproposal,
-          sender: p.sender,
-          senderlocen: p?.senderlocen,
-          senderlocam: p?.senderlocam,
-          senderlocar: p?.senderlocar,
-          senderlocfr: p?.senderlocfr,
-          AmJobtype:proposed_job[0]?.AmJobtype,
-          ArJobtype:proposed_job[0]?.ArJobtype,
-          EnJobtype:proposed_job[0]?.EnJobtype,
-          FrJobtype:proposed_job[0]?.FrJobtype,
-          flag: proposed_job[0]?.flag,
-          titleam: proposed_job[0]?.titleAm,
-          titleen: proposed_job[0]?.titleEn,
-          titlefr: proposed_job[0]?.titleFr,
-          titlear: proposed_job[0]?.titleAr,
-          approval: p.approval,
-          seenstatus: p.seenstatus,
-          propId:p.id
-        };
+            id: Number(p.career_id),
+            career_owner: p.career_owner,
+            created_at: p.created_at,
+            name: p.name,
+            detailAm: p?.amproposal,
+            detailAr: p?.arproposal,
+            detailFr: p?.frproposal,
+            detailEn: p?.enproposal,
+            sender: p.sender,
+            senderlocen: p?.senderlocen,
+            senderlocam: p?.senderlocam,
+            senderlocar: p?.senderlocar,
+            senderlocfr: p?.senderlocfr,
+            AmJobtype: proposed_job[0]?.AmJobtype,
+            ArJobtype: proposed_job[0]?.ArJobtype,
+            EnJobtype: proposed_job[0]?.EnJobtype,
+            FrJobtype: proposed_job[0]?.FrJobtype,
+            flag: proposed_job[0]?.flag,
+            titleam: proposed_job[0]?.titleAm,
+            titleen: proposed_job[0]?.titleEn,
+            titlefr: proposed_job[0]?.titleFr,
+            titlear: proposed_job[0]?.titleAr,
+            approval: p.approval,
+            seenstatus: p.seenstatus,
+            propId: p.id,
+          };
         },
       );
       setProposals(fullProposal);
@@ -550,7 +554,7 @@ const Employer = () => {
         headers: { "Content-Type": "application/json" },
       });
       const { msg } = await seenRes.json();
-      console.log(msg,"this is the msg")
+      console.log(msg, "this is the msg");
       if (msg !== "successful") {
       }
     }
@@ -581,7 +585,7 @@ const Employer = () => {
             className="relative flex rounded-xl font-medium item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
           >
             <i className="fa-solid fa-file-lines"></i>
-          {content.proposals}
+            {content.proposals}
           </div>
         </div>
       </aside>
@@ -610,6 +614,8 @@ const Employer = () => {
                 setPage={setPage}
                 setFd={setFd}
                 option={""}
+                setApprovals={setApprovals}
+                approvals={approvals}
               />
             ) : (
               <>
@@ -673,12 +679,14 @@ const Employer = () => {
                 setPage={setPage}
                 setFd={setFd}
                 setEdit={setEdit}
+                setApprovals={setApprovals}
+                approvals={approvals}
               />
             ) : (
               <>
                 <table className="w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden">
                   <thead className="border-b border-b-gray-300 px-7">
-                    <tr>{console.log(proposals,"dose this work")}
+                    <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">
                         {content.name}
                       </th>
@@ -695,7 +703,7 @@ const Employer = () => {
                       <tr
                         onClick={() => {
                           setJobdetail(i + 1);
-                          handleSeen(p.propId, p);
+                          handleSeen(p.propId as number, p);
                         }}
                         key={i}
                         className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
@@ -709,7 +717,9 @@ const Employer = () => {
                               width={20}
                               height={20}
                               src={p.flag}
-                              alt={p[`senderloc${lang.toLowerCase()}`] + " flag"}
+                              alt={
+                                p[`senderloc${lang.toLowerCase()}`] + " flag"
+                              }
                               className="h-fit aspect-video"
                             />
                           }

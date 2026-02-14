@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { pool as db } from "@/lib/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { franc } from "franc";
-import { detectLanguage } from "@/lib/detectLanguage";
 
 export function splitText(text: string, maxLength: number = 500) {
   const chunks: string[] = [];

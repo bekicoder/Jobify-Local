@@ -473,7 +473,6 @@ const arabic = {
 
   learn_more: "اعرف المزيد",
   contact: "تواصل معنا",
-  email: "البريد الإلكتروني",
   phone: "الهاتف",
   right: " جميع الحقوق محفوظة.",
   links: "روابط سريعة",
@@ -905,7 +904,6 @@ const french = {
 
   learn_more: "En savoir plus",
   contact: "Contact",
-  email: "E-mail",
   phone: "Téléphone",
   right: " Tous droits réservés.",
   links: "Liens rapides",
