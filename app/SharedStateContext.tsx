@@ -28,7 +28,7 @@ import amharic, {
   countriesEn,
   countriesFr,
   countriesAr,
-} from "./_components/contents.ts";
+} from "./_components/Contents";
 import ContentType, { countriesType } from "./interfaces";
 // Define all states you want to share
 type job_types = {

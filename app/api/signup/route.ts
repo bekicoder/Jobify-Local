@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { pool as db } from "@/lib/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { countriesAm } from "@/app/_components/contents.ts";
+import { countriesAm } from "@/app/_components/Contents";
 export async function POST(req: NextRequest) {
   try {
     const {

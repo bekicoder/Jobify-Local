@@ -11,7 +11,7 @@ import {
   countriesAm,
   countriesFr,
   countriesAr,
-} from "@/app/_components/contents.ts";
+} from "@/app/_components/Contents";
 import { jobData } from "../myJobs/route";
 export async function GET(req: NextRequest) {
   try {

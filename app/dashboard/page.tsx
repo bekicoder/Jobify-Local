@@ -28,7 +28,7 @@ import {
   jobTypesAr,
   categoriesFr,
   jobTypesFr,
-} from "../_components/contents.ts";
+} from "../_components/Contents";
 
 const JobDetailsPanel = ({
   option,
