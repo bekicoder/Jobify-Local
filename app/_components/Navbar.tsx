@@ -41,6 +41,7 @@ export default function NavBar() {
   };
 
   loadcontent();
+  console.log(mode)
 }, []);
 
 
@@ -61,13 +62,19 @@ export default function NavBar() {
     localStorage.setItem("lang",String(lang))
     setLang(lang)
   }
-  async function changeMode(){
-    if(mode == "light") setMode("dark")
-    else if(mode == "dark") setMode("light")
+  function changeMode(){
+    if(mode == "light"){
+       setMode("dark")
+       localStorage.setItem("mode","dark")
+    }
+    else if(mode == "dark"){
+       setMode("light")
+      localStorage.setItem("mode","light")
+    }
   }
   return (
     <nav
-  className={`fixed top-0 left-0 z-1000000 w-full backdrop-blur-md bg-${bgColor} border-b border-gray-200/40 text-${textColor} h-14 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
+  className={`fixed top-0 left-0 z-1000000 w-full backdrop-blur-md bg-${bgColor}/50 border-b border-gray-200/40 text-${textColor} h-14 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
     pathname == "/account" ? "hidden" : "flex"
   }`}
 >
@@ -179,7 +186,7 @@ export default function NavBar() {
 
     <button
       onClick={changeMode}
-      className={`w-9 h-9 flex items-center justify-center rounded-full bg-${lightDark} hover:scale-105 transition-transform duration-200 shadow-sm`}
+      className={`w-9 h-9 cursor-pointer flex items-center justify-center rounded-full bg-${lightDark} hover:scale-105 transition-transform duration-200 shadow-sm`}
     >
       <i
         className={`fas text-${textColor} text-sm fa-${

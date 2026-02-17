@@ -8,7 +8,7 @@ import { useSharedState } from "./SharedStateContext";
 export default function Home() {
  const {bgColor,textColor} = useSharedState()
   return (
-    <div className={`flex flex-col gap-12 pt-12 overflow-x-hidden bg-${bgColor}`}>
+    <div className={`flex  flex-col gap-12 pt-12 overflow-x-hidden bg-${bgColor}`}>
       <Hero />
       <Stats />
       <Community />

@@ -75,14 +75,14 @@ const JobDetailsPanel = ({
     }
   }
   return (
-    <div className="w-full pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl bg-white overflow-y-auto">
+    <div className="w-full pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl  overflow-y-auto">
       {/*proposal form */}
       {opend && (
         <div
           onClick={(e) => e.currentTarget == e.target && setOpend(false)}
           className="proposal_container w-screen h-screen fixed top-0 py-12 px-8 pt-16 left-0 bg-black/50 flex items-center justify-center"
         >
-          <div className="w-full p-4 h-full bg-white rounded-2xl max-w-2xl flex flex-col relative">
+          <div className="w-full p-4 h-full  rounded-2xl max-w-2xl flex flex-col relative">
             <h1 className="text-2xl font-bold text-center mb-1">
               Write Proposal
             </h1>
@@ -192,7 +192,7 @@ const CreateJobs = ({
 
   const { jobTypes } = useSharedState();
   const { jobCategories } = useSharedState();
-  const { content, lang } = useSharedState();
+  const { content, lang,bgColor,textColor,grayText,lightDark,mode } = useSharedState();
   const [selectedJt, setSelectedJt] = useState("");
   const incomeRanges: income_range[] = [
     { id: 1, label: `${content.below} $500` },
@@ -293,25 +293,25 @@ const CreateJobs = ({
   return (
     <form
       onSubmit={handleSumit}
-      className="w-full px-4 pt-4 h-full bg-white md:rounded-2xl flex flex-col"
+      className={`w-full px-4 pt-4 h-full  md:rounded-2xl flex flex-col md:bg-${lightDark} bg-${bgColor} text-${textColor}`}
     >
       <h1 className="text-2xl font-bold text-center mb-1">
         {content.writeProposal}
       </h1>
-      <p className="text-center text-sm text-gray-600 mb-4">
+      <p className="text-center text-sm mb-4">
         {content.markdownSupport}
       </p>
-      <div className="flex w-full flex-col gap-3 mb-4 font-medium text-gray-700 md:flex-row md:justify-between">
+      <div className="flex w-full flex-col gap-3 mb-4 font-medium md:flex-row md:justify-between">
         {/* job type */}
         <div
           onClick={(e) => toggleMenu(e, "Job_type")}
           onBlur={(e) => toggleMenu(e, "Job_type")}
           tabIndex={0}
-          className="p-2 tabin relative rounded-lg bg-gray-100 flex items-center cursor-pointer flex-1"
+          className={`p-3 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:bg-gray-50 hover:${mode=="dark"&&"text-gray-700"} flex items-center cursor-pointer flex-1`}
         >
-          <i className="fa-solid fa-briefcase mr-2 text-gray-500" />
+          <i className="fa-solid fa-briefcase mr-2" />
           {content.jobType}&nbsp;
-          <i className="fa-solid fa-chevron-down mr-3 text-gray-500 ml-auto"></i>
+          <i className="fa-solid fa-chevron-down mr-3 ml-auto"></i>
           <input
             name="Job_type"
             value={fd.Jobtype}
@@ -322,7 +322,7 @@ const CreateJobs = ({
           {openedMenu == "Job_type" && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50 bg-white left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap"
+              className={`filter-box text-${textColor} z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50  left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap bg-${bgColor}`}
             >
               {jobTypes.map((t, i) => (
                 <label
@@ -348,11 +348,11 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Job_catagories")}
           onBlur={(e) => toggleMenu(e, "Job_catagories")}
           tabIndex={0}
-          className="p-2 relative rounded-lg bg-gray-100 flex items-center cursor-pointer flex-1"
+          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-50 flex items-center cursor-pointer flex-1`}
         >
-          <i className="fas fa-layer-group mr-2 text-gray-500"></i>
+          <i className="fas fa-layer-group mr-2"></i>
           {content.categories}
-          <i className="fa-solid fa-chevron-down mr-3 text-gray-500 ml-auto"></i>
+          <i className="fa-solid fa-chevron-down mr-3 ml-auto"></i>
           <input
             name={content.categories}
             value={fd.category}
@@ -363,7 +363,7 @@ const CreateJobs = ({
           {openedMenu == "Job_catagories" && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50 bg-white left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap"
+              className={`filter-box text-${textColor} z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50  left-0 p-3 flex flex-col gap-2 bg-${bgColor} overflow-auto whitespace-nowrap`}
             >
               {jobCategories.map((t, i) => (
                 <label
@@ -389,11 +389,11 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Income_range")}
           onBlur={(e) => toggleMenu(e, "Income_range")}
           tabIndex={0}
-          className="p-2 relative rounded-lg bg-gray-100 flex items-center cursor-pointer flex-1"
+          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-50 flex items-center cursor-pointer flex-1`}
         >
-          <i className="fas fa-sack-dollar mr-2 text-gray-500"></i>
+          <i className="fas fa-sack-dollar mr-2"></i>
           {content.salary}
-          <i className="fa-solid fa-chevron-down mr-3 text-gray-500 ml-auto"></i>
+          <i className="fa-solid fa-chevron-down mr-3 ml-auto"></i>
           <input
             name="range"
             value={fd.range}
@@ -404,7 +404,7 @@ const CreateJobs = ({
           {openedMenu == "Income_range" && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50 bg-white left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap"
+              className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50  left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap text-${textColor} bg-${bgColor}`}
             >
               {incomeRanges.map((t, i) => (
                 <label
@@ -439,7 +439,7 @@ const CreateJobs = ({
         name="detail"
         value={fd.detail}
         placeholder={content.proposalPlaceholder}
-        className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5 outline-sky-500"
+        className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5"
         required
       ></textarea>
       <button
@@ -460,7 +460,7 @@ const Employer = () => {
   const [edit, setEdit] = useState<number | null>(null);
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
-  const { content, lang } = useSharedState();
+  const { content, lang,lightDark,bgColor,textColor,grayText,mode,borderColor } = useSharedState();
   const [approvals, setApprovals] = useState<
     { id: number; approval: string }[]
   >([]);
@@ -533,16 +533,6 @@ const Employer = () => {
       setProposals(fullProposal);
     };
 
-    /* const fetchProposals = async()=>{
-        const res = await fetch("/api/proposal/?role=employer",{cache:"no-store"})
-        const _res = await res.json()
-        setProposals(_res.data)
-        _res.data.forEach((p)=>{
-          setProposal_ids((prev)=>[...prev,p.career_id])
-        })
-      }
-      fetchProposals() */
-
     fetchData();
   }, []);
 
@@ -560,37 +550,40 @@ const Employer = () => {
     }
   }
   return (
-    <div className="w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-[#f6f9fc] md:fixed">
-      <aside className="w-full h-full md:w-70 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 bg-white ">
-        <h1 className="w-full py-3 h-fit bg-sky-600 text-white text-2xl text-center font-bold md:rounded-t">
-          {content.headline}
-        </h1>
-        <div className="px-3 flex gap-5 flex-col text-gray-700">
-          <div
-            onClick={() => setPage("myJobs")}
-            className="relative flex rounded-xl font-medium item-center px-2 hover:bg-green-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
-          >
-            <i className="fa-solid fa-clipboard-list"></i>
-            {content.myJobs}
-          </div>
-          <div
-            onClick={() => setPage("createJob")}
-            className="relative flex rounded-xl font-medium item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
-          >
-            <i className="fa-solid fa-file-circle-plus"></i>
-            {content.createJob}
-          </div>
-          <div
-            onClick={() => setPage("proposals")}
-            className="relative flex rounded-xl font-medium item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
-          >
-            <i className="fa-solid fa-file-lines"></i>
-            {content.proposals}
-          </div>
-        </div>
-      </aside>
+    <div className={`w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} flex-1`}>
+      <aside className={`w-full md:w-72 bg-${bgColor} md:h-screen md:rounded md:shadow-2xl md:border-r border-${borderColor}  flex md:flex-col flex-col`}>
+  <div className="md:hidden flex items-center justify-center h-14 bg-gradient-to-r from-sky-600 to-sky-500 text-white text-lg font-semibold tracking-wide shadow-md">
+    {content.headline}
+  </div>
+  <div className="hidden md:flex items-center justify-center py-3 bg-sky-600 text-white text-2xl font-semibold rounded-t">
+    {content.headline}
+  </div>
+  <div className={`flex md:flex-col flex-row md:gap-5 gap-3 md:p-4 p-3 justify-around md:justify-start  text-${textColor} md:bg-transparent`}>
+    <div
+      onClick={() => setPage("myJobs")}
+      className={`flex hover:scale-105 flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 bg-blue-500/25 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} active:scale-95 w-full md:w-auto`}
+    >
+      <i className="fa-solid fa-layer-group text-lg md:text-xl text-blue-500"></i>
+      <span className="max-md:text-sm md:text-base font-medium">{content.myJobs}</span>
+    </div>
+    <div
+      onClick={() => setPage("createJob")}
+      className={`flex flex-col md:flex-row items-center justify-center bg-green-500/25 md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95  w-full md:w-auto`}
+    >
+      <i className="fa-solid fa-wand-magic-sparkles text-lg md:text-xl text-green-500"></i>
+      <span className="max-md:text-sm md:text-base font-medium">{content.createJob}</span>
+    </div>
 
-      <div className="md:px-5 pb-5 w-full md:px-24 overflow-auto relative bg-gray-100 overflow-auto">
+    <div
+      onClick={() => setPage("proposals")}
+      className={`flex hover:${mode=="dark"&&"text-gray-700"} flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer bg-rose-500/25 transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
+    >
+      <i className="fa-solid fa-handshake text-lg md:text-xl text-rose-500"></i>
+      <span className="max-md:text-sm md:text-base font-medium">{content.proposals}</span>
+    </div>
+  </div>
+</aside>
+      <div className={`md:px-5 pb-5 w-full md:px-24 overflow-auto relative overflow-auto`}>
         {page == "createJob" && (
           <CreateJobs
             setJobdetail={setJobdetail}
@@ -619,7 +612,7 @@ const Employer = () => {
               />
             ) : (
               <>
-                <table className="w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden">
+                <table className={`w-full shadow-2xl rounded-2xl bg-${lightDark} px-7 overflow-hidden`}>
                   <thead className="border-b border-b-gray-300 px-7">
                     <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">
@@ -634,7 +627,7 @@ const Employer = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {myJobs.map((p: _myjobsType, i) => (
+                    {myJobs?.map((p: _myjobsType, i) => (
                       <tr
                         onClick={() => {
                           setJobdetail(i + 1);
@@ -684,7 +677,7 @@ const Employer = () => {
               />
             ) : (
               <>
-                <table className="w-full shadow-2xl rounded-2xl bg-white px-7 overflow-hidden">
+                <table className={`w-full shadow-2xl rounded-2xl  px-7 overflow-hidden bg-${lightDark}`}>
                   <thead className="border-b border-b-gray-300 px-7">
                     <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">

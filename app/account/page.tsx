@@ -29,7 +29,7 @@ const SignUp = ({ setOpen }: propType) => {
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const [eye, setEye] = useState(false);
   const [warring, setWarrning] = useState<string>();
-  const { countries, content } = useSharedState();
+  const { countries, content,lightDark,bgColor,textColor,grayText } = useSharedState();
 
   function toggleRoleCheckbox(value: string) {
     setType((prev) => ({ ...prev, role: value }));
@@ -76,12 +76,11 @@ const SignUp = ({ setOpen }: propType) => {
     }
   }
   return (
-    <div className="w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col bg-white items-center py-8 md:px-18 px-10 pt-4">
-      <strong className="text-2xl text-[#0a2540] mb-2">{content.signUp}</strong>
+    <div className={`w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col md:bg-${lightDark} bg-${bgColor} items-center py-8 md:px-18 px-10 pt-4 text-${textColor}`}>
+      <strong className={`text-2xl text-${grayText} mb-2`}>{content.signUp}</strong>
       <form
         onSubmit={(e) => handleSibmit(e)}
-        className="flex flex-col gap-4 w-full"
-      >
+        className="flex flex-col gap-4 w-full">
         {type.role == "employee" && (
           <div className="flex border border-gray-400 rounded p-1 px-2">
             <input
@@ -162,7 +161,7 @@ const SignUp = ({ setOpen }: propType) => {
           <div
             onClick={(e) => toggleMenu(e, "Location")}
             onBlur={(e) => toggleMenu(e, "Location")}
-            className="relative cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
+            className={`relative cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100 items-center pl-2 bg-${lightDark} md:bg-${bgColor} py-2 gap-2`}
           >
             <i className="fa-solid fa-map-marker-alt text-gray-500" />
             {content.location}
@@ -179,7 +178,7 @@ const SignUp = ({ setOpen }: propType) => {
           </div>
 
           <div
-            className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-white left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap ${openedMenu != "Location" ? "h-0 py-0 overflow-y-hidden" : "h-50 py-4 overflow-y-auto"}`}
+            className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap ${openedMenu != "Location" ? "h-0 py-0 overflow-y-hidden" : "h-50 py-4 overflow-y-auto"}`}
           >
             {countries.map((c, i) => (
               <div
@@ -219,9 +218,9 @@ const SignUp = ({ setOpen }: propType) => {
           <div
             onClick={(e) => toggleMenu(e, "role")}
             onBlur={(e) => toggleMenu(e, "role")}
-            className="cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
+            className={`cursor-pointer flex rounded-lg item-center px-2 hover:bg-green-100  items-center bg-${lightDark} md:bg-${bgColor} pl-2 bg py-2 gap-2`}
           >
-            <i className="fa-solid fa-map-marker-alt text-gray-500" />
+            <i className="fa-solid fa-id-badge text-gray-500" />
             {content.role}
             <i
               className={`fa-solid ${openedMenu == "role" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto mr-2.5`}
@@ -229,7 +228,7 @@ const SignUp = ({ setOpen }: propType) => {
           </div>
 
           <div
-            className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-white left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap overflow-y-hidden ${openedMenu != "role" ? "h-0 py-0" : "h-fit py-4"}`}
+            className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-${bgColor} left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap overflow-y-hidden ${openedMenu != "role" ? "h-0 py-0" : "h-fit py-4"}`}
           >
             {/*emloyer label */}
             <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
@@ -269,7 +268,6 @@ const SignUp = ({ setOpen }: propType) => {
             </label>
           </div>
         </div>
-
         {warring === "already exist" && (
           <p>
             {content.alreadySignedInMessage} &nbsp;
@@ -283,8 +281,7 @@ const SignUp = ({ setOpen }: propType) => {
         )}
         <button
           type="submit"
-          className="px-6 py-2 rounded-full w-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit mx-auto"
-        >
+          className="px-6 py-2 rounded-full w-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit mx-auto">
           {content.signUp}
         </button>
       </form>
@@ -307,8 +304,7 @@ const SignIn = ({ setOpen }: propType) => {
   const [warring, setWarrning] = useState<string>();
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const router = useRouter();
-  const { countries, content } = useSharedState();
-
+  const { content,bgColor,lightDark,textColor,grayText } = useSharedState();
   function toggleCheckbox(type: string) {
     setType(type);
     setOpenedMenu(null);
@@ -343,8 +339,8 @@ const SignIn = ({ setOpen }: propType) => {
     }
   };
   return (
-    <div className="w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col items-center bg-white  md:px-18 px-10 pt-4">
-      <strong className="text-2xl text-[#0a2540]">{content.logIn}</strong>
+    <div className={`w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col items-center bg-${bgColor} md:bg-${lightDark} text-${textColor}  md:px-18 px-10 pt-4`}>
+      <strong className={`text-2xl text-${grayText}`}>{content.logIn}</strong>
       <form
         onSubmit={(e) => handleSubmit(e)}
         className="flex flex-col pt-7 gap-4 w-full"
@@ -361,6 +357,7 @@ const SignIn = ({ setOpen }: propType) => {
             <i className="fa-solid fa-envelope text-gray-600 px-2"></i>
           </span>
         </div>
+
         <div className="flex border border-gray-400 rounded p-1 px-2">
           <input
             type={eye ? "text" : "password"}
@@ -386,17 +383,16 @@ const SignIn = ({ setOpen }: propType) => {
           <div
             onClick={(e) => toggleMenu(e, "role")}
             onBlur={(e) => toggleMenu(e, "role")}
-            className="cursor-pointer flex rounded-lg item-center px-1 hover:bg-yellow-100  bg-gray-100 items-center pl-2 bg-[#f6f9fc] py-2 gap-2"
-          >
-            <i className="fa-solid fa-map-marker-alt text-gray-500" />
+            className={`cursor-pointer flex rounded-lg item-center px-1 hover:bg-yellow-100  bg-${lightDark} md:bg-${bgColor} items-center pl-2 bg- py-2 gap-2`}>
+            <i className="fa-solid fa-id-badge text-gray-500" />
             {content.role}
             <i
-              className={`fa-solid ${openedMenu == "role" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto`}
+              className={`fa-solid ${openedMenu == "role" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto mr-3`}
             />
           </div>
 
           <div
-            className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-white left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap overflow-y-hidden ${openedMenu != "role" ? "h-0 py-0" : "h-fit py-4"}`}
+            className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap overflow-y-hidden ${openedMenu != "role" ? "h-0 py-0" : "h-fit py-4"}`}
           >
             {/*emloyer label */}
             <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
@@ -435,40 +431,6 @@ const SignIn = ({ setOpen }: propType) => {
           </div>
         </div>
 
-        {/*<div className="flex justify-between">
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
-            <input
-              name="type"
-              onChange={() => setType("employer")}
-              type="checkbox"
-              value={type}
-              className="peer sr-only"
-              required={type === "employer" || type == null}
-            />
-            <span
-              className={`w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 ${type == "employer" && "text-white"} rounded block ${type == "employer" && "bg-sky-600"} flex items-center justify-center`}
-            >
-              <i className="fa-solid fa-check scale-90 "></i>
-            </span>
-            Emloyer
-          </label>
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
-            <input
-              name="type"
-              onChange={() => setType("employee")}
-              type="checkbox"
-              value={type}
-              className="peer sr-only"
-              required={type === "employee" || type == null}
-            />
-            <span
-              className={`w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 ${type == "employee" && "text-white"} rounded block ${type == "employee" && "bg-sky-600"} flex items-center justify-center`}
-            >
-              <i className="fa-solid fa-check scale-90"></i>
-            </span>
-            Emloyee
-          </label>
-        </div>*/}
         {warring === "don't exist" && (
           <p>
             {content.donhave}&nbsp;
@@ -499,8 +461,9 @@ const SignIn = ({ setOpen }: propType) => {
 
 const Acount = () => {
   const [open, setOpen] = useState<string>("signUp");
+  const {bgColor,textColor,lightDark} = useSharedState()
   return (
-    <div className="w-full px-4 md:px-10 h-screen md:px-8 flex justify-center md:items-center bg-white md:bg-[#f1f5f9]">
+    <div className={`w-full px-4 md:px-10 h-screen md:px-8 flex justify-center md:items-center bg-${bgColor} md:bg-${bgColor}`}>
       <div className="flex flex-row max-w-2xl w-full md:shadow-lg md:shadow-gray-300 rounded-2xl">
         <div
           className="w-50 hidden md:block bg-cover flex-none rounded-l-2xl bg-center"

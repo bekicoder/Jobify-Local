@@ -6,6 +6,7 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}" // your components folder
   ],
   safelist:[
+    "bg-[#f6f9fc]",
     "bg-[#1E1E1E]",
     "bg-[#121212]",
     "even:bg-zinc-900",
@@ -19,7 +20,14 @@ module.exports = {
     "text-purple-600",
     "text-blue-600",
     "md:bg-[#1E1E1E]",
-    "hover:bg-[#1E1E1E]"
+    "hover:bg-[#1E1E1E]",
+    "hover:bg-[#f6f9fc]",
+    "md:bg-[#121212]",
+    "hover:text-gray-700",    
+    "border-gray-500",
+    "bg-white",
+    "bg-black",
+    "md:bg-[#f6f9fc]"
   ],
   theme: {
     extend: {},

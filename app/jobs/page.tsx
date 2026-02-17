@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { proposalType } from "../interfaces";
 import { job_detailsPanel, jobType } from "../interfaces";
 import { useSharedState } from "../SharedStateContext";
+
 const JobDetailsPanel = ({
   proposal_ids,
   job,
@@ -26,7 +27,8 @@ const JobDetailsPanel = ({
 }: job_detailsPanel) => {
   const [opend, setOpend] = useState<boolean>(false);
   const { lang } = useSharedState();
-  const { content,lightDark,bgColor,textColor,grayText,mode} = useSharedState();
+  const { content, lightDark, bgColor, textColor, grayText, mode } =
+    useSharedState();
   const date = job.created_at.split("T");
   const isSaved = saved_ids.some((s) => s == job.id);
   const proposal = proposals.find((p) => {
@@ -54,9 +56,8 @@ const JobDetailsPanel = ({
       setSavedJobs((prev) =>
         isSaved ? prev.filter((p) => p.id != job.id) : [savedJob, ...prev],
       );
-    }
-    else if(msg=="unauthorized"){
-      window.location.href = "/account"
+    } else if (msg == "unauthorized") {
+      window.location.href = "/account";
     }
   };
 
@@ -89,7 +90,9 @@ const JobDetailsPanel = ({
     }
   }
   return (
-    <div className={`w-full z-100000 pl-12 h-screen md:h-[calc(100vh-5rem)] md:rounded-2xl bg-${bgColor} md:bg-${lightDark} text-${textColor} overflow-y-auto max-md:fixed top-14 left-0`}>
+    <div
+      className={`w-full z-100000 px-4 md:pl-12 h-screen md:h-[calc(100vh-5rem)] md:rounded-2xl bg-${bgColor} md:bg-${lightDark} text-${textColor} overflow-y-auto max-md:fixed top-14 left-0`}
+    >
       {/*proposal form */}
       {opend && (
         <form
@@ -97,7 +100,9 @@ const JobDetailsPanel = ({
           onClick={(e) => e.currentTarget == e.target && setOpend(false)}
           className="proposal_container w-screen h-screen fixed top-0 py-12 px-8 pt-16 left-0 bg-black/50 flex items-center justify-center"
         >
-            <div className={`w-full max-md:max-h-90 p-4 h-full bg-${bgColor} rounded-2xl max-w-2xl flex flex-col relative`}>
+          <div
+            className={`w-full max-md:max-h-90 p-4 h-full bg-${bgColor} rounded-2xl max-w-2xl flex flex-col relative`}
+          >
             <h1 className="text-2xl font-bold text-center mb-1">
               {content.writeProposal}
             </h1>
@@ -178,7 +183,9 @@ const JobDetailsPanel = ({
       {/* job title */}
       <h1 className="text-2xl font-medium mb-2">{job.title}</h1>
       <div className="w-full flex justify-between pr-4">
-        <span className={` text-sm flex items-center font-medium text-${lightDark}`}>
+        <span
+          className={` text-sm flex items-center font-medium text-${lightDark}`}
+        >
           {job.salary_range} • {job[`${lang}Location`] as string}
           &nbsp;&nbsp;&nbsp;
           <div className="aspect-video w-6 relative">
@@ -198,14 +205,17 @@ const JobDetailsPanel = ({
           ></span>
         </span>
         <span className="text-sm">
-          <i className={`fa-solid fa-calendar-day text-${grayText}`} /> {date[0]}
+          <i className={`fa-solid fa-calendar-day text-${grayText}`} />{" "}
+          {date[0]}
         </span>
       </div>
 
       <h3 className={`text-xl font-medium mt-8 mb-1 text-${textColor}`}>
         {content.aboutJob}
       </h3>
-      <article className={`prose lg:prose-l prose-${mode=="dark"?"invert":"slate"} max-h-full flex-1 mb-16 text-${textColor}`}>
+      <article
+        className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} max-h-full flex-1 mb-16 text-${textColor}`}
+      >
         <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         {/*bottom space */}
         <div className="w-full h-12"></div>
@@ -227,6 +237,7 @@ const EmployeePage = () => {
     grayText,
     lightDark,
     mode,
+    borderColor,
   } = useSharedState();
   const [_jobs, setJobs] = useState<jobType[]>([]);
 
@@ -257,7 +268,7 @@ const EmployeePage = () => {
   const [approvals, setApprovals] = useState<
     { id: number; approval: string }[]
   >([]);
-  
+
   const [selectedJ, setSelectedJ] = useState<jobType>({
     id: 0,
     catagory: "",
@@ -391,51 +402,61 @@ const EmployeePage = () => {
     if (selected) setSelectedJ(selected as jobType);
   }, [selectedJob]);
 
-  const [rowsColor,setRcolor]=useState("gray-100")
-  const [rowshoverColor,setRHovcolor]=useState("zinc-950")
-  useEffect(()=>{
-    if(mode == "dark"){
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRcolor("zinc-900")
-    setRHovcolor("zinc-950")
-  }if(mode == "light"){
-    setRcolor("gray-100")
-    setRHovcolor("gray-200")
-  }
-  },[mode])
+  const [rowsColor, setRcolor] = useState("gray-100");
+  const [rowshoverColor, setRHovcolor] = useState("zinc-950");
+  useEffect(() => {
+    if (mode == "dark") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRcolor("zinc-900");
+      setRHovcolor("zinc-950");
+    }
+    if (mode == "light") {
+      setRcolor("gray-100");
+      setRHovcolor("gray-200");
+    }
+  }, [mode]);
   return (
     <div
       className={`w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-${bgColor} md:fixed`}
     >
       <aside
-        className={`w-full h-full md:w-70 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 bg-${bgColor} ${(route == "appliedJobs" || route == "savedJobs") && "hidden"}`}
+        className={`w-full md:shadow-2xl h-full md:w-72 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 border-r border-${borderColor} bg-${bgColor} ${(route == "appliedJobs" || route == "savedJobs") && "hidden"}`}
       >
         <h1 className="w-full py-3 h-fit bg-sky-600 text-white text-2xl text-center font-bold md:rounded-t">
           {content.headline}
         </h1>
-        <div className={`px-3 flex gap-5 flex-col text-${grayText}`}>
-          <div className={`flex rounded-2xl shadow- lg shadow-gray-300 overflow-hidden items-center pl-2 bg-${lightDark}`}>
-            <i className="fa-solid fa-search " />
-            <input
-              type="text"
-              placeholder={content.jobSearchPlaceholder}
-              className="w-full h-full py-2 px-3 focus:outline-0"
-            />
-          </div>
         <div
-          className={`relative flex rounded-xl item-center px-2 bg- items-center pl-2 bg-${lightDark} py-2 gap-2`}>
-            <i className="fas fa-layer-group text-gray-500"></i>
-            {content.categories}
+          className={`flex rounded-2xl shadow- lg shadow-gray-300 overflow-hidden items-center pl-2 bg-${lightDark} mx-2`}
+        >
+          <i className="fa-solid fa-search " />
+          <input
+            type="text"
+            placeholder={content.jobSearchPlaceholder}
+            className="w-full h-full py-2 px-3 focus:outline-0"
+          />
+        </div>
+        <div
+          className={`px-3 flex justify-around gap-2 md:gap-5 md:flex-col text-${grayText}`}
+        >
+          <div
+            className={`relative flex-1 flex flex-col justify-around rounded-xl item-center items-center md:gap-2`}
+          >
             <button
               onClick={() => toggleMenu("Catagories")}
-              className="cursor-pointer px-12 ml-auto h-full"
+              className="cursor-pointer transition-all duration-300 px-3 active:scale-95 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-blue-500/25 "
             >
-              <i
-                className={`fa-solid ${openedMenu == "Catagories" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto`}
-              />
+            <i className="fas fa-layer-group text-blue-500"></i>
+              <span className="max-md:text-xs font-medium">{content.categories}</span>
+              <span className="hidden md:block ml-auto">
+                <i
+                  className={`fa-solid ${openedMenu == "Catagories" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
+                />
+              </span>
             </button>
             {openedMenu == "Catagories" && (
-              <div className={`cursor-default filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}>
+              <div
+                className={`cursor-default filter-box z-1000 scale-95 w-48 absolute rounded-2xl shadow-lg top-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}
+              >
                 {jobCategories.map((job, i) => (
                   <label
                     key={i}
@@ -461,20 +482,24 @@ const EmployeePage = () => {
           </div>
           {/* location filter*/}
           <div
-            className={`relative flex rounded-xl item-center px-2 bg-${lightDark} items-center pl-2 py-2 gap-2`}
+            className={`relative flex-1 flex flex-col rounded-xl justify-around items-center md:gap-2`}
           >
-            <i className="fa-solid fa-map-marker-alt text-gray-500" />
-            {content.location}
-            <button
+             <button
               onClick={() => toggleMenu("Location")}
-              className="cursor-pointer px-12 ml-auto h-full"
+              className="cursor-pointer transition-all duration-300 active:scale-95 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-green-500/25 "
             >
-              <i
-                className={`fa-solid ${openedMenu == "Location" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto`}
-              />
+            <i className="fas fa-location-dot text-emerald-500"></i>
+              <span className="max-md:text-xs font-medium">{content.location}</span>
+              <span className="hidden md:block ml-auto">
+                <i
+                  className={`fa-solid ${openedMenu == "Location" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
+                />
+              </span>
             </button>
             {openedMenu == "Location" && (
-              <div className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full top-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}>
+              <div
+                className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-48 top-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}
+              >
                 {countries.map((c, i) => (
                   <label
                     key={i}
@@ -511,20 +536,24 @@ const EmployeePage = () => {
           </div>
           {/*job type filter */}
           <div
-            className={`relative cursor-pointer flex rounded-xl item-center px-2  bg-${lightDark} items-center pl-2 py-2 gap-2`}
-          >
-            <i className="fa-solid fa-briefcase text-gray-500" />
-            {content.jobType}
+            className={`relative flex-1 cursor-pointer flex flex-col items-center gap-2 min-w-16`}>
             <button
               onClick={() => toggleMenu("Job_type")}
-              className="cursor-pointer px-12 ml-auto h-full"
+              className="cursor-pointer active:scale-95 transition-all duration-300 px-1 md:px-3 h-full flex flex-col items-center justify-center gap-1 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-pink-500/25 "
             >
-              <i
-                className={`fa-solid ${openedMenu == "Job_type" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto`}
-              />
+            <i className="fas fa-briefcase text-pink-500"></i>
+              <span className="max-md:text-xs font-medium leading-4">{content.jobType}</span>
+              <span className="hidden md:block ml-auto">
+                <i
+                  className={`fa-solid ${openedMenu == "Job_type" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
+                />
+              </span>
             </button>
+        
             {openedMenu == "Job_type" && (
-              <div className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full bottom-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}>
+              <div
+                className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-48 top-[calc(100%+10px)] md:top-auto md:bottom-[calc(100%+10px)] h-50 bg-${lightDark} right-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}
+              >
                 {jobTypes.map((t, i) => (
                   <label
                     key={i}
@@ -554,20 +583,25 @@ const EmployeePage = () => {
           </div>
           {/*salary filter */}
           <div
-            className={`relative cursor-pointer flex rounded-xl item-center px-2 items-center pl-2 bg-${lightDark} py-2 gap-2`}
+            className={`relative cursor-pointer flex flex-col gap-2 flex-1`}
           >
-            <i className="fa-solid fa-dollar text-gray-500" />
-            {content.salary}
-            <button
+           <button
               onClick={() => toggleMenu("Income")}
-              className="cursor-pointer px-12 ml-auto h-full"
+              className="cursor-pointer active:scale-95 transition-all duration-300 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-amber-500/25 p-2"
             >
-              <i
-                className={`fa-solid ${openedMenu == "Income" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto`}
-              />
+            <i className="fas fa-coins text-amber-500"></i>
+              <span className="max-md:text-xs font-medium">{content.salary}</span>
+              <span className="hidden md:block ml-auto">
+                <i
+                  className={`fa-solid ${openedMenu == "Income" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
+                />
+              </span>
             </button>
+
             {openedMenu == "Income" && (
-              <div className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-full bottom-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}>
+              <div
+                className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-48 top-[calc(100%+10px)] md:top-auto md:bottom-[calc(100%+10px)] h-50 bg-${lightDark} right-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}
+              >
                 {incomeRanges.map((range, i) => (
                   <label
                     key={i}

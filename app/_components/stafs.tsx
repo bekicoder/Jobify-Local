@@ -46,82 +46,12 @@ const Stafs = () => {
   },
 ];
   const {teams}  = useSharedState();
-  const {content} = useSharedState();
+  const {content,grayText} = useSharedState();
   const [lang, setLang] = useState<string>("english");
-
-  function splitText(text: string, maxLength: number = 500) {
-  const chunks: string[] = [];
-  let start = 0;
-  while (start < text.length) {
-    chunks.push(text.slice(start, start + maxLength));
-    start += maxLength;
-  }
-  return chunks;
-}
-
-async function translateLargeText(text: string, targetLang: string) {
-  const chunks = splitText(text, 500); // split into 500-char chunks
-  const translatedChunks: string[] = [];
-
-  for (const chunk of chunks) {
-    const res = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-        chunk
-      )}&langpair=am|${targetLang}`
-    );
-    const data = await res.json();
-    translatedChunks.push(data.responseData.translatedText);
-  }
-
-  return translatedChunks.join(" "); // combine all
-}
-
-useEffect(()=>{
-//   async function translate(){
-// // Usage:
-// const amharicText = "…very long Amharic text…";
-// const translated = await translateLargeText(amharicText, "en"); // to English
-// console.log(translated,"this is the translated ");
-//   }
-
-
-// const requestBody = {
-//   data: {
-//     title: "Software Engineer",
-//     detail: "We are looking for a skilled software engineer to join our team.",
-//     EnLocation: "New York",
-//     AmLocation: "አዲስ አበባ",
-//     ArLocation: "دبي",
-//     FrLocation: "Paris",
-//     EnJobtype: "Full-time",
-//     AmJobtype: "ሙሉ ጊዜ",
-//     ArJobtype: "دوام كامل",
-//     FrJobtype: "Temps plein",
-//     EnCatagory: "IT",
-//     AmCatagory: "ቴክኖሎጂ",
-//     ArCatagory: "تكنولوجيا",
-//     FrCatagory: "Informatique",
-//     salary_range:"1000 - 2000"
-//   }
-// };
-
-// fetch("http://localhost:3000/api/createJob", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify(requestBody)
-// })
-//   .then(res => res.json())
-//   .then(data => console.log(data))
-//   .catch(err => console.error(err));
-
-})
-
 
   return (
     <div>
-      <strong className="w-full text-center block text-3xl text-[#0a2540] mb-16">
+      <strong className={`w-full text-center block text-3xl text-${grayText} mb-16`}>
         {content.team}
       </strong>
       <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 justify-items-center px-6">

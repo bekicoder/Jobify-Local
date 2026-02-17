@@ -65,6 +65,7 @@ type SharedStateType = {
   bgColor:string;
   grayText:string;
   lightDark:string;
+  borderColor:string;
 };
 
 const SharedStateContext = createContext<SharedStateType | undefined>(
@@ -83,6 +84,7 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   const [bgColor,setbgcolor] = useState("white")
   const [grayText,setgrayText] = useState("gray-700")
   const [lightDark,setLightD] = useState("white")
+  const [borderColor,setBorcolor] = useState("border-gray-200")
   useEffect(() => {
     if (lang == "Am") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -118,14 +120,22 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
     setbgcolor("[#121212]")
     setgrayText("white")
     setLightD("[#1E1E1E]")
+    setBorcolor("gray-500")
   }if(mode == "light"){
     setTextcolor("black")
     setbgcolor("white")
     setgrayText("gray-700")
     setLightD("[#f6f9fc]")
+    setBorcolor("gray-200")
   }
   },[mode])
   
+  useEffect(()=>{
+    const mode_ = localStorage.getItem("mode")
+    console.log(mode_,"this is the mode")
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if(mode_) setMode(mode_ as string)
+  },[])
   return (
     <SharedStateContext.Provider
       value={{
@@ -144,6 +154,7 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
         bgColor,
         grayText,
         lightDark,
+        borderColor,
       }}
     >
       {children}
