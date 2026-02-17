@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { pool as db } from "@/lib/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { jobDataType } from "../myJobs/route";
+      const languages = ["en", "am"];
+
 export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("jobify-token")?.value;
@@ -10,7 +12,6 @@ export async function GET(req: NextRequest) {
     }
     const data = jwt.verify(token, process.env.JWT_SECRET!);
     const decoded = data as JwtPayload;
-      const languages = ["en", "am", "ar", "fr"];
       const savedJobsRes:Record<string,number|string>[] = []
     const { rows } = await db.query(
       "select * from savedJobs where user_id = $1 order by id desc",
@@ -26,7 +27,6 @@ export async function GET(req: NextRequest) {
         jobData["id"] = Number(sj.career_id)
         jobData["created_at"] = job[0].created_at;
         jobData["posted_by"] = job[0].posted_by;
-        jobData["flag"] = job[0].flag;
         jobData["salary_range"] = job[0].salary_range
         await Promise.all(
           languages.map(async (lang) => {
@@ -48,7 +48,6 @@ export async function GET(req: NextRequest) {
           }),
         );
         savedJobsRes.push(jobData)
-        console.log("this is before the savedres",savedJobsRes,sj.career_id,jobData,"this is the job data ")
       }),
     );
     return NextResponse.json({ data: savedJobsRes }, { status: 200 });
@@ -76,13 +75,35 @@ export async function POST(req: NextRequest) {
       : "delete from savedJobs where career_id=$1;";
     const values = !saved ? [id, decoded.id] : [id];
     const { rows } = await db.query(sql, values);
-    let savedJob;
+    const savedJob:Record<string,number|string> = {}
     if (!saved) {
       const { rows: rows_ } = await db.query(
         "select * from jobs where id = $1;",
         [rows[0].career_id],
       );
-      savedJob = rows_[0];
+      savedJob["id"] = Number(id)
+        savedJob["created_at"] = rows_[0].created_at;
+        savedJob["posted_by"] = rows_[0].posted_by;
+        savedJob["salary_range"] = rows_[0].salary_range
+        await Promise.all(
+          languages.map(async (lang) => {
+            const lng = lang[0].toUpperCase() + lang[1];
+            const titleKey = `title${lng}`;
+            const detailKey = `detail${lng}`;
+            const locationKey = `${lng}Location`;
+            const jobtypeKey = `${lng}Jobtype`;
+            const catagoryKey = `${lng}Catagory`;
+            const { rows } = await db.query(
+              `select * from jobTranslations where id = $1;`,
+              [rows_[0][`${lang}jobid`]],
+            );
+            savedJob[titleKey] = rows[0].title;
+            savedJob[detailKey] = rows[0].detail;
+            savedJob[locationKey] = rows[0].location;
+            savedJob[catagoryKey] = rows[0].catagory;
+            savedJob[jobtypeKey] = rows[0].jobtype;
+          }),
+        );
     }
     const res = !saved
       ? { msg: "successful", id: rows[0].career_id, savedJob: savedJob }

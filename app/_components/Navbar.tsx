@@ -17,7 +17,7 @@ export default function NavBar() {
   const [user, setUser] = useState<Record<string,string> | null>(null);
   const [profileShow, setprofileShow] = useState<boolean>(false);
   const {content,lightDark} = useSharedState()
-  const [languages] = useState([{id:1,language:"English",short_name:"En"},{id:2,language:"Français",short_name:"Fr"},{id:3,language:"العربية",short_name:"Ar"},{id:4,language:"አማርኛ",short_name:"Am"}])
+  const [languages] = useState([{id:1,language:"English",short_name:"En"},{id:4,language:"አማርኛ",short_name:"Am"}])
   const {lang,setLang,mode,setMode,textColor,bgColor} = useSharedState()
   const [isOpen, setIsOpen] = useState(false);
   
@@ -72,6 +72,8 @@ export default function NavBar() {
       localStorage.setItem("mode","light")
     }
   }
+
+  console.log(user)
   return (
     <nav
   className={`fixed top-0 left-0 z-1000000 w-full backdrop-blur-md bg-${bgColor}/50 border-b border-gray-200/40 text-${textColor} h-14 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
@@ -93,7 +95,7 @@ export default function NavBar() {
   </Link>
 
   <ul
-    className={`fixed md:static top-14 right-0 w-72 md:w-auto h-[calc(100vh-3.5rem)] md:h-auto bg-${bgColor} md:bg-transparent shadow-2xl md:shadow-none border-l md:border-0 border-gray-200 transform transition-transform duration-300 ease-in-out flex flex-col md:flex-row md:items-center gap-2 md:gap-4 px-6 md:px-0 py-6 md:py-0 ${
+    className={`fixed md:static top-14 right-0 w-72 md:w-auto h-[calc(100vh-3.5rem)] md:h-auto bg-${bgColor} md:bg-transparent shadow-l-2xl md:shadow-none border-l md:border-0 border-gray-200 transform transition-transform duration-300 ease-in-out flex flex-col md:flex-row md:items-center gap-2 md:gap-4 px-6 md:px-0 py-6 md:py-0 ${
       hovered ? "translate-x-0" : "translate-x-full md:translate-x-0"
     }`}
   >
@@ -146,6 +148,37 @@ export default function NavBar() {
         </Link>
       </div>
     )}
+
+    {user && (
+  <div className="md:hidden mt-6 border-t border-gray-200 pt-4 space-y-3">
+    <div className="flex items-center gap-3">
+      <div
+        className="w-10 h-10 rounded-full flex justify-center items-center text-white text-lg"
+        style={{ backgroundColor: user.profile }}
+      >
+        {user.name.substr(0, 1)}
+      </div>
+
+      <div>
+        <p className="font-semibold text-sm">{user.name}</p>
+        <p className="text-xs text-gray-500">{user.email}</p>
+      </div>
+    </div>
+
+    <div className="flex items-center gap-2 text-sm pl-2">
+      {user[`${lang.toLowerCase()}Location`]}
+    </div>
+
+    <a
+      href="/api/signout/"
+      className="block text-center mt-3 px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition"
+      onClick={() => setHovered(false)}
+    >
+      {content.signOut}
+    </a>
+  </div>
+)}
+
   </ul>
 
   <div className="flex items-center gap-3">
@@ -196,7 +229,7 @@ export default function NavBar() {
     </button>
 
     {user && (
-      <div className="relative">
+      <div className="relative hidden md:block">
         <div
           onClick={() => setprofileShow(!profileShow)}
           className="w-9 h-9 rounded-full flex justify-center items-center text-white cursor-pointer"
@@ -222,13 +255,6 @@ export default function NavBar() {
             </p>
 
             <p className="flex items-center gap-2">
-              <Image
-                width={20}
-                height={20}
-                src={user.flag}
-                alt={user[`${lang.toLowerCase()}Location`]}
-                className="aspect-video"
-              />
               {user[`${lang.toLowerCase()}Location`]}
             </p>
 

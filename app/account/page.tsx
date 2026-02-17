@@ -11,25 +11,22 @@ const SignUp = ({ setOpen }: propType) => {
   type locations = {
     id: number;
     name: string;
-    flag: string;
   };
 
   type checkbox = {
     role: string;
     location: number;
-    flag: string;
   };
   const [type, setType] = useState<checkbox>({
     role: "employee",
     location: 0,
-    flag: "",
   });
 
   const router = useRouter();
   const [openedMenu, setOpenedMenu] = useState<string | null>(null);
   const [eye, setEye] = useState(false);
   const [warring, setWarrning] = useState<string>();
-  const { countries, content,lightDark,bgColor,textColor,grayText } = useSharedState();
+  const { cities, content,lightDark,bgColor,textColor,grayText } = useSharedState();
 
   function toggleRoleCheckbox(value: string) {
     setType((prev) => ({ ...prev, role: value }));
@@ -37,8 +34,8 @@ const SignUp = ({ setOpen }: propType) => {
       setOpenedMenu(null);
     }, 300);
   }
-  function toggleLocationCheckbox(location: number, flag: string) {
-    setType((prev) => ({ ...prev, location: location, flag: flag }));
+  function toggleLocationCheckbox(location: number) {
+    setType((prev) => ({ ...prev, location: location}));
     setTimeout(() => {
       setOpenedMenu(null);
     }, 300);
@@ -60,7 +57,6 @@ const SignUp = ({ setOpen }: propType) => {
     const target = e.target as HTMLFormElement;
     const fd = new FormData(target);
     const fdObj = Object.fromEntries(fd.entries());
-    console.log(fdObj);
     const res = await fetch("/api/signup", {
       method: "POST",
       body: JSON.stringify(fdObj),
@@ -161,7 +157,7 @@ const SignUp = ({ setOpen }: propType) => {
           <div
             onClick={(e) => toggleMenu(e, "Location")}
             onBlur={(e) => toggleMenu(e, "Location")}
-            className={`relative cursor-pointer flex rounded-lg item-center px-2 hover:bg-yellow-100 items-center pl-2 bg-${lightDark} md:bg-${bgColor} py-2 gap-2`}
+            className={`relative cursor-pointer flex rounded-lg item-center px-2 hover:scale-102 active:scale-98 items-center pl-2 bg-zinc-500/10 py-2 gap-2`}
           >
             <i className="fa-solid fa-map-marker-alt text-gray-500" />
             {content.location}
@@ -171,7 +167,6 @@ const SignUp = ({ setOpen }: propType) => {
               className="sr-only"
               required
             />
-            <input name="flag" value={type.flag} className="sr-only" required />
             <i
               className={`fa-solid ${openedMenu == "Location" ? "fa-chevron-up" : "fa-chevron-down"} ml-auto mr-2.5`}
             />
@@ -180,10 +175,10 @@ const SignUp = ({ setOpen }: propType) => {
           <div
             className={`filter-box z-1000 scale-95  absolute rounded-lg shadow-lg w-full top-[calc(100%+10px)] bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-x-auto whitespace-nowrap ${openedMenu != "Location" ? "h-0 py-0 overflow-y-hidden" : "h-50 py-4 overflow-y-auto"}`}
           >
-            {countries.map((c, i) => (
+            {cities.map((c, i) => (
               <div
                 onClick={(e) => {
-                  toggleLocationCheckbox(c.id, c.flag);
+                  toggleLocationCheckbox(c.id);
                 }}
                 key={i}
                 className="flex cursor-pointer items-center gap-2 text-sm font-medium"
@@ -200,13 +195,6 @@ const SignUp = ({ setOpen }: propType) => {
                     style={{ opacity: type.location === c.id ? 1 : 0 }}
                   ></i>
                 </span>
-                <Image
-                  width={20}
-                  height={20}
-                  src={c.flag}
-                  alt={c.name + " flag"}
-                  className="h-fit aspect-video"
-                />
                 {c.name}
               </div>
             ))}
@@ -218,7 +206,7 @@ const SignUp = ({ setOpen }: propType) => {
           <div
             onClick={(e) => toggleMenu(e, "role")}
             onBlur={(e) => toggleMenu(e, "role")}
-            className={`cursor-pointer flex rounded-lg item-center px-2 hover:bg-green-100  items-center bg-${lightDark} md:bg-${bgColor} pl-2 bg py-2 gap-2`}
+            className={`cursor-pointer flex rounded-lg item-center px-2 hover:scale-102 active:scale-98  items-center bg-zinc-500/10 pl-2 bg py-2 gap-2`}
           >
             <i className="fa-solid fa-id-badge text-gray-500" />
             {content.role}
@@ -332,6 +320,7 @@ const SignIn = ({ setOpen }: propType) => {
       body: JSON.stringify(fdObj),
     });
     const data = await res.json();
+    console.log(data,fdObj)
     if (data.message == "successful") {
       location.assign("/");
     } else if (data.message == `don't exist`) {
@@ -383,7 +372,7 @@ const SignIn = ({ setOpen }: propType) => {
           <div
             onClick={(e) => toggleMenu(e, "role")}
             onBlur={(e) => toggleMenu(e, "role")}
-            className={`cursor-pointer flex rounded-lg item-center px-1 hover:bg-yellow-100  bg-${lightDark} md:bg-${bgColor} items-center pl-2 bg- py-2 gap-2`}>
+            className={`cursor-pointer flex rounded-lg item-center px-1 bg-zinc-500/10 items-center pl-2 bg- py-2 gap-2`}>
             <i className="fa-solid fa-id-badge text-gray-500" />
             {content.role}
             <i

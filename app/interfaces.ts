@@ -1,73 +1,6 @@
 import { SetStateAction } from "react";
 export default interface ContentType {
-  myJobs: string;
-    createJob: string;
-    proposals: string;
-    create: string;
-    edit: string
-  alreadySignedInMessage:string;
-  organizationName:string;
-  password: string;
-  signUp: string;
-  fname: string;
-  lname: string;
-  role: string;
-  employee: string;
-  employer: string;
-  haveAccount: string;
-  logIn: string;
-  about: string;
-  footer_about_paragraph: string;
-  contact: string;
-  email: string;
-  phone: string;
-  home_link: string;
-  sent_link: string;
-  saved_link: string;
-  explore_link: string;
-  dashboard_link: string;
-  find_job: string;
-  hero_header: string;
-  hero_paragraph:string;
-  job_posted: string;
-  active_users: string;
-  campany_amount: string;
-  motive_header: string;
-  motive_paragraph:string;
-  about_us: string;
-  about_paragraph:string;
-  staf_header: string;
-  footer_paragraph:string;
-  links:string;
-  categories:string;
-  location:string;
-  jobType:string;
-  salary:string;
-  jobSearchPlaceholder:string;
-  proposalPlaceholder:string;
- writeProposal:string;
-  markdownSupport:string;
-  headline:string;
-  careers:string;
-  below:string;
-  send:string;
-  dashboard:string;
-  workspace:string;
-  inbox:string;
-  name:string;
-  post:string;
-  team:string;
-  aboutJob:string;
-  signOut:string;
-  jobDetails:string;
-  title:string;
-  language:string;
-  apply:string;
-  learn_more:string;
-  right:string;
-  donhave: string;
-  createOne: string;
-  notMemeber:string;
+  [key: string]: string;
 };
 export interface income_range {
   id: number;
@@ -80,13 +13,9 @@ export interface _Fd {
   salary_range: string;
 
   EnCategory: string;
-  FrCategory: string;
-  ArCategory: string;
   AmCategory: string;
 
   EnJobType: string;
-  FrJobType: string;
-  ArJobType: string;
   AmJobType: string;
 }
 export interface _myjobsType {
@@ -94,7 +23,6 @@ export interface _myjobsType {
  id: number;
   created_at: string; 
   posted_by: string; 
-  flag: string;     
   salary_range: string;
 
   titleEn: string;
@@ -137,7 +65,6 @@ export interface _jobs {
   title: string;
   location: string;
   jobType: string;
-  flag: string;
   created_at: string;
   category: string;
   salary_range: string;
@@ -159,7 +86,6 @@ export interface proposalType {
   sender: string;
   career_owner: string;
   name: string;
-  flag: string;
   salary_range: string;
   approval: string;
   seenstatus: boolean;
@@ -191,7 +117,6 @@ export interface jobType {
   catagory: string;
   created_at: string;
   detail: string;
-  flag: string;
   jobtype: string;
   location: string;
   posted_by: string;
@@ -213,8 +138,8 @@ export interface job_detailsPanel {
   setApprovals:React.Dispatch<SetStateAction<{ id: number; approval: string; }[]>>
 }
 
-export interface countriesType {
+export interface citiesType {
   id: number;
   name: string;
-  flag: string;
+  type:string;
 }

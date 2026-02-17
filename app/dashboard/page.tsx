@@ -19,16 +19,8 @@ import {
   proposalType,
   createJobsParamsType,
 } from "../interfaces";
-import {
-  categoriesEn,
-  jobTypesEn,
-  categoriesAm,
-  jobTypesAm,
-  categoriesAr,
-  jobTypesAr,
-  categoriesFr,
-  jobTypesFr,
-} from "../_components/Contents";
+import {categories as categoriesAm,jobTypes as jobTypesAm} from "@/lib/languages/am.json"
+import {categories as categoriesEn,jobTypes as jobTypesEn} from "@/lib/languages/en.json"
 
 const JobDetailsPanel = ({
   option,
@@ -42,7 +34,7 @@ const JobDetailsPanel = ({
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
   const proposal = option === "proposal";
-  const { content, lang } = useSharedState();
+  const { content, lang,lightDark,grayText,bgColor,textColor,mode } = useSharedState();
   const handleEdit = () => {
     setFd({
       Jobtype: job.Jobtype,
@@ -51,12 +43,8 @@ const JobDetailsPanel = ({
       detail: job[`detail${lang}`] as string,
       salary_range: job.salary_range,
       EnCategory: job.EnCategory,
-      FrCategory: job.FrCategory,
-      ArCategory: job.ArCategory,
       AmCategory: job.AmCategory,
       EnJobType: job.EnJobtype,
-      FrJobType: job.FrJobtype,
-      ArJobType: job.ArJobtype,
       AmJobType: job.AmJobtype,
     });
     setPage("createJob");
@@ -75,7 +63,7 @@ const JobDetailsPanel = ({
     }
   }
   return (
-    <div className="w-full pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl  overflow-y-auto">
+    <div className={`w-full pl-4 md:pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl  overflow-y-auto bg-${lightDark} text-${textColor}`}>
       {/*proposal form */}
       {opend && (
         <div
@@ -149,30 +137,21 @@ const JobDetailsPanel = ({
         )}
       </div>
       {/* job title */}
-      <h1 className="text-2xl font-medium mb-2">{job.title}</h1>
       <div className="w-full flex justify-between pr-4">
-        <span className=" text-sm flex items-center font-medium text-gray-600">
-          {proposal ? job.name : job.salary_range} • {job.location}
-          &nbsp;&nbsp;&nbsp;
-          <Image
-            width={20}
-            height={20}
-            src={job.flag}
-            alt={job.name + " flag"}
-            className="h-fit aspect-video"
-          />
-          &nbsp;&nbsp;{!proposal && " • " + job[`${lang}Jobtype`]}
+        <span className={`text-sm flex items-center font-medium text-${grayText}`}>
+          {proposal ? job.name : job.salary_range} {proposal && " • " + job.location}{!proposal && " • " + job[`${lang}Jobtype`]}
         </span>
         <span className="text-sm">
-          <i className="fa-solid fa-calendar-day text-gray-500" />
-          {date[0].replaceAll("-", "/")}
+          <i className={`fa-solid fa-calendar-day mr-2 text-${grayText}`}/>
+          {date[0]}
         </span>
       </div>
+        <h1 className="text-2xl font-medium mb-4 mt-8">{job[`title${lang}`]}</h1>
       {proposal && <p className="text-sm  mt-1">{job.sender}</p>}
-      <h3 className="text-xl font-medium mt-8 mb-1 text-slate-800">
+      <h3 className={`text-xl font-medium mb-2 text-${grayText}`}>
         {content.aboutJob}
       </h3>
-      <article className="prose lg:prose-l prose-slate max-h-full flex-1 mb-16">
+      <article className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} max-h-full flex-1 mb-16 text-${textColor}`}>
         <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         <div className="w-full h-12"></div>
       </article>
@@ -216,41 +195,35 @@ const CreateJobs = ({
       setOpenedMenu(menu);
     }
   }
-  let disabled = false;
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!disabled) {
+    const tempStore = fd
+    console.log(fd)
       const res = await fetch("/api/createJob", {
         body: JSON.stringify({ fd: fd, editId: edit }),
         method: "POST",
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
-      const data = await res.json();
-      const data_res = data.data;
-      if (data.status == "successful") {
-        setFd({
+      setFd({
           title: "",
           detail: "",
           salary_range: "",
           EnCategory: "",
-          FrCategory: "",
-          ArCategory: "",
           AmCategory: "",
           EnJobType: "",
-          FrJobType: "",
-          ArJobType: "",
           AmJobType: "",
         });
-        // eslint-disable-next-line react-hooks/immutability
-        disabled = !disabled;
+      const data = await res.json();
+      if (data.status == "successful") {
+        setMyjobs(prev=>[data.data,...prev])
+      }else{
+        setFd(tempStore)
+        alert("Failed to create job try again later!")
       }
-      console.log(data);
-    }
   }
-
   function handleChange(id: number, option: string) {
-    const languages = ["En", "Am", "Fr", "Ar"];
+    const languages = ["En", "Am"];
 
     interface OptionType {
       id: number;
@@ -262,10 +235,6 @@ const CreateJobs = ({
       jobTypesEn: jobTypesEn,
       categoriesAm: categoriesAm,
       jobTypesAm: jobTypesAm,
-      categoriesFr: categoriesFr,
-      jobTypesFr: jobTypesFr,
-      categoriesAr: categoriesAr,
-      jobTypesAr: jobTypesAr,
     };
 
     // Build all translations first
@@ -293,7 +262,7 @@ const CreateJobs = ({
   return (
     <form
       onSubmit={handleSumit}
-      className={`w-full px-4 pt-4 h-full  md:rounded-2xl flex flex-col md:bg-${lightDark} bg-${bgColor} text-${textColor}`}
+      className={`w-full px-4 pt-4 md:rounded-2xl flex flex-col md:bg-${lightDark} bg-${bgColor} text-${textColor} h-full`}
     >
       <h1 className="text-2xl font-bold text-center mb-1">
         {content.writeProposal}
@@ -307,16 +276,16 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Job_type")}
           onBlur={(e) => toggleMenu(e, "Job_type")}
           tabIndex={0}
-          className={`p-3 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:bg-gray-50 hover:${mode=="dark"&&"text-gray-700"} flex items-center cursor-pointer flex-1`}
+          className={`p-3 relative rounded-lg bg-${mode=="light"?"white":bgColor}  hover:bg-gray-100 md:shadow-lg hover:${mode=="dark"&&"text-gray-700"} flex items-center cursor-pointer flex-1`}
         >
           <i className="fa-solid fa-briefcase mr-2" />
           {content.jobType}&nbsp;
           <i className="fa-solid fa-chevron-down mr-3 ml-auto"></i>
           <input
             name="Job_type"
-            value={fd.Jobtype}
+            value={fd.EnJobType}
             className="sr-only"
-            readOnly
+            
             required
           />
           {openedMenu == "Job_type" && (
@@ -348,16 +317,15 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Job_catagories")}
           onBlur={(e) => toggleMenu(e, "Job_catagories")}
           tabIndex={0}
-          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-50 flex items-center cursor-pointer flex-1`}
+          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-100 md:shadow-lg flex items-center cursor-pointer flex-1`}
         >
           <i className="fas fa-layer-group mr-2"></i>
           {content.categories}
           <i className="fa-solid fa-chevron-down mr-3 ml-auto"></i>
           <input
             name={content.categories}
-            value={fd.category}
+            value={fd.EnCategory}
             className="sr-only"
-            readOnly
             required
           />
           {openedMenu == "Job_catagories" && (
@@ -389,16 +357,15 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Income_range")}
           onBlur={(e) => toggleMenu(e, "Income_range")}
           tabIndex={0}
-          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-50 flex items-center cursor-pointer flex-1`}
+          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-100 md:shadow-lg flex items-center cursor-pointer flex-1`}
         >
           <i className="fas fa-sack-dollar mr-2"></i>
           {content.salary}
           <i className="fa-solid fa-chevron-down mr-3 ml-auto"></i>
           <input
             name="range"
-            value={fd.range}
+            value={fd.salary_range}
             className="sr-only"
-            readOnly
             required
           />
           {openedMenu == "Income_range" && (
@@ -439,7 +406,7 @@ const CreateJobs = ({
         name="detail"
         value={fd.detail}
         placeholder={content.proposalPlaceholder}
-        className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5"
+        className="w-full border rounded-xl min-h-50 resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5"
         required
       ></textarea>
       <button
@@ -461,21 +428,15 @@ const Employer = () => {
   const [proposals, setProposals] = useState([]);
   const [proposal_ids, setProposal_ids] = useState([]);
   const { content, lang,lightDark,bgColor,textColor,grayText,mode,borderColor } = useSharedState();
-  const [approvals, setApprovals] = useState<
-    { id: number; approval: string }[]
-  >([]);
+  const [approvals, setApprovals] = useState<{ id: number; approval: string }[]>([]);
 
   const [fd, setFd] = useState({
     title: "",
     detail: "",
     salary_range: "",
     EnCategory: "",
-    FrCategory: "",
-    ArCategory: "",
     AmCategory: "",
     EnJobType: "",
-    FrJobType: "",
-    ArJobType: "",
     AmJobType: "",
   });
 
@@ -500,30 +461,20 @@ const Employer = () => {
             },
           );
 
-          console.log(proposed_job, "hi beki this is the porposed job");
           return {
             id: Number(p.career_id),
             career_owner: p.career_owner,
             created_at: p.created_at,
             name: p.name,
             detailAm: p?.amproposal,
-            detailAr: p?.arproposal,
-            detailFr: p?.frproposal,
             detailEn: p?.enproposal,
             sender: p.sender,
             senderlocen: p?.senderlocen,
             senderlocam: p?.senderlocam,
-            senderlocar: p?.senderlocar,
-            senderlocfr: p?.senderlocfr,
             AmJobtype: proposed_job[0]?.AmJobtype,
-            ArJobtype: proposed_job[0]?.ArJobtype,
             EnJobtype: proposed_job[0]?.EnJobtype,
-            FrJobtype: proposed_job[0]?.FrJobtype,
-            flag: proposed_job[0]?.flag,
             titleam: proposed_job[0]?.titleAm,
             titleen: proposed_job[0]?.titleEn,
-            titlefr: proposed_job[0]?.titleFr,
-            titlear: proposed_job[0]?.titleAr,
             approval: p.approval,
             seenstatus: p.seenstatus,
             propId: p.id,
@@ -549,9 +500,23 @@ const Employer = () => {
       }
     }
   }
+
+  const [rowsColor, setRcolor] = useState("gray-100");
+    const [rowshoverColor, setRHovcolor] = useState("zinc-950");
+    useEffect(() => {
+      if (mode == "dark") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setRcolor("zinc-900");
+        setRHovcolor("zinc-950");
+      }
+      if (mode == "light") {
+        setRcolor("gray-100");
+        setRHovcolor("gray-200");
+      }
+    }, [mode]);
   return (
-    <div className={`w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} flex-1`}>
-      <aside className={`w-full md:w-72 bg-${bgColor} md:h-screen md:rounded md:shadow-2xl md:border-r border-${borderColor}  flex md:flex-col flex-col`}>
+    <div className={`w-full md:h-full pt-16 min-h-[100vh] flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} md:fixed`}>
+      <aside className={`w-full md:w-72 h-full bg-${bgColor} md:rounded md:shadow-2xl md:border-r border-${borderColor}`}>
   <div className="md:hidden flex items-center justify-center h-14 bg-gradient-to-r from-sky-600 to-sky-500 text-white text-lg font-semibold tracking-wide shadow-md">
     {content.headline}
   </div>
@@ -561,29 +526,29 @@ const Employer = () => {
   <div className={`flex md:flex-col flex-row md:gap-5 gap-3 md:p-4 p-3 justify-around md:justify-start  text-${textColor} md:bg-transparent`}>
     <div
       onClick={() => setPage("myJobs")}
-      className={`flex hover:scale-105 flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 bg-blue-500/25 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} active:scale-95 w-full md:w-auto`}
+      className={`flex hover:scale-105 flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} active:scale-95 w-full md:w-auto`}
     >
-      <i className="fa-solid fa-layer-group text-lg md:text-xl text-blue-500"></i>
+      <i className="fa-solid fa-layer-group text-lg md:text-xl"></i>
       <span className="max-md:text-sm md:text-base font-medium">{content.myJobs}</span>
     </div>
     <div
       onClick={() => setPage("createJob")}
-      className={`flex flex-col md:flex-row items-center justify-center bg-green-500/25 md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95  w-full md:w-auto`}
+      className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95  w-full md:w-auto`}
     >
-      <i className="fa-solid fa-wand-magic-sparkles text-lg md:text-xl text-green-500"></i>
+      <i className="fa-solid fa-wand-magic-sparkles text-lg md:text-xl"></i>
       <span className="max-md:text-sm md:text-base font-medium">{content.createJob}</span>
     </div>
 
     <div
       onClick={() => setPage("proposals")}
-      className={`flex hover:${mode=="dark"&&"text-gray-700"} flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer bg-rose-500/25 transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
+      className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
     >
-      <i className="fa-solid fa-handshake text-lg md:text-xl text-rose-500"></i>
+      <i className="fa-solid fa-handshake text-lg md:text-xl"></i>
       <span className="max-md:text-sm md:text-base font-medium">{content.proposals}</span>
     </div>
   </div>
-</aside>
-      <div className={`md:px-5 pb-5 w-full md:px-24 overflow-auto relative overflow-auto`}>
+      </aside>
+      <div className={`pb-5 w-full min-[768]:px-12 min-[950px]:px-24 overflow-auto relative`}>
         {page == "createJob" && (
           <CreateJobs
             setJobdetail={setJobdetail}
@@ -598,7 +563,7 @@ const Employer = () => {
         )}
 
         {page == "myJobs" && (
-          <div className="w-full h-full">
+          <div className={`w-full h-full ${!selectedJob &&"mb-28"}`}>
             {selectedJob ? (
               <JobDetailsPanel
                 setEdit={setEdit}
@@ -612,7 +577,7 @@ const Employer = () => {
               />
             ) : (
               <>
-                <table className={`w-full shadow-2xl rounded-2xl bg-${lightDark} px-7 overflow-hidden`}>
+                <table className={`w-full md:shadow-2xl md:rounded-2xl bg-${lightDark} px-7 overflow-hidden pb-48`}>
                   <thead className="border-b border-b-gray-300 px-7">
                     <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">
@@ -633,21 +598,13 @@ const Employer = () => {
                           setJobdetail(i + 1);
                         }}
                         key={i}
-                        className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                        className={`even:bg-${rowsColor} hover:bg-${rowshoverColor} cursor-pointer`}
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
                           {p[`title${lang}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
-                          {
-                            <Image
-                              width={20}
-                              height={20}
-                              src={p.flag}
-                              alt={p.location + " flag"}
-                              className="h-fit aspect-video"
-                            />
-                          }
+          
                           {p[`${lang}Location`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -677,7 +634,7 @@ const Employer = () => {
               />
             ) : (
               <>
-                <table className={`w-full shadow-2xl rounded-2xl  px-7 overflow-hidden bg-${lightDark}`}>
+                <table className={`w-full md:shadow-2xl md:rounded-2xl  px-7 overflow-hidden bg-${lightDark}`}>
                   <thead className="border-b border-b-gray-300 px-7">
                     <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">
@@ -705,17 +662,7 @@ const Employer = () => {
                           {p.name}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
-                          {
-                            <Image
-                              width={20}
-                              height={20}
-                              src={p.flag}
-                              alt={
-                                p[`senderloc${lang.toLowerCase()}`] + " flag"
-                              }
-                              className="h-fit aspect-video"
-                            />
-                          }
+                          
                           {p[`senderloc${lang.toLowerCase()}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">

@@ -5,6 +5,8 @@ import About from "./_components/about";
 import Community from "./_components/stafs";
 import Footer from "./_components/footer";
 import { useSharedState } from "./SharedStateContext";
+import Home_  from "./_components/home";
+import Testmonial from "./_components/testmonials";
 export default function Home() {
  const {bgColor,textColor} = useSharedState()
   return (

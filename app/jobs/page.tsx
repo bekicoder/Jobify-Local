@@ -36,7 +36,6 @@ const JobDetailsPanel = ({
   });
   const approval = approvals.find((a) => a.id == job.id);
   const approved = approval?.approval;
-  console.log(approval?.approval, "this is the approved", approvals, approval);
   const isApplied = proposal_ids.some((p) => Number(p) == Number(job.id));
   const handleSave = async () => {
     setOpend(false);
@@ -46,7 +45,9 @@ const JobDetailsPanel = ({
       body: JSON.stringify({ jobId: job.id, saved: isSaved }),
       headers: { "Content-Type": "application/json" },
     });
+
     const { msg, id: savedId, savedJob } = await save.json();
+    console.log({ msg, id: savedId, savedJob })
     if (msg == "successful") {
       setSaved_ids((prev) =>
         isSaved
@@ -69,6 +70,7 @@ const JobDetailsPanel = ({
     const target = e.target as HTMLFormElement;
     const fd = new FormData(target);
     const data = Object.fromEntries(fd.entries());
+    console.log(data)
     const res = await fetch("/api/proposal", {
       method: "POST",
       cache: "no-store",
@@ -76,14 +78,16 @@ const JobDetailsPanel = ({
       headers: { "Content-Type": "application" },
     });
     const _res = await res.json();
-    if (_res.msg === "successful") {
+    if(_res.msg=="unauthorized"){
+      window.location.href = "/account"
+    }else if (_res.msg === "successful") {
       target.reset();
       setOpend(false);
       const data = await fetch(`/api/proposal?id=${_res.id}`, {
         cache: "no-store",
       });
       const updatedData = await data.json();
-      setProposal_ids((prev) => [_res.id, ...prev]);
+      setProposal_ids((prev) => [job.id, ...prev]);
       setApprovals((prev) => {
         return [{ id: job.id, approval: updatedData.data.approval }, ...prev];
       });
@@ -143,13 +147,14 @@ const JobDetailsPanel = ({
           </div>
         </form>
       )}
-      <div className="w-full flex justify-between pr-4 pt-4">
+      <div className="w-full flex justify-between md:pr-4 pt-4">
         <button
           onClick={handleClose}
           className={`py-2 cursor-pointer text-${textColor} w-10 h-10 flex justify-start`}
         >
           <i className="fa-solid fa-arrow-left" />
         </button>
+
         <button
           onClick={handleSave}
           className="ml-auto mr-5 text-[18px] cursor-pointer fa-solid fa-regular"
@@ -180,37 +185,28 @@ const JobDetailsPanel = ({
           </button>
         )}
       </div>
-      {/* job title */}
-      <h1 className="text-2xl font-medium mb-2">{job.title}</h1>
-      <div className="w-full flex justify-between pr-4">
-        <span
-          className={` text-sm flex items-center font-medium text-${lightDark}`}
+      <div className="w-full flex justify-between md:pr-4">
+        <div
+          className={` text-sm flex items-center font-medium text-${lightDark} flex-wrap flex-2`}
         >
-          {job.salary_range} • {job[`${lang}Location`] as string}
-          &nbsp;&nbsp;&nbsp;
-          <div className="aspect-video w-6 relative">
-            {
-              <Image
-                src={job.flag}
-                alt={job[`${lang}Location`] + " flag"}
-                fill
-                sizes="20px"
-                className={`object-contain ${opend && "hidden"}`}
-              />
-            }
+          <div>
+            {job.salary_range} • {job[`${lang}Location`] as string} • 
           </div>
-          &nbsp;&nbsp;• {job[`${lang}Jobtype`] as string} &nbsp;&nbsp;
-          <span
+          <div className="flex">
+            {job[`${lang}Jobtype`] as string} &nbsp;&nbsp;    <span
             className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-yellow-500" : approved && "bg-green-500"} my-auto mt-2 `}
           ></span>
-        </span>
-        <span className="text-sm">
+          </div>
+         
+        </div>
+        <span className="text-xs mt-2 md:text-sm flex-1 text-end">
           <i className={`fa-solid fa-calendar-day text-${grayText}`} />{" "}
           {date[0]}
         </span>
       </div>
 
-      <h3 className={`text-xl font-medium mt-8 mb-1 text-${textColor}`}>
+        <h1 className="text-2xl font-medium mb-4 mt-8">{job[`title${lang}`]}</h1>
+      <h3 className={`text-xl font-medium text-${textColor} mb-2`}>
         {content.aboutJob}
       </h3>
       <article
@@ -231,7 +227,7 @@ const EmployeePage = () => {
     content,
     jobCategories,
     jobTypes,
-    countries,
+    cities,
     bgColor,
     textColor,
     grayText,
@@ -274,7 +270,6 @@ const EmployeePage = () => {
     catagory: "",
     created_at: "",
     detail: "",
-    flag: "",
     jobtype: "",
     location: "",
     posted_by: "",
@@ -338,32 +333,23 @@ const EmployeePage = () => {
             seenstatus: p.seenstatus,
             approval: p.approval,
             detailAm: p?.amproposal,
-            detailAr: p?.arproposal,
-            detailFr: p?.frproposal,
             detailEn: p?.enproposal,
             sender: p.sender,
             senderlocen: p?.senderlocen,
             senderlocam: p?.senderlocam,
-            senderlocar: p?.senderlocar,
-            senderlocfr: p?.senderlocfr,
             AmJobtype: career?.AmJobtype,
-            ArJobtype: career?.ArJobtype,
             EnJobtype: career?.EnJobtype,
-            FrJobtype: career?.FrJobtype,
-            flag: career?.flag,
             titleam: career?.titleAm,
             titleen: career?.titleEn,
-            titlefr: career?.titleFr,
-            titlear: career?.titleAr,
             salary_range: career?.salary_range,
           };
         },
       );
-      console.log(approved, "this is approved hi beki are you fine");
       setProposal_ids(proposalIds);
       setProposals(fullProposal);
       setApprovals(approved);
     };
+
     const fetchSaved = async () => {
       const savedRes = await fetch("/api/saveJob", { cache: "no-store" });
       const { data } = await savedRes.json();
@@ -426,7 +412,7 @@ const EmployeePage = () => {
           {content.headline}
         </h1>
         <div
-          className={`flex rounded-2xl shadow- lg shadow-gray-300 overflow-hidden items-center pl-2 bg-${lightDark} mx-2`}
+          className={`flex rounded-2xl shadow- lg shadow-gray-300 overflow-hidden items-center pl-2 bg-${lightDark} text-${textColor} mx-2`}
         >
           <i className="fa-solid fa-search " />
           <input
@@ -443,9 +429,9 @@ const EmployeePage = () => {
           >
             <button
               onClick={() => toggleMenu("Catagories")}
-              className="cursor-pointer transition-all duration-300 px-3 active:scale-95 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-blue-500/25 "
+              className={`cursor-pointer transition-all duration-300 px-3 active:scale-95 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-${lightDark}`}
             >
-            <i className="fas fa-layer-group text-blue-500"></i>
+            <i className="fas fa-layer-group"></i>
               <span className="max-md:text-xs font-medium">{content.categories}</span>
               <span className="hidden md:block ml-auto">
                 <i
@@ -486,9 +472,9 @@ const EmployeePage = () => {
           >
              <button
               onClick={() => toggleMenu("Location")}
-              className="cursor-pointer transition-all duration-300 active:scale-95 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-green-500/25 "
+              className={`cursor-pointer transition-all duration-300 active:scale-95 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-${lightDark}`}
             >
-            <i className="fas fa-location-dot text-emerald-500"></i>
+            <i className="fas fa-location-dot"></i>
               <span className="max-md:text-xs font-medium">{content.location}</span>
               <span className="hidden md:block ml-auto">
                 <i
@@ -500,7 +486,7 @@ const EmployeePage = () => {
               <div
                 className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-48 top-[calc(100%+10px)] h-50 bg-${lightDark} left-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}
               >
-                {countries.map((c, i) => (
+                {cities.map((c, i) => (
                   <label
                     key={i}
                     className="flex cursor-pointer items-center gap-2 text-sm font-medium"
@@ -521,13 +507,6 @@ const EmployeePage = () => {
                     <span className="w-4 h-4 aspect-square flex-none bg-sky-200 text-sky-200 peer-checked:text-white rounded block peer-checked:bg-sky-600 flex items-center justify-center">
                       <i className="fa-solid fa-check scale-90 "></i>
                     </span>
-                    <Image
-                      width={20}
-                      height={20}
-                      src={c.flag}
-                      alt={c.name + " flag"}
-                      className="h-fit aspect-video"
-                    />
                     {c.name}
                   </label>
                 ))}
@@ -539,9 +518,9 @@ const EmployeePage = () => {
             className={`relative flex-1 cursor-pointer flex flex-col items-center gap-2 min-w-16`}>
             <button
               onClick={() => toggleMenu("Job_type")}
-              className="cursor-pointer active:scale-95 transition-all duration-300 px-1 md:px-3 h-full flex flex-col items-center justify-center gap-1 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-pink-500/25 "
+              className={`cursor-pointer active:scale-95 transition-all duration-300 px-1 md:px-3 h-full flex flex-col items-center justify-center gap-1 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-${lightDark}`}
             >
-            <i className="fas fa-briefcase text-pink-500"></i>
+            <i className="fas fa-briefcase"></i>
               <span className="max-md:text-xs font-medium leading-4">{content.jobType}</span>
               <span className="hidden md:block ml-auto">
                 <i
@@ -587,9 +566,9 @@ const EmployeePage = () => {
           >
            <button
               onClick={() => toggleMenu("Income")}
-              className="cursor-pointer active:scale-95 transition-all duration-300 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-amber-500/25 p-2"
+              className={`cursor-pointer active:scale-95 transition-all duration-300 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl p-2 bg-${lightDark}`}
             >
-            <i className="fas fa-coins text-amber-500"></i>
+            <i className="fas fa-coins"></i>
               <span className="max-md:text-xs font-medium">{content.salary}</span>
               <span className="hidden md:block ml-auto">
                 <i
@@ -632,7 +611,7 @@ const EmployeePage = () => {
         </div>
       </aside>
 
-      <div className="md:px-5 w-full md:px-24 h-full overflow-auto relative">
+      <div className="w-full md:px-24 h-full overflow-auto relative">
         <div className="w-full h-full">
           {selectedJob ? (
             <JobDetailsPanel
@@ -679,19 +658,10 @@ const EmployeePage = () => {
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
                           {p[`title${lang}`] as string}
                         </td>
-                        <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
+                        <td className="text-left text-sm px-4 py-2">
                           <div className="aspect-video w-5 relative">
-                            {
-                              <Image
-                                src={p.flag as string}
-                                alt={p.location + " flag"}
-                                fill
-                                sizes="20px"
-                                className="object-contain"
-                              />
-                            }
                           </div>
-                          {p[`${lang}Location`] as string}
+                         {p[`${lang}Location`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
                           {p[`${lang}Jobtype`] as string}
@@ -704,22 +674,14 @@ const EmployeePage = () => {
                       <tr
                         onClick={() => setJobdetail(p.id)}
                         key={i}
-                        className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                        className={`even:bg-${rowsColor} hover:bg-${rowshoverColor} cursor-pointer`}
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
                           {p[`title${lang.toLowerCase()}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
-                            {
-                              <Image
-                                src={p.flag}
-                                alt={p.location + " flag"}
-                                fill
-                                sizes="20px"
-                                className="object-contain"
-                              />
-                            }
+                            
                           </div>
                           {p[`senderloc${lang.toLowerCase()}`]}
                         </td>
@@ -733,22 +695,14 @@ const EmployeePage = () => {
                       <tr
                         onClick={() => setJobdetail(p.id)}
                         key={i}
-                        className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                        className={`even:bg-${rowsColor} hover:bg-${rowshoverColor} cursor-pointer`}
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
                           {p[`title${lang}`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
                           <div className="aspect-video w-5 relative">
-                            {
-                              <Image
-                                src={p.flag}
-                                alt={p.location + " flag"}
-                                fill
-                                sizes="20px"
-                                className="object-contain"
-                              />
-                            }
+                            
                           </div>
                           {p[`${lang}Location`] as string}
                         </td>

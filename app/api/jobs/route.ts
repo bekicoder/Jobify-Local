@@ -9,42 +9,25 @@ interface jobDataType {
   detailEn: string;
   titleAm: string;
   detailAm: string;
-  titleAr: string;
-  detailAr: string;
-  titleFr: string;
-  detailFr: string;
   EnCategory: string;
-  FrCategory: string;
-  ArCategory: string;
   AmCategory: string;
   EnJobtype: string;
-  FrJobtype: string;
-  ArJobtype: string;
   AmJobtype: string;
 }
 const jobData: jobDataType = {
   id: 0,
   posted_by: "",
   created_at: "",
-  flag: "",
   titleEn: "",
   detailEn: "",
   titleAm: "",
   detailAm: "",
-  titleAr: "",
-  detailAr: "",
-  titleFr: "",
-  detailFr: "",
   EnCategory: "",
-  FrCategory: "",
-  ArCategory: "",
   AmCategory: "",
   EnJobtype: "",
-  FrJobtype: "",
-  ArJobtype: "",
   AmJobtype: "",
 };
-const languages = ["en", "am", "ar", "fr"];
+const languages = ["en", "am"];
 export async function GET() {
   const { rows } = await db.query("select * from jobs order by id desc;");
   return NextResponse.json({ count: rows.length});
@@ -63,7 +46,6 @@ export async function POST(req: NextRequest) {
         jobData.id = job.id
         jobData.created_at = job.created_at;
         jobData.posted_by = job.posted_by;
-        jobData.flag = job.flag;
         jobData.salary_range = job.salary_range
         await Promise.all(
           languages.map(async (lang) => {
@@ -87,8 +69,6 @@ export async function POST(req: NextRequest) {
       }),
     );
     return NextResponse.json({ jobData }, { status: 200 });
-    //   const {rows} = await db.query("select * from jobs where id = $1 ",[id])
-    //     return NextResponse.json(rows[0])
   } catch (err) {
     return NextResponse.json(
       { error: `Failed to fetch jobs ${err}` },

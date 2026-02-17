@@ -12,20 +12,45 @@ const Stats = () => {
   ];
 
   return (
-    <div className={`flex flex-col md:flex-row justify-center items-center gap-8 px-4`}>
-      {/* Jobs Posted */}
-      {stats.map((stat,index)=>(
-        <div key={index} className={`flex flex-col items-center bg-${lightDark} text-${textColor} rounded-2xl shadow-lg p-8 w-72 hover:scale-105 transition-transform duration-300`}>
-        <div className={`bg-${stat.color}-100 p-4 rounded-full mb-4`}>
-          <i className={`fa-solid fa-briefcase text-${stat.color}-600 text-2xl`}></i>
+    <section className={`py-24 px-6 bg-${lightDark} text-${textColor}`}>
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-16">
+            {content.how_it_works}
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className={`p-8 rounded-2xl shadow-md bg-${bgColor}`}>
+              <div className="text-sky-600 text-4xl mb-4">
+                <i className="fa-solid fa-user-plus"></i>
+              </div>
+              <h3 className="font-semibold text-xl mb-2">{content.create_account}</h3>
+              <p className={`text-${grayText}`}>
+                {content.create_account_desc}
+              </p>
+            </div>
+
+            <div className={`bg-${bgColor} p-8 rounded-2xl shadow-md`}>
+              <div className="text-sky-600 text-4xl mb-4">
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+              <h3 className="font-semibold text-xl mb-2">{content.search_jobs}</h3>
+              <p className={`text-${grayText}`}>
+                {content.create_account_desc}
+              </p>
+            </div>
+
+            <div className={`bg-${bgColor} p-8 rounded-2xl shadow-md`}>
+              <div className="text-sky-600 text-4xl mb-4">
+                <i className="fa-solid fa-paper-plane"></i>
+              </div>
+              <h3 className="font-semibold text-xl mb-2">{content.apply_instantly}</h3>
+              <p className={`text-${grayText}`}>
+                {content.apply_instantly_desc}
+              </p>
+            </div>
+          </div>
         </div>
-        <h3 className={`text-xl font-semibold text-${grayText} mb-2`}>
-          {stat.title}
-        </h3>
-        <p className={`text-3xl font-bold text-${stat.color}`}>{stat.count}</p>
-      </div>
-      ))}
-    </div>
+      </section>
   );
 };
 

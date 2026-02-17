@@ -6,8 +6,7 @@ import { console } from "inspector";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, type, location } = await req.json();
-    const hashePass = await bcrypt.hash(password, 10);
+    const { email, password, type } = await req.json();
     const tableName =
       type == "employer" ? "organizations" : type == "employee" && "users";
     const { rows } = await db.query(
@@ -19,9 +18,7 @@ export async function POST(req: NextRequest) {
     if (rows.length == 0) {
       return NextResponse.json({ message: `don't exist` }, { status: 500 });
     }
-
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -37,11 +34,8 @@ export async function POST(req: NextRequest) {
         email: user.email,
         profile: user.profile,
         role: type,
-        flag: user.flag,
         enLocation: user.enlocation,
         amLocation: user.amlocation,
-        arLocation: user.arlocation,
-        frLocation: user.frlocation,
       },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" },
@@ -52,11 +46,8 @@ export async function POST(req: NextRequest) {
         email: user.email,
         profile: user.profile,
         role: type,
-        flag: user.flag,
         enLocation: user.enlocation,
         amLocation: user.amlocation,
-        arLocation: user.arlocation,
-        frLocation: user.frlocation,
       })
     response.cookies.set({
       name: "jobify-token",

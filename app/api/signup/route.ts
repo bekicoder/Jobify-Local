@@ -2,12 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { pool as db } from "@/lib/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {
-  countriesAm,
-  countriesAr,
-  countriesEn,
-  countriesFr,
-} from "@/app/_components/Contents";
+import {cities as citiesEn} from "@/lib/languages/en.json"
+import {cities as citiesAm} from "@/lib/languages/am.json"
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +15,6 @@ export async function POST(req: NextRequest) {
       password,
       type: role,
       location,
-      flag,
     } = await req.json();
     if (
       (role == "employee" && (!fname || !lname)) ||
@@ -27,9 +22,7 @@ export async function POST(req: NextRequest) {
       !email ||
       !password ||
       !role ||
-      !location ||
-      !flag
-    ) {
+      !location) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 },
@@ -65,23 +58,16 @@ export async function POST(req: NextRequest) {
       "#FBC02D",
       "#5D4037",
     ];
-    const EnLocation = countriesEn.filter(
+    const EnLocation = citiesEn.filter(
       (countrie) => countrie.id == location,
     );
-    const AmLocation = countriesAm.filter(
+    const AmLocation = citiesAm.filter(
       (countrie) => countrie.id == location,
     );
-    const FrLocation = countriesFr.filter(
-      (countrie) => countrie.id == location,
-    );
-    const ArLocation = countriesAr.filter(
-      (countrie) => countrie.id == location,
-    );
+    
     const locationMap: Record<string, string> = {
       EnLocation: EnLocation[0].name,
       AmLocation: AmLocation[0].name,
-      ArLocation: ArLocation[0].name,
-      FrLocation: FrLocation[0].name,
     };
     const hashedPass = await bcrypt.hash(password, 10);
     const name =
@@ -90,17 +76,14 @@ export async function POST(req: NextRequest) {
     const randomColor =
       profileColors[Math.floor(Math.random() * profileColors.length)];
 
-    const sql = `INSERT INTO ${tableName} (${column_name},email, password,profile,flag,enlocation,amlocation,arlocation,frlocation) values($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`;
+    const sql = `INSERT INTO ${tableName} (${column_name},email, password,profile,enlocation,amlocation) values($1,$2,$3,$4,$5,$6) RETURNING *`;
     const result = await db.query(sql, [
       name,
       email,
       hashedPass,
       randomColor,
-      flag,
       locationMap.EnLocation,
       locationMap.AmLocation,
-      locationMap.ArLocation,
-      locationMap.FrLocation,
     ]);
 
     const user = result.rows[0];
@@ -109,13 +92,10 @@ export async function POST(req: NextRequest) {
         id: user.id,
         name: user[column_name],
         email: user.email,
-        role: user.role,
+        role: role,
         profile: user.profile,
-        flag: user.flag,
         enLocation: locationMap.EnLocation,
         amLocation: locationMap.AmLocation,
-        arLocation: locationMap.ArLocation,
-        frLocation: locationMap.FrLocation,
       },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" },
@@ -126,11 +106,8 @@ export async function POST(req: NextRequest) {
         email: user.email,
         role: role,
         profile: user.profile,
-        flag: user.flag,
         enLocation: locationMap.EnLocation,
         amLocation: locationMap.AmLocation,
-        arLocation: locationMap.ArLocation,
-        frLocation: locationMap.FrLocation,
       },"dose this contain the role")
     const response = NextResponse.json(
       { message: "successful" },

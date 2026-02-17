@@ -3,15 +3,8 @@ import { pool as db } from "@/lib/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { splitText, translateLargeText } from "../createJob/route";
 import { franc } from "franc";
-import {
-  countriesEn,
-  categoriesAm,
-  categoriesAr,
-  categoriesFr,
-  countriesAm,
-  countriesFr,
-  countriesAr,
-} from "@/app/_components/Contents";
+import {cities as citiesEn} from "@/lib/languages/en.json"
+import {cities as citiesAm} from "@/lib/languages/am.json"
 import { jobData } from "../myJobs/route";
 export async function GET(req: NextRequest) {
   try {
@@ -51,43 +44,35 @@ export async function POST(req: NextRequest) {
       );
     }
     if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ msg: "unauthorized" }, { status: 401 });
     }
     const data = jwt.verify(token, process.env.JWT_SECRET!);
     const decoded = data as JwtPayload;
-    const languages = ["En", "Am", "Fr", "Ar"];
+    const languages = ["En", "Am"]
     const isoMap: Record<string, string> = {
       eng: "En",
       amh: "Am",
-      arb: "Ar",
-      fra: "Fr",
     };
     const proposalData: Record<string, string> = {};
     const detectedLang = franc(article);
-    console.log(detectedLang, "this is the lang");
     const lang = isoMap[detectedLang] || "En";
-    const locationId = countriesEn.filter((c) => c.name == proposal.location);
-    const countriesMap: Record<string, { id: number; name: string }[]> = {
-      En: countriesEn,
-      Am: countriesAm,
-      Fr: countriesFr,
-      Ar: countriesAr,
+    
+    const locationId = citiesEn.filter((c) => c.name == decoded['enLocation']);
+    const locationMap: Record<string, { id: number; name: string }[]> = {
+      En: citiesEn,
+      Am: citiesAm,
     };
     languages.map((lng) => {
-      const countrie = countriesMap[lng].filter((c) => {
+      const countrie = locationMap[lng].filter((c) => {
         return c.id == Number(locationId[0].id);
       });
       proposalData[`senderloc${lng.toLowerCase()}`] = countrie[0].name;
     });
-    //     return NextResponse.json(
-    //   { msg: "successful", id: proposalData },
-    //   { status: 200 },
-    // );
+
     const values = Object.values(proposalData);
     values.unshift(
       decoded.name,
       decoded.email,
-      decoded.flag,
       proposal.id,
       proposal.posted_by,
     );
@@ -111,7 +96,7 @@ export async function POST(req: NextRequest) {
       }),
     );
     const { rows } = await db.query(
-      `insert into proposals (name,sender,sender_flag,career_id,career_owner,senderlocEn,senderlocam,senderlocfr,senderlocar,enproposal,arproposal,amproposal,frproposal) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id;`,
+      `insert into proposals (name,sender,career_id,career_owner,senderlocEn,senderlocam,enproposal,amproposal) values($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id;`,
       values,
     );
     return NextResponse.json(

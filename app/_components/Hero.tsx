@@ -1,18 +1,16 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSharedState } from "../SharedStateContext";
 const Hero = () => {
   const [user, setUser] = useState<{ role?: string } | null>(null);
-  const {content,textColor,bgColor,mode} = useSharedState();
+  const {content,textColor,bgColor,mode,grayText} = useSharedState();
   const [homeText,setHomeT] = useState('[#0a2540]')
-  // Load user info
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await fetch("/api/users");
-        if (!res.ok) throw new Error("Failed to fetch users");
+        if (!res.ok) return;
         const data = await res.json();
         setUser(data);
       } catch (err) {
@@ -31,14 +29,22 @@ const Hero = () => {
   },[mode])
   return (
     <div className={`w-full flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor}`}>
-      <div className="px-10 pt-24 wrap-break-word flex flex-1 flex-col gap-5">
-        <h1 className={`font-bold text-5xl text-${homeText} leading-tight`}>
-          {content?.hero_header}
-        </h1>
-        <p>{content?.hero_paragraph}</p>
+      <div className="px-10 pt-24 wrap-break-word flex flex-1 flex-col gap-5 justify-center">
+        <div className="space-y-6">
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+              {content.hero_header} <br/>
+              <span className="text-sky-600 ">{content.fasterSmarter}</span>
+            </h1>
+            <p className={`text-${grayText}`}>{content?.hero_paragraph}</p>
+            <div className={`flex gap-6 text-sm text-${grayText} pt-2`}>
+              <span>150k+ {content.jobs}</span>
+              <span>50k+ {content.users}</span>
+              <span>10k+ {content.campanies}</span>
+            </div>
+            </div>
         <Link
           href={user?.role !== "employer" ? "/jobs" : "/dashboard"}
-          className="w-fit px-4 py-2 rounded-full bg-sky-600 text-white font-bold cursor-pointer hover:bg-[#0a2540]"
+          className="w-fit px-4 py-2 rounded-full bg-sky-600 text-white font-bold cursor-pointer hover:bg-[#0a2540] mb-auto"
         >
           {user?.role !== "employer"
             ? content?.find_job
