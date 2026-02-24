@@ -19,29 +19,8 @@ export default function Footer() {
           <p className="text-gray-300 text-sm">{content?.footer_paragraph} </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <h3 className="font-semibold text-lg mb-2">{content.links}</h3>
-          <Link href="/" className="hover:text-sky-500 transition">
-            {content?.home_link}
-          </Link>
-          <Link href="/jobs" className="hover:text-sky-500 transition">
-            {content?.explore_link}
-          </Link>
-          <Link
-            href="/jobs?route=appliedJobs"
-            className="hover:text-sky-500 transition"
-          >
-            {content?.sent_link}
-          </Link>
-          <Link
-            href="/jobs?route=savedJobs"
-            className="hover:text-sky-500 transition"
-          >
-            {content?.saved_link}
-          </Link>
-        </div>
+        
 
-        {/* About */}
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-lg mb-2">{content?.about}</h3>
           <p className="text-gray-300 text-sm">
@@ -52,7 +31,6 @@ export default function Footer() {
           </a>
         </div>
 
-        {/* Contact & Social */}
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-lg mb-2">{content?.contact}</h3>
           <p className="text-gray-300 text-sm">
