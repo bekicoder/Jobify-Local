@@ -29,7 +29,7 @@ const JobDetailsPanel = ({
   const { lang } = useSharedState();
   const { content, lightDark, bgColor, textColor, grayText, mode } =
     useSharedState();
-  const date = job.created_at.split("T");
+  const date = job.created_at.split(" ");
   const isSaved = saved_ids.some((s) => s == job.id);
   const proposal = proposals.find((p) => {
     return p.id == job.id;
@@ -205,7 +205,7 @@ const JobDetailsPanel = ({
         </span>
       </div>
 
-        <h1 className="text-2xl font-medium mb-4 mt-8">{job[`title${lang}`]}</h1>
+        <h1 className="text-2xl font-medium mb-4 mt-8">{job[`title${lang}`] as string}</h1>
       <h3 className={`text-xl font-medium text-${textColor} mb-2`}>
         {content.aboutJob}
       </h3>
@@ -612,7 +612,7 @@ const EmployeePage = () => {
       </aside>
 
       <div className="w-full md:px-24 h-full overflow-auto relative">
-        <div className="w-full h-full">
+        <div className="w-full  md: mb-28">
           {selectedJob ? (
             <JobDetailsPanel
               setSavedJobs={setSavedJobs}

@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   }
   if (editId) {
     const { rows } = await db.query(
-      "update jobs set updated_at=now(),salary_range=$1 where id=$2 RETURNING id,enjobid,amjobid,frjobid,arjobid,salary_range,posted_by,created_at,updated_at",
+      "update jobs set updated_at=now(),salary_range=$1 where id=$2 RETURNING id,enjobid,amjobid,salary_range,posted_by,created_at,updated_at",
       [fd.salary_range, editId],
     );
     jobData.id = rows[0].id;

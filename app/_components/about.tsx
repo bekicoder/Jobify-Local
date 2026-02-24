@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useSharedState } from "../SharedStateContext";
 const About = () => {
   const { content } = useSharedState();
-  const [lang, setLang] = useState<string>("english");
 
   return (
     <div>

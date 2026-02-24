@@ -45,9 +45,7 @@ const Stafs = () => {
     title: "Assistant",
   },
 ];
-  const {teams}  = useSharedState();
-  const {content,grayText,bgColor,textColor} = useSharedState();
-  const [lang, setLang] = useState<string>("english");
+  const {content,textColor} = useSharedState();
 
   return (
     <div>
@@ -55,6 +53,7 @@ const Stafs = () => {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
 
           <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/construction-workers-welding-steel-beams.jpg"
               className="rounded-3xl shadow-xl"

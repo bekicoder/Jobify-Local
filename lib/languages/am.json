@@ -5,7 +5,7 @@
     "createJob": "ስራ ፍጠር",
     "proposals": "ጥያቄዎች",
     "create": "ፍጠር",
-    "alreadySignedInMessage": "አንተ ከዚህ ቀደም ተገብተሃል።",
+    "alreadySignedInMessage": "አንተ ከዚህ ቀደም ገብተሃል።",
     "organizationName": "የድርጅት ስም",
     "donhave": "አካውንት የለዎትም?",
     "createOne": "አንድ ይፍጠሩ",
@@ -91,18 +91,6 @@
   "review_2": "በ2 ሳምንታት ውስጥ ተቀጠርኩ!",
   "review_3": "ለመጠቀም በጣም ቀላል ነው!"
   },
-
-  "teams": [
-    {
-      "name": "Oliver Benjamin",
-      "img": "/photo-1560250097-0b93528c311a.avif",
-      "description": "የቅጥር መድረኮችን በሰው ሰራሽ ብልህነት ለማስፋፋት የስትራቴጂ እና የራዕይ መመሪያ",
-      "stars": 4.5,
-      "halfStar": true,
-      "color": "bg-sky-600",
-      "title": "ዋና ሥራ አስፈጻሚ"
-    }
-  ],
   "categories": [
     { "id": 1, "name": "የጤና እና ሕክምና" },
     { "id": 2, "name": "የመረጃ ቴክኖሎጂ (IT) እና ሶፍትዌር" },

@@ -8,7 +8,6 @@ export default function Footer() {
   return (
     <footer className={`bg-[#0a2540] text-white mt-24`}>
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
-        {/* Logo & Description */}
         <div className="flex flex-col gap-4">
           <Link href="/" className="flex items-center gap-3">
             <div className="relative">
@@ -20,7 +19,6 @@ export default function Footer() {
           <p className="text-gray-300 text-sm">{content?.footer_paragraph} </p>
         </div>
 
-        {/* Quick Links */}
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-lg mb-2">{content.links}</h3>
           <Link href="/" className="hover:text-sky-500 transition">

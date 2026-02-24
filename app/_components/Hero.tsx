@@ -22,6 +22,7 @@ const Hero = () => {
   }, []);
   useEffect(()=>{
     if(mode == "dark"){
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHomeT("white")
   }if(mode == "light"){
     setHomeT("[#0a2540]")

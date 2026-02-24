@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
     const { rows: jobs } = await db.query("select * from jobs where id = $1;", [
       id,
     ]);
-    console.log(jobs[0].id,"this is the id")
     await Promise.all(
       jobs.map(async (job) => {
         jobData.id = job.id

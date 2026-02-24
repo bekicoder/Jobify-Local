@@ -8,8 +8,10 @@ import {
   useEffect,
 } from "react";
 
-import {contents as contentsEn,teams as teamsEn,categories as categoriesEn,jobTypes as jobTypesEn,cities as citiesEn} from "@/lib/languages/en.json"
-import {contents as contentsAm,teams as teamsAm,categories as categoriesAm,jobTypes as jobTypesAm,cities as citiesAm} from "@/lib/languages/am.json"
+import {contents as contentsEn,categories as categoriesEn,jobTypes as jobTypesEn,cities as citiesEn} from "@/lib/languages/en.json"
+import {contents as contentsAm,categories as categoriesAm,jobTypes as jobTypesAm,cities as citiesAm} from "@/lib/languages/am.json"
+import {contents as contentsHd,categories as categoriesHd,jobTypes as jobTypesHd,cities as citiesHd} from "@/lib/languages/hd.json"
+
 import ContentType, { citiesType } from "./interfaces";
 // Define all states you want to share
 type job_types = {
@@ -37,7 +39,6 @@ type SharedStateType = {
   setContent: (val: ContentType) => void;
   jobTypes: job_types[];
   jobCategories: JobCategory[];
-  teams: teamsType[];
   cities: citiesType[];
   setCities: (val: citiesType[]) => void;
   mode:string;
@@ -47,6 +48,8 @@ type SharedStateType = {
   grayText:string;
   lightDark:string;
   borderColor:string;
+  lng:string;
+  setLng:(val: string) => void;
 };
 
 const SharedStateContext = createContext<SharedStateType | undefined>(
@@ -58,7 +61,6 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   const [content, setContent] = useState<ContentType>(contentsEn);
   const [jobTypes, setJobTypes] = useState<job_types[]>(jobTypesEn);
   const [jobCategories, setCatagories] = useState<JobCategory[]>(categoriesEn);
-  const [teams, setTeam] = useState<teamsType[]>(teamsEn);
   const [cities, setCities] = useState<citiesType[]>(citiesEn);
   const [mode,setMode] = useState("light")
   const [textColor,setTextcolor] = useState("black")
@@ -66,23 +68,28 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   const [grayText,setgrayText] = useState("gray-700")
   const [lightDark,setLightD] = useState("white")
   const [borderColor,setBorcolor] = useState("border-gray-200")
+  const [lng,setLng] = useState("En")
   useEffect(() => {
-    if (lang == "Am") {
+    if (lang == "Am" && lng != "Hd") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(contentsAm);
       setCities(citiesAm);
       setJobTypes(jobTypesAm);
       setCatagories(categoriesAm);
-      setTeam(teamsAm);
     }
-    else if (lang == "En") {
+    else if (lang == "En" && lng != "Hd") {
       setContent(contentsEn);
       setCities(citiesEn);
       setJobTypes(jobTypesEn);
       setCatagories(categoriesEn);
-      setTeam(teamsEn);
+    }else if(lng == "Hd"){
+      setContent(contentsHd);
+      setCities(citiesHd);
+      setJobTypes(jobTypesHd);
+      setCatagories(categoriesHd);
     }
-  }, [lang]);
+  }, [lng]);
+
   useEffect(()=>{
     if(mode == "dark"){
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -99,9 +106,9 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
     setBorcolor("gray-200")
   }
   },[mode])
+
   useEffect(()=>{
     const mode_ = localStorage.getItem("mode")
-    console.log(mode_,"this is the mode")
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if(mode_) setMode(mode_ as string)
   },[])
@@ -113,7 +120,6 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
         setLang,
         content,
         setContent,
-        teams,
         jobCategories,
         jobTypes,
         cities,
@@ -125,6 +131,8 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
         grayText,
         lightDark,
         borderColor,
+        lng,
+        setLng,
       }}
     >
       {children}

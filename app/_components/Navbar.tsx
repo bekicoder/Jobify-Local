@@ -17,18 +17,21 @@ export default function NavBar() {
   const [user, setUser] = useState<Record<string,string> | null>(null);
   const [profileShow, setprofileShow] = useState<boolean>(false);
   const {content,lightDark} = useSharedState()
-  const [languages] = useState([{id:1,language:"English",short_name:"En"},{id:4,language:"አማርኛ",short_name:"Am"}])
-  const {lang,setLang,mode,setMode,textColor,bgColor} = useSharedState()
+  const [languages] = useState([{id:1,language:"English",short_name:"En"},{id:2,language:"አማርኛ",short_name:"Am"},{id:3,language:"Haddiyysa",short_name:"Hd"}])
+  const {lang,setLang,mode,setMode,textColor,bgColor,setLng,lng} = useSharedState()
   const [isOpen, setIsOpen] = useState(false);
   
   useEffect(() => {
   const loadcontent = async () => {
     const selectedLang = localStorage.getItem("lang");
+    console.log(selectedLang,"this is the selected lang")
     if(!selectedLang){
         localStorage.setItem(lang,lang)
       }
-    else if(selectedLang){
+    else if(selectedLang && selectedLang !== "Hd"){
       setLang(selectedLang)
+    }else{
+      setLng(selectedLang)
     }
     const fetchData = async () => {
       const res = await fetch("/api/users/");
@@ -58,9 +61,15 @@ export default function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function handleTranslation(lang:string){
-    localStorage.setItem("lang",String(lang))
-    setLang(lang)
+  async function handleTranslation(lang_:string){
+    localStorage.setItem("lang",String(lang_))
+    console.log(lang_)
+    if(lang_ !== "Hd"){
+      setLang(lang_)
+      setLng(lang_)
+    }else if(lang_ == "Hd"){
+      setLng(lang_)
+    }
   }
   function changeMode(){
     if(mode == "light"){
@@ -72,8 +81,6 @@ export default function NavBar() {
       localStorage.setItem("mode","light")
     }
   }
-
-  console.log(user)
   return (
     <nav
   className={`fixed top-0 left-0 z-1000000 w-full backdrop-blur-md bg-${bgColor}/50 border-b border-gray-200/40 text-${textColor} h-14 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
@@ -188,7 +195,7 @@ export default function NavBar() {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-${lightDark} cursor-pointer transition text-sm font-medium`}
       >
-        {lang}
+        {lng}
         <i className="fa-solid fa-chevron-down text-xs mt-1"></i>
       </button>
 
@@ -206,7 +213,7 @@ export default function NavBar() {
               >
                 <input
                   type="radio"
-                  checked={lang === language.short_name}
+                  checked={lng === language.short_name}
                   readOnly
                   className="accent-blue-600"
                 />

@@ -198,14 +198,7 @@ const CreateJobs = ({
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const tempStore = fd
-    console.log(fd)
-      const res = await fetch("/api/createJob", {
-        body: JSON.stringify({ fd: fd, editId: edit }),
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-      });
-      setFd({
+    setFd({
           title: "",
           detail: "",
           salary_range: "",
@@ -214,9 +207,17 @@ const CreateJobs = ({
           EnJobType: "",
           AmJobType: "",
         });
+      const res = await fetch("/api/createJob", {
+        body: JSON.stringify({ fd:tempStore, editId: edit }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
       const data = await res.json();
       if (data.status == "successful") {
-        setMyjobs(prev=>[data.data,...prev])
+        setMyjobs(prev=>(
+          prev.map(j=>j.id === data.data.id ? data.data:j)
+        ))
       }else{
         setFd(tempStore)
         alert("Failed to create job try again later!")
@@ -285,7 +286,7 @@ const CreateJobs = ({
             name="Job_type"
             value={fd.EnJobType}
             className="sr-only"
-            
+            onChange={()=>{}}
             required
           />
           {openedMenu == "Job_type" && (
@@ -326,6 +327,7 @@ const CreateJobs = ({
             name={content.categories}
             value={fd.EnCategory}
             className="sr-only"
+            onChange={()=>{}}
             required
           />
           {openedMenu == "Job_catagories" && (
@@ -366,6 +368,7 @@ const CreateJobs = ({
             name="range"
             value={fd.salary_range}
             className="sr-only"
+            onChange={()=>{}}
             required
           />
           {openedMenu == "Income_range" && (
