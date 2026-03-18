@@ -1,7 +1,7 @@
 "use client"
 import Hero from "./_components/Hero";
-import Stats from "./_components/stats";
-import Community from "./_components/stafs";
+import Stats from "./_components/how";
+import Community from "./_components/why";
 import Footer from "./_components/footer";
 import { useSharedState } from "./SharedStateContext";
 export default function Home() {

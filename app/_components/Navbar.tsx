@@ -52,9 +52,8 @@ export default function NavBar() {
   };
 
   loadcontent();
+
 }, []);
-
-
   const dropdownRef = useRef<HTMLDivElement>(null);
   
    useEffect(() => {
