@@ -363,7 +363,9 @@ const EmployeePage = () => {
     fethJobs();
   }, []);
   function handleFilter(filterType: string, option: string, status: boolean) {
+    console.log(filterType,option,status)
     if (!option || !filterType) return;
+
     setFilteredJobs((prev) => {
       if (status) {
         return [
@@ -403,7 +405,7 @@ const EmployeePage = () => {
   }, [mode]);
   return (
     <div
-      className={`w-full md:h-full pt-16 flex flex-col md:flex-row overflow-auto bg-${bgColor} md:fixed`}
+      className={`w-full md:h-full min-h-screen pt-16 flex flex-col md:flex-row overflow-auto bg-${bgColor} md:fixed`}
     >
       <aside
         className={`w-full md:shadow-2xl h-full md:w-72 shadow-r-lg flex gap-5 flex-col md:rounded pb-12 border-r border-${borderColor} bg-${bgColor} ${(route == "appliedJobs" || route == "savedJobs") && "hidden"}`}

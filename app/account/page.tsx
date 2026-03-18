@@ -320,7 +320,6 @@ const SignIn = ({ setOpen }: propType) => {
       body: JSON.stringify(fdObj),
     });
     const data = await res.json();
-    console.log(data,fdObj)
     if (data.message == "successful") {
       location.assign("/");
     } else if (data.message == `don't exist`) {

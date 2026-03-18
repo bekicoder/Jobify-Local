@@ -7,7 +7,7 @@ export default function Footer() {
   
   return (
     <footer className={`bg-[#0a2540] text-white mt-24`}>
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 content-center w-full">
         <div className="flex flex-col gap-4">
           <Link href="/" className="flex items-center gap-3">
             <div className="relative">
@@ -42,19 +42,19 @@ export default function Footer() {
           <div className="flex gap-3 mt-4">
             <a
               href="#"
-              className="p-2 -sky-600 rounded-full hover:bg-sky-400 transition"
+              className="p-2 aspect-square bg-sky-600 text-center block  flex-none rounded-full hover:bg-sky-400 transition"
             >
               <i className="fab fa-facebook-f"></i>
             </a>
             <a
               href="#"
-              className="p-2 bg-sky-600 rounded-full hover:bg-sky-400 transition"
+              className="p-2 aspect-square bg-sky-600 text-center block  flex-none rounded-full hover:bg-sky-400 transition"
             >
               <i className="fab fa-twitter"></i>
             </a>
             <a
               href="#"
-              className="p-2 bg-sky-600 rounded-full hover:bg-sky-400 transition"
+              className="p-2 aspect-square bg-sky-600 text-center block  flex-none rounded-full hover:bg-sky-400 transition"
             >
               <i className="fab fa-linkedin-in"></i>
             </a>
@@ -62,7 +62,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-gray-700 mt-12 py-4 text-center text-gray-400 text-sm">
+      <div className="border-t border-gray-700 py-4 text-center text-gray-400 text-sm">
         &copy; {new Date().getFullYear()} Jobify. {content.right}
       </div>
     </footer>

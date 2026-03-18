@@ -64,35 +64,6 @@ const JobDetailsPanel = ({
   }
   return (
     <div className={`w-full pl-4 md:pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl  overflow-y-auto bg-${lightDark} text-${textColor}`}>
-      {/*proposal form */}
-      {opend && (
-        <div
-          onClick={(e) => e.currentTarget == e.target && setOpend(false)}
-          className="proposal_container w-screen h-screen fixed top-0 py-12 px-8 pt-16 left-0 bg-black/50 flex items-center justify-center"
-        >
-          <div className="w-full p-4 h-full  rounded-2xl max-w-2xl flex flex-col relative">
-            <h1 className="text-2xl font-bold text-center mb-1">
-              Write Proposal
-            </h1>
-            <p className="text-center text-sm text-gray-600 mb-4">
-              {content.markdownSupport}
-            </p>
-            <button
-              onClick={() => setOpend(false)}
-              className="absolute top-6 right-6 hover:bg-gray-300 w-8 h-8 rounded-full"
-            >
-              <i className="fa-solid fa-times"></i>
-            </button>
-            <textarea
-              placeholder="Enter proposal details..."
-              className="w-full border rounded-xl resize-none p-4 max-h-full flex-1 focus:border-0 focus-outline-0.5 outline-sky-500"
-            ></textarea>
-            <button className="px-6 py-2 rounded-full bg-sky-600 hover:bg-[#0a2540] text-white font-medium cursor-pointer flex-none w-fit my-4 mx-auto">
-              {content.send}
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="w-full flex justify-between pr-4 pt-4">
         <button
@@ -139,7 +110,7 @@ const JobDetailsPanel = ({
       {/* job title */}
       <div className="w-full flex justify-between pr-4">
         <span className={`text-sm flex items-center font-medium text-${grayText}`}>
-          {proposal ? job.name : job.salary_range} {proposal && " • " + job.location}{!proposal && " • " + job[`${lang}Jobtype`]}
+          {proposal ? job.name : job.salary_range} {proposal && " • " + job[`senderloc${lang.toLowerCase()}`]}{!proposal && " • " + job[`${lang}Jobtype`]}
         </span>
         <span className="text-sm">
           <i className={`fa-solid fa-calendar-day mr-2 text-${grayText}`}/>
@@ -172,7 +143,8 @@ const CreateJobs = ({
   const { jobTypes } = useSharedState();
   const { jobCategories } = useSharedState();
   const { content, lang,bgColor,textColor,grayText,lightDark,mode } = useSharedState();
-  const [selectedJt, setSelectedJt] = useState("");
+  const [selectedJt, setSelectedJt] = useState<number|null>(null);
+  const [selectedCt, setSelectedCt] = useState<number|null>(null);
   const incomeRanges: income_range[] = [
     { id: 1, label: `${content.below} $500` },
     { id: 2, label: "$500 – $1,000" },
@@ -219,13 +191,14 @@ const CreateJobs = ({
           prev.map(j=>j.id === data.data.id ? data.data:j)
         ))
       }else{
+        console.log(data,tempStore)
         setFd(tempStore)
         alert("Failed to create job try again later!")
       }
   }
   function handleChange(id: number, option: string) {
     const languages = ["En", "Am"];
-
+    console.log(option)
     interface OptionType {
       id: number;
       name: string;
@@ -237,10 +210,8 @@ const CreateJobs = ({
       categoriesAm: categoriesAm,
       jobTypesAm: jobTypesAm,
     };
-
     // Build all translations first
     const newTranslations: { [key: string]: string } = {};
-
     languages.forEach((lang) => {
       const keyName =
         option === "categories" ? `categories${lang}` : `jobTypes${lang}`;
@@ -249,14 +220,15 @@ const CreateJobs = ({
         option === "categories" ? `${lang}Category` : `${lang}JobType`;
 
       const found = options[keyName]?.find((o) => o.id === id);
-      if (lang == "En" && found) setSelectedJt(found?.name);
+      console.log(found)
+      if (found && option=="Jobtypes") setSelectedJt(found?.id);
+      if (found && option=="categories") setSelectedCt(found?.id);
 
       if (found) {
         newTranslations[stateKey] = found.name;
       }
     });
-
-    // Update fd once with all translations
+    console.log(newTranslations)
     setFd((prev) => ({ ...prev, ...newTranslations }));
   }
 
@@ -303,7 +275,7 @@ const CreateJobs = ({
                   className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                 >
                   <span
-                    className={`w-4 h-4 aspect-square ${fd[`${lang}JobType`] == t.name.trim() ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"} flex-none rounded flex items-center justify-cente`}
+                    className={`w-4 h-4 aspect-square ${Number(selectedJt) == Number(t.id) ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"} flex-none rounded flex items-center justify-cente`}
                   >
                     <i className="fa-solid fa-check scale-90 ml-0.5"></i>
                   </span>
@@ -344,7 +316,7 @@ const CreateJobs = ({
                   className="flex cursor-pointer items-center gap-2 text-sm font-medium"
                 >
                   <span
-                    className={`w-4 h-4 aspect-square flex-none ${fd[`${lang}Category`] == t.name ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"}  rounded flex items-center justify-cente`}
+                    className={`w-4 h-4 aspect-square flex-none ${Number(selectedCt) == Number(t.id) ? "bg-[#0ea5e9] text-white" : "bg-gray-200 text-gray-200"}  rounded flex items-center justify-cente`}
                   >
                     <i className="fa-solid fa-check scale-90 ml-0.5"></i>
                   </span>
@@ -518,9 +490,9 @@ const Employer = () => {
       }
     }, [mode]);
   return (
-    <div className={`w-full md:h-full pt-16 min-h-[100vh] flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} md:fixed`}>
+    <div className={`w-full md:h-full pt-16 min-h-screen flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} md:fixed`}>
       <aside className={`w-full md:w-72 h-full bg-${bgColor} md:rounded md:shadow-2xl md:border-r border-${borderColor}`}>
-  <div className="md:hidden flex items-center justify-center h-14 bg-gradient-to-r from-sky-600 to-sky-500 text-white text-lg font-semibold tracking-wide shadow-md">
+  <div className="md:hidden flex items-center justify-center h-14 bg-linear-to-r from-sky-600 to-sky-500 text-white text-lg font-semibold tracking-wide shadow-md">
     {content.headline}
   </div>
   <div className="hidden md:flex items-center justify-center py-3 bg-sky-600 text-white text-2xl font-semibold rounded-t">
@@ -547,7 +519,7 @@ const Employer = () => {
       className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
     >
       <i className="fa-solid fa-handshake text-lg md:text-xl"></i>
-      <span className="max-md:text-sm md:text-base font-medium">{content.proposals}</span>
+      <span className="max-md:text-sm md:text-base font-medium">{content.sent_link}</span>
     </div>
   </div>
       </aside>

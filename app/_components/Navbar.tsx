@@ -24,27 +24,34 @@ export default function NavBar() {
   useEffect(() => {
   const loadcontent = async () => {
     const selectedLang = localStorage.getItem("lang");
-    console.log(selectedLang,"this is the selected lang")
     if(!selectedLang){
         localStorage.setItem(lang,lang)
       }
     else if(selectedLang && selectedLang !== "Hd"){
+      console.log("this is not hd",selectedLang)
       setLang(selectedLang)
+      setLng(selectedLang)
     }else{
       setLng(selectedLang)
     }
+    
     const fetchData = async () => {
+      try{
       const res = await fetch("/api/users/");
       const data = await res.json();
+      console.log(data)
       if (data.message === "Unauthorized") return;
-     console.log(data,"this is the user data")
       setUser(data);
+      }catch(err){return;}
     };
+    try{
     fetchData();
+    }catch(err){
+      return;
+    }
   };
 
   loadcontent();
-  console.log(mode)
 }, []);
 
 
@@ -63,8 +70,8 @@ export default function NavBar() {
 
   async function handleTranslation(lang_:string){
     localStorage.setItem("lang",String(lang_))
-    console.log(lang_)
     if(lang_ !== "Hd"){
+      console.log("this is not hd",lang_)
       setLang(lang_)
       setLng(lang_)
     }else if(lang_ == "Hd"){

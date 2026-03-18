@@ -13,7 +13,6 @@ import {contents as contentsAm,categories as categoriesAm,jobTypes as jobTypesAm
 import {contents as contentsHd,categories as categoriesHd,jobTypes as jobTypesHd,cities as citiesHd} from "@/lib/languages/hd.json"
 
 import ContentType, { citiesType } from "./interfaces";
-// Define all states you want to share
 type job_types = {
   id: number;
   name: string;
@@ -71,6 +70,7 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   const [lng,setLng] = useState("En")
   useEffect(() => {
     if (lang == "Am" && lng != "Hd") {
+      console.log("this is amharic")
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(contentsAm);
       setCities(citiesAm);
@@ -78,11 +78,13 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
       setCatagories(categoriesAm);
     }
     else if (lang == "En" && lng != "Hd") {
+      console.log("this is english",lang)
       setContent(contentsEn);
       setCities(citiesEn);
       setJobTypes(jobTypesEn);
       setCatagories(categoriesEn);
     }else if(lng == "Hd"){
+      console.log("this is hd")
       setContent(contentsHd);
       setCities(citiesHd);
       setJobTypes(jobTypesHd);

@@ -7,14 +7,13 @@ export interface income_range {
   label: string;
 }
 export interface _Fd {
-  [key:string]:string | number
+  [key:string]:string | number | null
   title: string;
   detail: string;
   salary_range: string;
 
   EnCategory: string;
   AmCategory: string;
-
   EnJobType: string;
   AmJobType: string;
 }

@@ -5,7 +5,7 @@ export async function GET(req:NextRequest) {
   try{
     const token = req.cookies.get("jobify-token")?.value;
   if(!token){
-    return NextResponse.json({message:"Unauthorized"},{status:401})
+    return NextResponse.json({message:"Unauthorized"},{status:200})
   }
     const userData = jwt.verify(token,process.env.JWT_SECRET!);
     const decoded = userData as JwtPayload;

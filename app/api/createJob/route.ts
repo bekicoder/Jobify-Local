@@ -20,7 +20,7 @@ export async function translateLargeText(
 ) {
   const chunks = splitText(text, 500);
   const translatedChunks: string[] = [];
-
+ const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
   for (const chunk of chunks) {
     const res = await fetch(
       `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
@@ -29,6 +29,7 @@ export async function translateLargeText(
     );
     const data = await res.json();
     translatedChunks.push(data.responseData.translatedText);
+    await delay(100);
   }
 
   return { translated: translatedChunks.join(" "), status: "successful" };
@@ -142,6 +143,7 @@ export async function POST(req: NextRequest) {
     const decoded = data as JwtPayload;
     const detectedLang = franc(detail);
     const lang = isoMap[detectedLang];
+    console.log(lang,decoded)
     await Promise.all(
       languages.map(async (language) => {
         const titleKey = `title${language}`;

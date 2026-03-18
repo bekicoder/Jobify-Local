@@ -60,7 +60,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const { jobId: id, saved } = await req.json();
-    console.log(saved)
     const token = req.cookies.get("jobify-token")?.value;
     if (!id) {
       return NextResponse.json({ msg: `id is required` }, { status: 401 });
