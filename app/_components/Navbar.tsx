@@ -11,7 +11,7 @@ export default function NavBar() {
   language: string;
   short_name:string;
 };
-
+  
   const pathname = usePathname();
   const [hovered, setHovered] = useState<boolean>(false);
   const [user, setUser] = useState<Record<string,string> | null>(null);

@@ -28,7 +28,10 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
-, "app/jobs/page.tsx", "app/jobs/employee/ha.ts", "app/api/createtb"  ],
+    "**/*.mts",
+    "app/jobs/page.tsx",
+    "app/jobs/employee/ha.ts",
+    "app/api/createdb"
+  ],
   "exclude": ["node_modules"]
 }
