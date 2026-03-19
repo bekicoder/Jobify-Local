@@ -312,19 +312,20 @@ const SignIn = ({ setOpen }: propType) => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const target = e.target as HTMLFormElement;
-    const fd = new FormData(target);
+    const  fd = new FormData(target);
     const fdObj = Object.fromEntries(fd.entries());
+    try{
     const res = await fetch("/api/signin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fdObj),
-    });
-    const data = await res.json();
-    if (data.message == "successful") {
-      location.assign("/");
-    } else if (data.message == `don't exist`) {
-      setWarrning("don't exist");
-    }
+    })
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) return setWarrning("don't exist");
+    location.assign("/");
+     
+  }catch(err){return console.log("don't have an account")}
   };
   return (
     <div className={`w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col items-center bg-${bgColor} md:bg-${lightDark} text-${textColor}  md:px-18 px-10 pt-4`}>
