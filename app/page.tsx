@@ -1,7 +1,7 @@
 "use client"
 import Hero from "./_components/Hero";
-import Stats from "./_components/how";
-import Community from "./_components/why";
+import How from "./_components/how";
+import Why from "./_components/why";
 import Footer from "./_components/footer";
 import { useSharedState } from "./SharedStateContext";
 export default function Home() {
@@ -9,8 +9,8 @@ export default function Home() {
   return (
     <div className={`flex  flex-col gap-12 pt-12 overflow-x-hidden bg-${bgColor}`}>
       <Hero />
-      <Stats />
-      <Community />
+      <How />
+      <Why />
       <Footer />
     </div>
   );

@@ -15,6 +15,6 @@ export async function GET() {
     });
 
   } catch (err) {
-    return Response.json({ error: "Failed" }, { status: 500 });
+    return Response.json({ error: `Failed${err}` }, { status: 500 });
   }
 }

@@ -1,21 +1,19 @@
 @import "tailwindcss";
 
-/* Load Typography plugin */
 @plugin "@tailwindcss/typography";
 
-/* Now generate Tailwind utilities */
 @tailwind utilities;
 
 .animate-circle{
     animation:animate 2s 2s linear;
 }
 .filter-box::-webkit-scrollbar {
-    width: 0px;   /* hides the scrollbar */
-    background: transparent; /* optional */
+    width: 0px;   
+    background: transparent;
 }
 .revert-tailwind {
   all: initial;
-  box-sizing: border-box; /* Preflight default that you likely still want */
+  box-sizing: border-box; 
 }
 
 .revert-tailwind > * {
