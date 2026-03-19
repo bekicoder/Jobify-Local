@@ -198,7 +198,6 @@ const CreateJobs = ({
   }
   function handleChange(id: number, option: string) {
     const languages = ["En", "Am"];
-    console.log(option)
     interface OptionType {
       id: number;
       name: string;
@@ -220,7 +219,6 @@ const CreateJobs = ({
         option === "categories" ? `${lang}Category` : `${lang}JobType`;
 
       const found = options[keyName]?.find((o) => o.id === id);
-      console.log(found)
       if (found && option=="Jobtypes") setSelectedJt(found?.id);
       if (found && option=="categories") setSelectedCt(found?.id);
 
@@ -228,7 +226,6 @@ const CreateJobs = ({
         newTranslations[stateKey] = found.name;
       }
     });
-    console.log(newTranslations)
     setFd((prev) => ({ ...prev, ...newTranslations }));
   }
 
@@ -470,7 +467,6 @@ const Employer = () => {
         headers: { "Content-Type": "application/json" },
       });
       const { msg } = await seenRes.json();
-      console.log(msg, "this is the msg");
       if (msg !== "successful") {
       }
     }

@@ -26,7 +26,7 @@ export default function Footer() {
           <p className="text-gray-300 text-sm">
             {content?.footer_about_paragraph}
           </p>
-          <a href="/about" className="hover:text-sky-500 transition mt-2">
+          <a href="#" className="hover:text-sky-600 text-sky-500 transition mt-2">
             {content?.learn_more}
           </a>
         </div>

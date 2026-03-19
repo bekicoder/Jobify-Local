@@ -47,7 +47,6 @@ const JobDetailsPanel = ({
     });
 
     const { msg, id: savedId, savedJob } = await save.json();
-    console.log({ msg, id: savedId, savedJob })
     if (msg == "successful") {
       setSaved_ids((prev) =>
         isSaved
@@ -70,7 +69,6 @@ const JobDetailsPanel = ({
     const target = e.target as HTMLFormElement;
     const fd = new FormData(target);
     const data = Object.fromEntries(fd.entries());
-    console.log(data)
     const res = await fetch("/api/proposal", {
       method: "POST",
       cache: "no-store",
@@ -311,10 +309,14 @@ const EmployeePage = () => {
         jobs_.unshift(job.jobData);
       }
       setJobs(jobs_);
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      let props;
+      try{
       const prop_res = await fetch("/api/proposal/?role=employee", {
         cache: "no-store",
       });
-      const props = await prop_res.json();
+      if(!prop_res.ok){return;}
+      props = await prop_res.json()
       const proposalIds: number[] = [];
       const approved: { id: number; approval: string }[] = [];
       const fullProposal = props.data.map(
@@ -348,6 +350,7 @@ const EmployeePage = () => {
       setProposal_ids(proposalIds);
       setProposals(fullProposal);
       setApprovals(approved);
+    }catch(err){return;}
     };
 
     const fetchSaved = async () => {
@@ -363,7 +366,6 @@ const EmployeePage = () => {
     fethJobs();
   }, []);
   function handleFilter(filterType: string, option: string, status: boolean) {
-    console.log(filterType,option,status)
     if (!option || !filterType) return;
 
     setFilteredJobs((prev) => {

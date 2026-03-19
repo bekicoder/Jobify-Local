@@ -28,7 +28,6 @@ export default function NavBar() {
         localStorage.setItem(lang,lang)
       }
     else if(selectedLang && selectedLang !== "Hd"){
-      console.log("this is not hd",selectedLang)
       setLang(selectedLang)
       setLng(selectedLang)
     }else{
@@ -70,7 +69,6 @@ export default function NavBar() {
   async function handleTranslation(lang_:string){
     localStorage.setItem("lang",String(lang_))
     if(lang_ !== "Hd"){
-      console.log("this is not hd",lang_)
       setLang(lang_)
       setLng(lang_)
     }else if(lang_ == "Hd"){

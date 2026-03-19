@@ -143,7 +143,6 @@ export async function POST(req: NextRequest) {
     const decoded = data as JwtPayload;
     const detectedLang = franc(detail);
     const lang = isoMap[detectedLang];
-    console.log(lang,decoded)
     await Promise.all(
       languages.map(async (language) => {
         const titleKey = `title${language}`;

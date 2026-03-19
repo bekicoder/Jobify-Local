@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#test text
+test.txt
+
+#create tables temporary folder 
+**/createdb/

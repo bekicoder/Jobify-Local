@@ -72,17 +72,17 @@ const SignUp = ({ setOpen }: propType) => {
     }
   }
   return (
-    <div className={`w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col md:bg-${lightDark} bg-${bgColor} items-center py-8 md:px-18 px-10 pt-4 text-${textColor}`}>
+    <div className={`w-full max-w-xl h-full md:h-124 md:rounded-r-2xl flex flex-col md:bg-${lightDark} bg-${bgColor} items-center py-8 md:px-18 px-4 pt-4 text-${textColor}`}>
       <strong className={`text-2xl text-${grayText} mb-2`}>{content.signUp}</strong>
       <form
         onSubmit={(e) => handleSibmit(e)}
         className="flex flex-col gap-4 w-full">
         {type.role == "employee" && (
-          <div className="flex border border-gray-400 rounded p-1 px-2">
+          <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
             <input
               type="text"
               name="fname"
-              className="w-full focus:outline-0"
+              className="w-full focus:outline-0 "
               placeholder={content.fname}
               required
             />
@@ -92,7 +92,7 @@ const SignUp = ({ setOpen }: propType) => {
           </div>
         )}
         {type.role == "employee" && (
-          <div className="flex border border-gray-400 rounded p-1 px-2">
+          <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
             <input
               type="text"
               name="lname"
@@ -106,7 +106,7 @@ const SignUp = ({ setOpen }: propType) => {
           </div>
         )}
         {type.role == "employer" && (
-          <div className="flex border border-gray-400 rounded p-1 px-2">
+          <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
             <input
               type="text"
               name="orgname"
@@ -119,7 +119,7 @@ const SignUp = ({ setOpen }: propType) => {
             </span>
           </div>
         )}
-        <div className="flex border border-gray-400 rounded p-1 px-2">
+        <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
           <input
             type="email"
             name="email"
@@ -131,7 +131,7 @@ const SignUp = ({ setOpen }: propType) => {
             <i className="fa-solid fa-envelope text-gray-600 px-2"></i>
           </span>
         </div>
-        <div className="flex border border-gray-400 rounded p-1 px-2">
+        <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
           <input
             type={eye ? "text" : "password"}
             name="password"
@@ -333,7 +333,7 @@ const SignIn = ({ setOpen }: propType) => {
         onSubmit={(e) => handleSubmit(e)}
         className="flex flex-col pt-7 gap-4 w-full"
       >
-        <div className="flex border border-gray-400 rounded p-1 px-2">
+        <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
           <input
             type="email"
             name="email"
@@ -346,7 +346,7 @@ const SignIn = ({ setOpen }: propType) => {
           </span>
         </div>
 
-        <div className="flex border border-gray-400 rounded p-1 px-2">
+        <div className="flex border border-gray-400 rounded p-2 md:p-1 px-2">
           <input
             type={eye ? "text" : "password"}
             name="password"
@@ -451,7 +451,7 @@ const Acount = () => {
   const [open, setOpen] = useState<string>("signUp");
   const {bgColor,textColor,lightDark} = useSharedState()
   return (
-    <div className={`w-full px-4 md:px-10 h-screen md:px-8 flex justify-center md:items-center bg-${bgColor} md:bg-${bgColor}`}>
+    <div className={`w-full md:px-10 h-screen flex justify-center md:items-center bg-${bgColor} md:bg-${bgColor}`}>
       <div className="flex flex-row max-w-2xl w-full md:shadow-lg md:shadow-gray-300 rounded-2xl">
         <div
           className="w-50 hidden md:block bg-cover flex-none rounded-l-2xl bg-center"

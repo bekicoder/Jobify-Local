@@ -122,13 +122,81 @@ export async function GET() {
     //       console.log(`Successfully stored: ${lang.code}`);
     //     }
 
-    const result = await pool.query(
-      "SELECT content FROM translations WHERE lang_code = $1",
-      ["hd"],
-    );
-    const fullData = result.rows[0].content;
+    // const result = await pool.query(
+    //   "SELECT content FROM translations WHERE lang_code = $1",
+    //   ["hd"],
+    // );
+    // const fullData = result.rows[0].content;
 
-    console.log(fullData.cities); // This will show the cities array
+    // console.log(fullData.cities); // This will show the cities array
+
+    await pool.query(`
+
+-- 1. CUSTOMERS
+CREATE TABLE IF NOT EXISTS customers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  phone_number VARCHAR(20),
+  profile_color VARCHAR(20)
+);
+
+-- 2. FOODS
+CREATE TABLE IF NOT EXISTS foods (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  price NUMERIC(10,2) NOT NULL,
+  time_taken INTEGER NOT NULL,
+  image_url VARCHAR(255)
+);
+
+-- 3. MANAGERS
+CREATE TABLE IF NOT EXISTS managers (
+  id SERIAL PRIMARY KEY,
+  password VARCHAR(255) NOT NULL,
+  recovery_email VARCHAR(100)
+);
+
+-- 4. COMMENTS
+CREATE TABLE IF NOT EXISTS comments (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
+  comment TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- 5. LIKED FOODS
+CREATE TABLE IF NOT EXISTS liked_foods (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
+  liked_foodid INTEGER REFERENCES foods(id) ON DELETE CASCADE,
+  UNIQUE (user_id, liked_foodid)
+);
+
+-- 6. ORDERS
+CREATE TABLE IF NOT EXISTS orders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
+  food_id INTEGER REFERENCES foods(id) ON DELETE CASCADE,
+  hour INTEGER,
+  minute INTEGER,
+  period VARCHAR(2),
+  amount INTEGER CHECK (amount > 0),
+  total_price NUMERIC(10,2),
+  status BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- 7. SESSIONS
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id VARCHAR(32) PRIMARY KEY,
+  user_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+`);
+
     await pool.query("COMMIT");
 
     return NextResponse.json({
