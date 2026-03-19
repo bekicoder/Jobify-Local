@@ -173,6 +173,7 @@ const CreateJobs = ({
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const tempStore = fd
+    console.log(tempStore)
     setFd({
           title: "",
           detail: "",
@@ -190,10 +191,13 @@ const CreateJobs = ({
       });
       const data = await res.json();
       console.log(data,"this is response")
-      if (data.status == "successful") {
+      if (data.status == "successful"&&edit) {
         setMyjobs(prev=>(
           prev.map(j=>j.id === data.data.id ? data.data:j)
         ))
+        setEdit(null)
+      }else if(data.status == "successful"&&!edit){
+        setMyjobs(prev=>{return[data.data,...prev]})
       }else{
         console.log(data,tempStore)
         setFd(tempStore)

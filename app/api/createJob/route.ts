@@ -28,6 +28,7 @@ export async function translateLargeText(
       )}&langpair=${sourceLang}|${targetLang}`,
     );
     const data = await res.json();
+    console.log(data)
     translatedChunks.push(data.responseData.translatedText);
     await delay(100);
   }
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
     AmLocation:"",
     EnLocation:"",
     salary_range:"",
+    created_at:"",
   };
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -101,7 +103,7 @@ export async function POST(req: NextRequest) {
     jobData.EnCategory = fd.EnCategory;
     jobData.posted_by = rows[0].posted_by;
     jobData.EnLocation = decoded.enLocation;
-    jobData.AmLocaition = decoded.amLocation;
+    jobData.AmLocation = decoded.amLocation;
     jobData.salary_range = fd.salary_range
     jobData["created_at"] = rows[0].created_at;
     jobData["updated_at"] = rows[0].updated_at;
@@ -173,7 +175,9 @@ export async function POST(req: NextRequest) {
       }),
     );
     const insertIds: { [key: string]: number } = {};
-
+    
+    
+        jobData.salary_range = fd.salary_range
     await Promise.all(
       languages.map(async (lng) => {
         const titleKey = `title${lng}`;
@@ -181,8 +185,8 @@ export async function POST(req: NextRequest) {
         const locationKey = `${lng.toLowerCase()}Location`;
         const jobtypeKey = `${lng}JobType`;
         const catagoryKey = `${lng}Category`;
-        jobData[locationKey] = decoded[locationKey]
-        jobData[jobtypeKey] = fd[jobtypeKey]
+        jobData[`${lng}Location`] = decoded[locationKey]
+        jobData[`${lng}Jobtype`] = fd[jobtypeKey]
         jobData[catagoryKey] = fd[catagoryKey]
         const values = [
           decoded[locationKey],
@@ -190,7 +194,7 @@ export async function POST(req: NextRequest) {
           fd[catagoryKey],
           jobData[detailKey],
           jobData[titleKey],
-        ];
+        ]
         const { rows } = await db.query(
           `INSERT INTO jobTranslations(location,jobtype,catagory,detail,title)
            VALUES($1,$2,$3,$4,$5)
