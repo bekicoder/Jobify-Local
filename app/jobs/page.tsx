@@ -27,8 +27,9 @@ const JobDetailsPanel = ({
 }: job_detailsPanel) => {
   const [opend, setOpend] = useState<boolean>(false);
   const { lang } = useSharedState();
-  const { content, lightDark, bgColor, textColor, grayText, mode } =
+  const { content, lightDark, bgColor, textColor, grayText, mode,borderColor } =
     useSharedState();
+    console.log(mode)
   const date = job.created_at.split(" ");
   const isSaved = saved_ids.some((s) => s == job.id);
   const proposal = proposals.find((p) => {
@@ -91,9 +92,10 @@ const JobDetailsPanel = ({
       });
     }
   }
+  console.log(mode)
   return (
     <div
-      className={`w-full z-100000 px-4 md:pl-12 h-screen md:h-[calc(100vh-5rem)] md:rounded-2xl bg-${bgColor} md:bg-${lightDark} text-${textColor} overflow-y-auto max-md:fixed top-14 left-0`}
+      className={`w-full z-100000 px-4 h-screen md:h-[calc(100vh-5rem)] md:rounded-2xl bg-${bgColor} md:bg-${lightDark} text-${textColor} overflow-y-auto max-md:fixed top-14 left-0`}
     >
       {/*proposal form */}
       {opend && (
@@ -145,7 +147,7 @@ const JobDetailsPanel = ({
           </div>
         </form>
       )}
-      <div className="w-full flex justify-between md:pr-4 pt-4">
+      <div className="w-full flex justify-between md:pr-4 pt-4 pl-6">
         <button
           onClick={handleClose}
           className={`py-2 cursor-pointer text-${textColor} w-10 h-10 flex justify-start`}
@@ -177,13 +179,13 @@ const JobDetailsPanel = ({
           <button
             disabled={isApplied ? true : false}
             onClick={(e) => setOpend(true)}
-            className={`px-6 rounded-full bg-sky-600 && "hover:bg-[#0a2540]" text-white font-medium`}
+            className={`px-6 rounded-full bg-sky-600 && "hover:bg-[#0a2540]" text-white font-medium cursor-pointer`}
           >
             {content.apply}
           </button>
         )}
       </div>
-      <div className="w-full flex justify-between md:pr-4">
+      <div className="w-full flex justify-between md:pr-4 pl-12">
         <div
           className={` text-sm flex items-center font-medium text-${lightDark} flex-wrap flex-2`}
         >
@@ -202,18 +204,19 @@ const JobDetailsPanel = ({
           {date[0]}
         </span>
       </div>
-
-        <h1 className="text-2xl font-medium mb-4 mt-8">{job[`title${lang}`] as string}</h1>
-      <h3 className={`text-xl font-medium text-${textColor} mb-2`}>
+      <h1 className="text-2xl font-medium mb-4 mt-8 ml-12">{job[`title${lang}`] as string}</h1>
+      <h3 className={`text-xl font-medium text-${textColor} mb-2 ml-12`}>
         {content.aboutJob}
-      </h3>
+      </h3> 
+      <div className="flex flex-col overflow-y-auto">
       <article
-        className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} max-h-full flex-1 mb-16 text-${textColor}`}
-      >
+        className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 pl-12 text-${textColor}`}>
         <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
-        {/*bottom space */}
-        <div className="w-full h-12"></div>
       </article>
+      <p className={`w-full h-32 md:h-fit p-4 text-right border-t border-t-${borderColor} font-medium`}>
+          {job.posted_by}
+        </p>
+        </div>
     </div>
   );
 };
@@ -615,9 +618,8 @@ const EmployeePage = () => {
           </div>
         </div>
       </aside>
-
       <div className="w-full md:px-24 h-full overflow-auto relative">
-        <div className="w-full  md: mb-28">
+        <div className={`w-full ${!selectedJob}`}>
           {selectedJob ? (
             <JobDetailsPanel
               setSavedJobs={setSavedJobs}

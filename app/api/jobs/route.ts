@@ -28,6 +28,7 @@ const jobData: jobDataType = {
   AmJobtype: "",
 };
 const languages = ["en", "am"];
+
 export async function GET() {
   const { rows } = await db.query("select * from jobs order by id desc;");
   return NextResponse.json({ count: rows.length});

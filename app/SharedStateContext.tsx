@@ -61,7 +61,7 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   const [borderColor, setBorcolor] = useState("border-gray-200");
   const [lng, setLng] = useState("En");
 
-  const [translations, setTranslations] = useState<any>(null);
+  const [translations, setTranslations] = useState<unknown>(null);
 
   useEffect(() => {
     async function loadTranslations() {
@@ -85,30 +85,33 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (!translations) return;
-
+    if(!translations)return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const languages = translations as any
     if (lang === "Am" && lng !== "Hd") {
-      setContent(translations.am.contents);
-      setCities(translations.am.cities);
-      setJobTypes(translations.am.jobTypes);
-      setCatagories(translations.am.categories);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setContent(languages.am.contents);
+      setCities(languages.am.cities);
+      setJobTypes(languages.am.jobTypes);
+      setCatagories(languages.am.categories);
 
     } else if (lang === "En" && lng !== "Hd") {
-      setContent(translations.en.contents);
-      setCities(translations.en.cities);
-      setJobTypes(translations.en.jobTypes);
-      setCatagories(translations.en.categories);
+      setContent(languages.en.contents);
+      setCities(languages.en.cities);
+      setJobTypes(languages.en.jobTypes);
+      setCatagories(languages.en.categories);
 
     } else if (lng === "Hd") {
-      setContent(translations.hd.contents);
-      setCities(translations.hd.cities);
-      setJobTypes(translations.hd.jobTypes);
-      setCatagories(translations.hd.categories);
+      setContent(languages.hd.contents);
+      setCities(languages.hd.cities);
+      setJobTypes(languages.hd.jobTypes);
+      setCatagories(languages.hd.categories);
     }
   }, [lng, translations, lang]);
 
   useEffect(() => {
     if (mode === "dark") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTextcolor("white");
       setbgcolor("[#121212]");
       setgrayText("white");
@@ -127,6 +130,7 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const mode_ = localStorage.getItem("mode");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (mode_) setMode(mode_ as string);
   }, []);
 

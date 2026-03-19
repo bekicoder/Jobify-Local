@@ -35,6 +35,7 @@ const JobDetailsPanel = ({
   const date = job.created_at.split(" ");
   const proposal = option === "proposal";
   const { content, lang,lightDark,grayText,bgColor,textColor,mode } = useSharedState();
+  console.log(mode,"this is the mode")
   const handleEdit = () => {
     setFd({
       Jobtype: job.Jobtype,
@@ -122,7 +123,7 @@ const JobDetailsPanel = ({
       <h3 className={`text-xl font-medium mb-2 text-${grayText}`}>
         {content.aboutJob}
       </h3>
-      <article className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} max-h-full flex-1 mb-16 text-${textColor}`}>
+      <article className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} max-h-full flex-1 mb-16`}>
         <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         <div className="w-full h-12"></div>
       </article>
