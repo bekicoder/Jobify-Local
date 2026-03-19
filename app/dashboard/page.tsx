@@ -424,7 +424,7 @@ const Employer = () => {
       });
       const props = await prop_res.json();
       if (props.data.legth == 0) return;
-
+      console.log(props)
       const fullProposal = props.data.map(
         (p: Record<string, string | number>) => {
           const proposed_job = resData.filter(

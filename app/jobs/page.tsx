@@ -307,6 +307,7 @@ const EmployeePage = () => {
         });
         const job = await res.json();
         jobs_.unshift(job.jobData);
+        console.log(job,"this is job")
       }
       setJobs(jobs_);
       // eslint-disable-next-line react-hooks/rules-of-hooks
