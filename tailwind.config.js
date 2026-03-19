@@ -27,7 +27,9 @@ module.exports = {
     "border-gray-500",
     "bg-white",
     "bg-black",
-    "md:bg-[#f6f9fc]"
+    "md:bg-[#f6f9fc]",
+    "prose-invert",
+    "prose-slate"
   ],
   theme: {
     extend: {},
