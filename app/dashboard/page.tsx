@@ -29,20 +29,29 @@ const JobDetailsPanel = ({
   setPage,
   setFd,
   setEdit,
+  incomeRanges,
+  setSelectedJt,
+  setSelectedCt,
 }: DetailsPanelType) => {
+  console.log(incomeRanges,"this is the checking test")
   const [approval, setApproval] = useState<string>(job.approval as string);
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
   const proposal = option === "proposal";
-  const { content, lang,lightDark,grayText,bgColor,textColor,mode } = useSharedState();
-  console.log(mode,"this is the mode")
+  const { content, lang,lightDark,grayText,bgColor,textColor,mode,jobTypes,jobCategories } = useSharedState();
   const handleEdit = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const jt = jobTypes.find(t=>{return t.name == job.EnJobtype})
+    const ct = jobCategories.find(c=>{return c.name == job.EnCategory})
+    const i = incomeRanges.find(i=>{return i.label == job.salary_range})
+    if(ct&&jt){
+      setSelectedCt(ct.id)
+      setSelectedJt(jt.id)
+    }
     setFd({
-      Jobtype: job.Jobtype,
-      category: job.category,
       title: job[`title${lang}`] as string,
       detail: job[`detail${lang}`] as string,
-      salary_range: job.salary_range,
+      salary_range:job.salary_range,
       EnCategory: job.EnCategory,
       AmCategory: job.AmCategory,
       EnJobType: job.EnJobtype,
@@ -64,7 +73,7 @@ const JobDetailsPanel = ({
     }
   }
   return (
-    <div className={`w-full pl-4 md:pl-12 h-full md:h-[calc(100vh-5rem)] rounded-2xl  overflow-y-auto bg-${lightDark} text-${textColor}`}>
+    <div className={`w-full pl-4 md:pl-12 h-full md:h-[calc(100vh-5rem)] md:rounded-2xl  overflow-y-auto bg-${lightDark} text-${textColor}`}>
 
       <div className="w-full flex justify-between pr-4 pt-4">
         <button
@@ -138,24 +147,17 @@ const CreateJobs = ({
   setEdit,
   setMyjobs,
   setPage,
+  incomeRanges,
+  setSelectedJt,
+  setSelectedCt,
+  selectedJt,
+  selectedCt,
 }: createJobsParamsType) => {
   const [openedMenu, setOpenedMenu] = useState<string | null>();
 
-  const { jobTypes } = useSharedState();
   const { jobCategories } = useSharedState();
-  const { content, lang,bgColor,textColor,grayText,lightDark,mode } = useSharedState();
-  const [selectedJt, setSelectedJt] = useState<number|null>(null);
-  const [selectedCt, setSelectedCt] = useState<number|null>(null);
-  const incomeRanges: income_range[] = [
-    { id: 1, label: `${content.below} $500` },
-    { id: 2, label: "$500 – $1,000" },
-    { id: 3, label: "$1,000 – $2,000" },
-    { id: 4, label: "$2,000 – $3,000" },
-    { id: 5, label: "$3,000 – $5,000" },
-    { id: 6, label: "$5,000 – $7,000" },
-    { id: 7, label: "$7,000 – $10,000" },
-    { id: 8, label: "$10,000+" },
-  ];
+  const { content, lang,bgColor,textColor,grayText,lightDark,mode,jobTypes } = useSharedState();
+  
   function toggleMenu(
     e:
       | React.FocusEvent<HTMLDivElement, Element>
@@ -187,6 +189,7 @@ const CreateJobs = ({
         cache: "no-store",
       });
       const data = await res.json();
+      console.log(data,"this is response")
       if (data.status == "successful") {
         setMyjobs(prev=>(
           prev.map(j=>j.id === data.data.id ? data.data:j)
@@ -402,7 +405,8 @@ const Employer = () => {
   const [proposal_ids, setProposal_ids] = useState([]);
   const { content, lang,lightDark,bgColor,textColor,grayText,mode,borderColor } = useSharedState();
   const [approvals, setApprovals] = useState<{ id: number; approval: string }[]>([]);
-
+  const [selectedJt, setSelectedJt] = useState<number|null>(null);
+  const [selectedCt, setSelectedCt] = useState<number|null>(null);
   const [fd, setFd] = useState({
     title: "",
     detail: "",
@@ -412,12 +416,21 @@ const Employer = () => {
     EnJobType: "",
     AmJobType: "",
   });
-
+  const incomeRanges: income_range[] = [
+    { id: 1, label: `${content.below} $500` },
+    { id: 2, label: "$500 – $1,000" },
+    { id: 3, label: "$1,000 – $2,000" },
+    { id: 4, label: "$2,000 – $3,000" },
+    { id: 5, label: "$3,000 – $5,000" },
+    { id: 6, label: "$5,000 – $7,000" },
+    { id: 7, label: "$7,000 – $10,000" },
+    { id: 8, label: "$10,000+" },
+  ];
   useEffect(() => {
     const fetchData = async () => {
       const job_res = await fetch("/api/myJobs");
       const { resData } = await job_res.json();
-
+      console.log(resData)
       setMyjobs(resData);
       //fetch proposals
       const prop_res = await fetch("/api/proposal/?role=employer", {
@@ -520,7 +533,7 @@ const Employer = () => {
     </div>
   </div>
       </aside>
-      <div className={`pb-5 w-full min-[768]:px-12 min-[950px]:px-24 overflow-auto relative`}>
+      <div className={` w-full min-[768]:px-12 min-[950px]:px-24 overflow-auto relative`}>
         {page == "createJob" && (
           <CreateJobs
             setJobdetail={setJobdetail}
@@ -531,6 +544,11 @@ const Employer = () => {
             setFd={setFd}
             edit={edit}
             setEdit={setEdit}
+            incomeRanges={incomeRanges}
+            selectedJt={selectedJt}
+            setSelectedJt={setSelectedJt}
+            selectedCt={selectedCt}
+            setSelectedCt={setSelectedCt}
           />
         )}
 
@@ -546,6 +564,9 @@ const Employer = () => {
                 option={""}
                 setApprovals={setApprovals}
                 approvals={approvals}
+                incomeRanges={incomeRanges}
+                setSelectedJt={setSelectedJt}
+                setSelectedCt={setSelectedCt}
               />
             ) : (
               <>
@@ -603,6 +624,9 @@ const Employer = () => {
                 setEdit={setEdit}
                 setApprovals={setApprovals}
                 approvals={approvals}
+                incomeRanges={incomeRanges}
+                setSelectedJt={setSelectedJt}
+                setSelectedCt={setSelectedCt}
               />
             ) : (
               <>

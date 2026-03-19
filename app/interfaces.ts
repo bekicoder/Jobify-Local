@@ -57,6 +57,9 @@ export interface DetailsPanelType {
   setEdit: React.Dispatch<SetStateAction<number | null>>;
   setApprovals:React.Dispatch<SetStateAction<{ id: number; approval: string; }[]>>
   approvals:{ id: number; approval: string; }[]
+  incomeRanges:income_range[]
+  setSelectedJt:React.Dispatch<SetStateAction<number | null>>;
+  setSelectedCt:React.Dispatch<SetStateAction<number | null>>;
 }  
 
 export interface _jobs {
@@ -78,6 +81,11 @@ export interface createJobsParamsType {
   edit: number | null;
   setMyjobs: React.Dispatch<SetStateAction<_myjobsType[]>>;
   setJobdetail: React.Dispatch<SetStateAction<number | null>>;
+  incomeRanges:income_range[]
+  selectedJt:number|null;
+  setSelectedJt:React.Dispatch<SetStateAction<number | null>>;
+  selectedCt:number|null;
+  setSelectedCt:React.Dispatch<SetStateAction<number | null>>;
 }
 export interface proposalType {
   [key:string]:string | number | boolean

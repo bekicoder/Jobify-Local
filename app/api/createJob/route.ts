@@ -67,8 +67,11 @@ export async function POST(req: NextRequest) {
     posted_by: "",
     EnCategory: "",
     AmCategory: "",
-    EnJobType: "",
-    AmJobType: "",
+    EnJobtype: "",
+    AmJobtype: "",
+    AmLocation:"",
+    EnLocation:"",
+    salary_range:"",
   };
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -81,6 +84,10 @@ export async function POST(req: NextRequest) {
   if (!isValid) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 400 });
   }
+
+    const data = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = data as JwtPayload;
+
   if (editId) {
     const { rows } = await db.query(
       "update jobs set updated_at=now(),salary_range=$1 where id=$2 RETURNING id,enjobid,amjobid,salary_range,posted_by,created_at,updated_at",
@@ -89,10 +96,13 @@ export async function POST(req: NextRequest) {
     jobData.id = rows[0].id;
     jobData.posted_by = rows[0].posted_by;
     jobData.AmCategory = fd.AmCategory;
-    jobData.EnJobType = fd.EnJobType;
-    jobData.AmJobType = fd.AmJobType;
+    jobData.EnJobtype = fd.EnJobType;
+    jobData.AmJobtype = fd.AmJobType;
     jobData.EnCategory = fd.EnCategory;
     jobData.posted_by = rows[0].posted_by;
+    jobData.EnLocation = decoded.enLocation;
+    jobData.AmLocaition = decoded.amLocation;
+    jobData.salary_range = fd.salary_range
     jobData["created_at"] = rows[0].created_at;
     jobData["updated_at"] = rows[0].updated_at;
     const detectedLang = franc(detail);
@@ -139,8 +149,6 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
-    const data = jwt.verify(token, process.env.JWT_SECRET!);
-    const decoded = data as JwtPayload;
     const detectedLang = franc(detail);
     const lang = isoMap[detectedLang];
     await Promise.all(
@@ -164,7 +172,6 @@ export async function POST(req: NextRequest) {
         jobData[titleKey] = titleRes.translated;
       }),
     );
-
     const insertIds: { [key: string]: number } = {};
 
     await Promise.all(

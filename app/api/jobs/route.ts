@@ -59,10 +59,11 @@ export async function POST(req: NextRequest) {
               `select * from jobTranslations where id = $1;`,
               [job[`${lang}jobid`]],
             );
+            console.log(rows[0])
             jobData[titleKey] = rows[0].title;
             jobData[detailKey] = rows[0].detail;
             jobData[locationKey] = rows[0].location;
-            jobData[catagoryKey] = rows[0].category;
+            jobData[catagoryKey] = rows[0].catagory;
             jobData[jobtypeKey] = rows[0].jobtype;
           }),
         );

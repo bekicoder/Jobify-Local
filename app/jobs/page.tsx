@@ -310,7 +310,7 @@ const EmployeePage = () => {
         });
         const job = await res.json();
         jobs_.unshift(job.jobData);
-        console.log(job,"this is job")
+        console.log(job.jobData,"this is job")
       }
       setJobs(jobs_);
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -328,7 +328,7 @@ const EmployeePage = () => {
           approved.unshift({
             id: Number(p.career_id),
             approval: String(p.approval),
-          });
+          })
           proposalIds.unshift(Number(p.career_id));
           const career = jobs_.find((j) => j.id == Number(p.career_id));
           return {
@@ -369,9 +369,11 @@ const EmployeePage = () => {
     fetchSaved();
     fethJobs();
   }, []);
+
+
   function handleFilter(filterType: string, option: string, status: boolean) {
     if (!option || !filterType) return;
-
+   console.log(option,filterType,status,filteredJobs,_jobs)
     setFilteredJobs((prev) => {
       if (status) {
         return [
@@ -398,6 +400,8 @@ const EmployeePage = () => {
 
   const [rowsColor, setRcolor] = useState("gray-100");
   const [rowshoverColor, setRHovcolor] = useState("zinc-950");
+
+
   useEffect(() => {
     if (mode == "dark") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -459,7 +463,7 @@ const EmployeePage = () => {
                     <input
                       onChange={(e) => {
                         toggleCheckbox("catagory", job.id);
-                        handleFilter("catagory", job.name, e.target.checked);
+                        handleFilter("EnCategory", job.name, e.target.checked);
                       }}
                       type="checkbox"
                       value={job.name}
@@ -726,7 +730,7 @@ const EmployeePage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default function Employee() {
   return (
