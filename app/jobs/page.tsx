@@ -243,12 +243,12 @@ const JobDetailsPanel = ({
           <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         </article>
         <p
-          className={`w-full text-right border-t border-t-${borderColor} font-medium`}
+          className={`w-full text-right border-t p-2 border-t-${borderColor} font-medium`}
         >
           {job.posted_by}
         </p>
       </div>
-      <div className="h-32 w-full"></div>
+      <div className="h-40 md:h-10 w-full"></div>
     </div>
   );
 };
