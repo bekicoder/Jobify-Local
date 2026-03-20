@@ -66,7 +66,7 @@ export const SharedStateProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function loadTranslations() {
       try {
-        const res = await fetch("/api/languages");
+        const res = await fetch("/api/languages",{cache: "no-store",});
         const data = await res.json();
 
         setTranslations(data);

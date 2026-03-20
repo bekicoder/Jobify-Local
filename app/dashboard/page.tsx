@@ -81,6 +81,7 @@ const JobDetailsPanel = ({
       method: "POST",
       body: JSON.stringify({ status: status, jobId: job.propId }),
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     });
     const approval_res = await res.json();
     if (approval_res.msg == "successful") {
@@ -486,7 +487,7 @@ const Employer = () => {
     setProposals([])
     setMyjobs([])
     const fetchData = async () => {
-      const job_res = await fetch("/api/myJobs");
+      const job_res = await fetch("/api/myJobs",{cache: "no-store",});
       const { resData } = await job_res.json();
       setMyjobs(resData);
       //fetch proposals
@@ -536,6 +537,7 @@ const Employer = () => {
         method: "POST",
         body: JSON.stringify({ jobId: jobid_ }),
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
       });
       const { msg } = await seenRes.json();
       if (msg !== "successful") {
