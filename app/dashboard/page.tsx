@@ -4,7 +4,7 @@ import React, {
   use,
   useEffect,
   useState,
-  SetStateAction,
+  useMemo,
 } from "react";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
@@ -421,8 +421,9 @@ const Employer = () => {
     AmCategory: "",
     EnJobType: "",
     AmJobType: "",
-  });
-  const incomeRanges: income_range[] = [
+  }); 
+  console.log(content.below,"dose this is show the full course while this is the ")
+  const incomeRanges: income_range[] =useMemo(()=>[
     { id: 1, label: `${content.below} $500` },
     { id: 2, label: "$500 – $1,000" },
     { id: 3, label: "$1,000 – $2,000" },
@@ -431,7 +432,7 @@ const Employer = () => {
     { id: 6, label: "$5,000 – $7,000" },
     { id: 7, label: "$7,000 – $10,000" },
     { id: 8, label: "$10,000+" },
-  ];
+  ],[content])
   useEffect(() => {
     const fetchData = async () => {
       const job_res = await fetch("/api/myJobs");
