@@ -38,7 +38,6 @@ export default function NavBar() {
       try{
       const res = await fetch("/api/users/");
       const data = await res.json();
-      console.log(data)
       if (data.message === "Unauthorized") return;
       setUser(data);
       }catch(err){return;}

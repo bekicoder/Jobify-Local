@@ -209,7 +209,6 @@ const CreateJobs = ({
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const tempStore = fd;
-    console.log(tempStore);
     setFd({
       title: "",
       detail: "",
@@ -226,7 +225,6 @@ const CreateJobs = ({
       cache: "no-store",
     });
     const data = await res.json();
-    console.log(data, "this is response");
     if (data.status == "successful" && edit) {
       setMyjobs((prev) =>
         prev.map((j) => (j.id === data.data.id ? data.data : j)),
@@ -470,10 +468,6 @@ const Employer = () => {
     EnJobType: "",
     AmJobType: "",
   });
-  console.log(
-    content.below,
-    "dose this is show the full course while this is the ",
-  );
   const incomeRanges: income_range[] = useMemo(
     () => [
       { id: 1, label: `${content.below} $500` },
@@ -488,6 +482,9 @@ const Employer = () => {
     [content],
   );
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setProposals([])
+    setMyjobs([])
     const fetchData = async () => {
       const job_res = await fetch("/api/myJobs");
       const { resData } = await job_res.json();

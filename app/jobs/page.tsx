@@ -332,6 +332,10 @@ const EmployeePage = () => {
   }
 
   useEffect(() => {
+    setApprovals([])
+    setProposal_ids([])
+    setProposals([])
+    setJobs([])
     const fetchJobs = async () => {
       const jobCount = await fetch("/api/jobs", { cache: "no-store" });
       const { count } = await jobCount.json();
