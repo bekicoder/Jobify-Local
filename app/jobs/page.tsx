@@ -236,18 +236,19 @@ const JobDetailsPanel = ({
       <h3 className={`text-xl font-medium text-${textColor} mb-2 md:ml-12`}>
         {content.aboutJob}
       </h3>
-      <div className="flex flex-col overflow-y-auto bg-red-500">
+      <div className="flex flex-col overflow-y-auto">
         <article
           className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 md:pl-12 text-${textColor}`}
         >
           <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         </article>
         <p
-          className={`w-full h-32 md:h-fit text-right border-t border-t-${borderColor} font-medium`}
+          className={`w-full text-right border-t border-t-${borderColor} font-medium`}
         >
           {job.posted_by}
         </p>
       </div>
+      <div className="h-32 w-full"></div>
     </div>
   );
 };
