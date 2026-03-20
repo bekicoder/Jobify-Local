@@ -55,8 +55,12 @@ export async function POST(req: NextRequest) {
     posted_by: string;
     EnCategory: string;
     AmCategory: string;
-    EnJobType: string;
-    AmJobType: string;
+    EnJobtype: string;
+    AmJobtype: string;
+    AmLocation:string
+    EnLocation:string;
+    salary_range:string;
+    created_at:string;
   }
 
   const jobData: jobDataType = {
@@ -74,7 +78,7 @@ export async function POST(req: NextRequest) {
     EnLocation:"",
     salary_range:"",
     created_at:"",
-  };
+  }
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -92,7 +96,7 @@ export async function POST(req: NextRequest) {
 
   if (editId) {
     const { rows } = await db.query(
-      "update jobs set updated_at=now(),salary_range=$1 where id=$2 RETURNING id,enjobid,amjobid,salary_range,posted_by,created_at,updated_at",
+      "update jobs set updated_at=now(),salary_range=$1 where id=$2 RETURNING *;",
       [fd.salary_range, editId],
     );
     jobData.id = rows[0].id;

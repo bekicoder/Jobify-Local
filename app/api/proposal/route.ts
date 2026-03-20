@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool as db } from "@/lib/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { splitText, translateLargeText } from "../createJob/route";
+import { translateLargeText } from "../createJob/route";
 import { franc } from "franc";
 import {cities as citiesEn} from "@/lib/languages/en.json"
 import {cities as citiesAm} from "@/lib/languages/am.json"
-import { jobData } from "../myJobs/route";
 export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("jobify-token")?.value;

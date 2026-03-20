@@ -9,8 +9,7 @@ import React, {
 } from "react";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "next/navigation";
-import { proposalType } from "../interfaces";
-import { job_detailsPanel, jobType } from "../interfaces";
+import { job_detailsPanel, jobType, proposalType } from "../interfaces";
 import { useSharedState } from "../SharedStateContext";
 
 const JobDetailsPanel = ({
@@ -24,12 +23,20 @@ const JobDetailsPanel = ({
   setSavedJobs,
   approvals,
   setApprovals,
+  setProposals,
 }: job_detailsPanel) => {
   const [opend, setOpend] = useState<boolean>(false);
   const { lang } = useSharedState();
-  const { content, lightDark, bgColor, textColor, grayText, mode,borderColor } =
-    useSharedState();
-    console.log(mode)
+  const {
+    content,
+    lightDark,
+    bgColor,
+    textColor,
+    grayText,
+    mode,
+    borderColor,
+  } = useSharedState();
+  console.log(job, "test is this is the job");
   const date = job.created_at.split(" ");
   const isSaved = saved_ids.some((s) => s == job.id);
   const proposal = proposals.find((p) => {
@@ -77,22 +84,43 @@ const JobDetailsPanel = ({
       headers: { "Content-Type": "application" },
     });
     const _res = await res.json();
-    if(_res.msg=="unauthorized"){
-      window.location.href = "/account"
-    }else if (_res.msg === "successful") {
+    console.log(_res,"this is the proposal data");
+    if (_res.msg == "unauthorized") {
+      window.location.href = "/account";
+    } else if (_res.msg === "successful") {
       target.reset();
       setOpend(false);
-      const data = await fetch(`/api/proposal?id=${_res.id}`, {
+      const propdata = await fetch(`/api/proposal?id=${_res.id}`, {
         cache: "no-store",
       });
-      const updatedData = await data.json();
+      const {data:p} = await propdata.json();
+      const fullProposal = {
+        id: Number(p.career_id),
+        career_owner: p.career_owner,
+        created_at: p.created_at,
+        name: p.name,
+        seenstatus: p.seenstatus,
+        approval: p.approval,
+        detailAm: p?.amproposal,
+        detailEn: p?.enproposal,
+        sender: p.sender,
+        senderlocen: p?.senderlocen,
+        senderlocam: p?.senderlocam as string,
+        AmJobtype: job?.AmJobtype as string,
+        EnJobtype: job?.EnJobtype as string,
+        titleam: job?.titleAm,
+        titleen: job?.titleEn,
+        salary_range: job?.salary_range,
+      };
+      console.log(p,fullProposal,"this is the full proposal");
+            
       setProposal_ids((prev) => [job.id, ...prev]);
+      setProposals(prev=>[fullProposal,...prev])
       setApprovals((prev) => {
-        return [{ id: job.id, approval: updatedData.data.approval }, ...prev];
+        return [{ id: job.id, approval: p.approval }, ...prev];
       });
     }
   }
-  console.log(mode)
   return (
     <div
       className={`w-full z-100000 px-4 h-screen md:h-[calc(100vh-5rem)] md:rounded-2xl bg-${bgColor} md:bg-${lightDark} text-${textColor} overflow-y-auto max-md:fixed top-14 left-0`}
@@ -190,33 +218,39 @@ const JobDetailsPanel = ({
           className={` text-sm flex items-center font-medium text-${lightDark} flex-wrap flex-2`}
         >
           <div>
-            {job.salary_range} • {job[`${lang}Location`] as string} • 
+            {job.salary_range}{" "}
+            {!isApplied && ((" • " + job[`${lang}Location`]) as string)}
           </div>
-          <div className="flex">
-            {job[`${lang}Jobtype`] as string} &nbsp;&nbsp;    <span
-            className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-yellow-500" : approved && "bg-green-500"} my-auto mt-2 `}
-          ></span>
+          <div className="flex ml-1">
+            {(" • " + job[`${lang}Jobtype`]) as string} &nbsp;&nbsp;{" "}
+            <span
+              className={`w-2 h-2 rounded-full block ${!proposal?.seenstatus && approved ? "bg-yellow-500" : approved && "bg-green-500"} my-auto mt-2 `}
+            ></span>
           </div>
-         
         </div>
         <span className="text-xs mt-2 md:text-sm flex-1 text-end">
           <i className={`fa-solid fa-calendar-day text-${grayText}`} />{" "}
           {date[0]}
         </span>
       </div>
-      <h1 className="text-2xl font-medium mb-4 mt-8 ml-12">{job[`title${lang}`] as string}</h1>
+      <h1 className="text-2xl font-medium mb-4 mt-8 ml-12">
+        {job[`title${lang}`] as string}
+      </h1>
       <h3 className={`text-xl font-medium text-${textColor} mb-2 ml-12`}>
         {content.aboutJob}
-      </h3> 
+      </h3>
       <div className="flex flex-col overflow-y-auto">
-      <article
-        className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 pl-12 text-${textColor}`}>
-        <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
-      </article>
-      <p className={`w-full h-32 md:h-fit p-4 text-right border-t border-t-${borderColor} font-medium`}>
+        <article
+          className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 pl-12 text-${textColor}`}
+        >
+          <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
+        </article>
+        <p
+          className={`w-full h-32 md:h-fit p-4 text-right border-t border-t-${borderColor} font-medium`}
+        >
           {job.posted_by}
         </p>
-        </div>
+      </div>
     </div>
   );
 };
@@ -268,15 +302,19 @@ const EmployeePage = () => {
 
   const [selectedJ, setSelectedJ] = useState<jobType>({
     id: 0,
-    catagory: "",
+    AmCategory: "",
+    AmJobtype: "",
+    AmLocation: "",
+    EnCategory: "",
+    EnJobtype: "",
+    EnLocation: "",
     created_at: "",
-    detail: "",
-    jobtype: "",
-    location: "",
+    detailAm: "",
+    detailEn: "",
     posted_by: "",
     salary_range: "",
-    title: "",
-    updated_at: "",
+    titleAm: "",
+    titleEn: "",
   });
   function toggleMenu(menu: string) {
     if (openedMenu == menu) {
@@ -310,25 +348,25 @@ const EmployeePage = () => {
         });
         const job = await res.json();
         jobs_.unshift(job.jobData);
-        console.log(job.jobData,"this is job")
       }
       setJobs(jobs_);
       // eslint-disable-next-line react-hooks/rules-of-hooks
       let props;
-      try{
-      const prop_res = await fetch("/api/proposal/?role=employee", {
-        cache: "no-store",
-      });
-      if(!prop_res.ok){return;}
-      props = await prop_res.json()
-      const proposalIds: number[] = [];
-      const approved: { id: number; approval: string }[] = [];
-      const fullProposal = props.data.map(
-        (p: Record<string, string | number>) => {
+      try {
+        const prop_res = await fetch("/api/proposal/?role=employee", {
+          cache: "no-store",
+        });
+        if (!prop_res.ok) {
+          return;
+        }
+        props = await prop_res.json();
+        const proposalIds: number[] = [];
+        const approved: { id: number; approval: string }[] = [];
+        const fullProposal = props.data.map((p: proposalType) => {
           approved.unshift({
             id: Number(p.career_id),
             approval: String(p.approval),
-          })
+          });
           proposalIds.unshift(Number(p.career_id));
           const career = jobs_.find((j) => j.id == Number(p.career_id));
           return {
@@ -349,12 +387,13 @@ const EmployeePage = () => {
             titleen: career?.titleEn,
             salary_range: career?.salary_range,
           };
-        },
-      );
-      setProposal_ids(proposalIds);
-      setProposals(fullProposal);
-      setApprovals(approved);
-    }catch(err){return;}
+        });
+        setProposal_ids(proposalIds);
+        setProposals(fullProposal);
+        setApprovals(approved);
+      } catch (err) {
+        return;
+      }
     };
 
     const fetchSaved = async () => {
@@ -370,10 +409,9 @@ const EmployeePage = () => {
     fethJobs();
   }, []);
 
-
   function handleFilter(filterType: string, option: string, status: boolean) {
     if (!option || !filterType) return;
-   console.log(option,filterType,status,filteredJobs,_jobs)
+    console.log(option, filterType, status, filteredJobs, _jobs);
     setFilteredJobs((prev) => {
       if (status) {
         return [
@@ -400,7 +438,6 @@ const EmployeePage = () => {
 
   const [rowsColor, setRcolor] = useState("gray-100");
   const [rowshoverColor, setRHovcolor] = useState("zinc-950");
-
 
   useEffect(() => {
     if (mode == "dark") {
@@ -443,8 +480,10 @@ const EmployeePage = () => {
               onClick={() => toggleMenu("Catagories")}
               className={`cursor-pointer transition-all duration-300 px-3 active:scale-95 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-${lightDark}`}
             >
-            <i className="fas fa-layer-group"></i>
-              <span className="max-md:text-xs font-medium">{content.categories}</span>
+              <i className="fas fa-layer-group"></i>
+              <span className="max-md:text-xs font-medium">
+                {content.categories}
+              </span>
               <span className="hidden md:block ml-auto">
                 <i
                   className={`fa-solid ${openedMenu == "Catagories" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
@@ -482,12 +521,14 @@ const EmployeePage = () => {
           <div
             className={`relative flex-1 flex flex-col rounded-xl justify-around items-center md:gap-2`}
           >
-             <button
+            <button
               onClick={() => toggleMenu("Location")}
               className={`cursor-pointer transition-all duration-300 active:scale-95 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-${lightDark}`}
             >
-            <i className="fas fa-location-dot"></i>
-              <span className="max-md:text-xs font-medium">{content.location}</span>
+              <i className="fas fa-location-dot"></i>
+              <span className="max-md:text-xs font-medium">
+                {content.location}
+              </span>
               <span className="hidden md:block ml-auto">
                 <i
                   className={`fa-solid ${openedMenu == "Location" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
@@ -527,20 +568,23 @@ const EmployeePage = () => {
           </div>
           {/*job type filter */}
           <div
-            className={`relative flex-1 cursor-pointer flex flex-col items-center gap-2 min-w-16`}>
+            className={`relative flex-1 cursor-pointer flex flex-col items-center gap-2 min-w-16`}
+          >
             <button
               onClick={() => toggleMenu("Job_type")}
               className={`cursor-pointer active:scale-95 transition-all duration-300 px-1 md:px-3 h-full flex flex-col items-center justify-center gap-1 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl bg-${lightDark}`}
             >
-            <i className="fas fa-briefcase"></i>
-              <span className="max-md:text-xs font-medium leading-4">{content.jobType}</span>
+              <i className="fas fa-briefcase"></i>
+              <span className="max-md:text-xs font-medium leading-4">
+                {content.jobType}
+              </span>
               <span className="hidden md:block ml-auto">
                 <i
                   className={`fa-solid ${openedMenu == "Job_type" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
                 />
               </span>
             </button>
-        
+
             {openedMenu == "Job_type" && (
               <div
                 className={`filter-box z-1000 scale-95  absolute rounded-2xl shadow-lg w-48 top-[calc(100%+10px)] md:top-auto md:bottom-[calc(100%+10px)] h-50 bg-${lightDark} right-0 p-3 flex flex-col gap-2 overflow-auto whitespace-nowrap`}
@@ -573,15 +617,15 @@ const EmployeePage = () => {
             )}
           </div>
           {/*salary filter */}
-          <div
-            className={`relative cursor-pointer flex flex-col gap-2 flex-1`}
-          >
-           <button
+          <div className={`relative cursor-pointer flex flex-col gap-2 flex-1`}>
+            <button
               onClick={() => toggleMenu("Income")}
               className={`cursor-pointer active:scale-95 transition-all duration-300 px-3 h-full flex flex-col items-center justify-center gap-2 md:flex-row md:py-4 w-full hover:scale-105 rounded-xl p-2 bg-${lightDark}`}
             >
-            <i className="fas fa-coins"></i>
-              <span className="max-md:text-xs font-medium">{content.salary}</span>
+              <i className="fas fa-coins"></i>
+              <span className="max-md:text-xs font-medium">
+                {content.salary}
+              </span>
               <span className="hidden md:block ml-auto">
                 <i
                   className={`fa-solid ${openedMenu == "Income" ? "fa-chevron-up" : "fa-chevron-down"} hidden md:block  ml-auto`}
@@ -636,6 +680,7 @@ const EmployeePage = () => {
               setJobdetail={setJobdetail}
               approvals={approvals}
               setApprovals={setApprovals}
+              setProposals={setProposals}
             />
           ) : (
             <>
@@ -670,9 +715,8 @@ const EmployeePage = () => {
                           {p[`title${lang}`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-2">
-                          <div className="aspect-video w-5 relative">
-                          </div>
-                         {p[`${lang}Location`] as string}
+                          <div className="aspect-video w-5 relative"></div>
+                          {p[`${lang}Location`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
                           {p[`${lang}Jobtype`] as string}
@@ -691,9 +735,7 @@ const EmployeePage = () => {
                           {p[`title${lang.toLowerCase()}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
-                          <div className="aspect-video w-5 relative">
-                            
-                          </div>
+                          <div className="aspect-video w-5 relative"></div>
                           {p[`senderloc${lang.toLowerCase()}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -712,9 +754,7 @@ const EmployeePage = () => {
                           {p[`title${lang}`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
-                          <div className="aspect-video w-5 relative">
-                            
-                          </div>
+                          <div className="aspect-video w-5 relative"></div>
                           {p[`${lang}Location`] as string}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -730,7 +770,7 @@ const EmployeePage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default function Employee() {
   return (

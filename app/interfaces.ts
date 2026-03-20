@@ -88,48 +88,42 @@ export interface createJobsParamsType {
   setSelectedCt:React.Dispatch<SetStateAction<number | null>>;
 }
 export interface proposalType {
-  [key:string]:string | number | boolean
-  id: number;
-  sender: string;
-  career_owner: string;
-  name: string;
-  salary_range: string;
-  approval: string;
-  seenstatus: boolean;
-  created_at: string; // or Date if you parse it
-  senderlocen: string;
-  senderlocam: string;
-  senderlocar: string;
-  senderlocfr: string;
-
-  EnJobtype: string;
-  AmJobtype: string;
-  ArJobtype: string;
-  FrJobtype: string;
-
-  titleen: string;
-  titleam: string;
-  titlear: string;
-  titlefr: string;
-
-  detailEn: string;
-  detailAm: string;
-  detailAr: string;
-  detailFr: string;
+            [key:string]:string | number;
+            id:number,
+            career_owner:string;
+            created_at:string;
+            name: string;
+            seenstatus: string;
+            approval: string;
+            detailAm: string;
+            detailEn: string;
+            sender: string;
+            senderlocen: string;
+            senderlocam: string;
+            AmJobtype: string;
+            EnJobtype: string;
+            titleam: string;
+            titleen: string;
+            salary_range:string;
 }
 
 export interface jobType {
-  [key: string]: unknown;
+  [key:string]:string | number;
   id: number;
-  catagory: string;
-  created_at: string;
-  detail: string;
-  jobtype: string;
-  location: string;
-  posted_by: string;
+  titleEn: string;
+  titleAm: string;
+  EnCategory: string;
+  AmCategory: string;
+  EnJobtype: string; 
+  AmJobtype: string;
+  EnLocation: string;
+  AmLocation: string;
+  detailEn: string;
+  detailAm: string;
   salary_range: string;
-  title: string;
-  updated_at: string;
+  posted_by: string;
+  created_at: string;
+
 }
 
 export interface job_detailsPanel {
@@ -143,6 +137,7 @@ export interface job_detailsPanel {
   setSavedJobs: React.Dispatch<SetStateAction<jobType[]>>;
   approvals:{ id: number; approval: string; }[];
   setApprovals:React.Dispatch<SetStateAction<{ id: number; approval: string; }[]>>
+  setProposals:React.Dispatch<SetStateAction<proposalType[]>>
 }
 
 export interface citiesType {

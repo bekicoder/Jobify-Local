@@ -196,6 +196,8 @@ const CreateJobs = ({
           prev.map(j=>j.id === data.data.id ? data.data:j)
         ))
         setEdit(null)
+        setSelectedCt(null)
+        setSelectedJt(null)
       }else if(data.status == "successful"&&!edit){
         setMyjobs(prev=>{return[data.data,...prev]})
       }else{
@@ -533,7 +535,7 @@ const Employer = () => {
       className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
     >
       <i className="fa-solid fa-handshake text-lg md:text-xl"></i>
-      <span className="max-md:text-sm md:text-base font-medium">{content.sent_link}</span>
+      <span className="max-md:text-sm md:text-base font-medium">{content.proposals}</span>
     </div>
   </div>
       </aside>
@@ -588,6 +590,7 @@ const Employer = () => {
                       </th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {myJobs?.map((p: _myjobsType, i) => (
                       <tr
@@ -656,7 +659,7 @@ const Employer = () => {
                           handleSeen(p.propId as number, p);
                         }}
                         key={i}
-                        className="even:bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                        className={`even:bg-${rowsColor} hover:bg-${rowshoverColor} cursor-pointer`}
                       >
                         <td className="text-left text-sm px-4 py-2 text-indigo-500 font-medium">
                           {p.name}
