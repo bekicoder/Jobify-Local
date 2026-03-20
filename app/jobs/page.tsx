@@ -36,7 +36,6 @@ const JobDetailsPanel = ({
     mode,
     borderColor,
   } = useSharedState();
-  console.log(job, "test is this is the job");
   const date = job.created_at.split(" ");
   const isSaved = saved_ids.some((s) => s == job.id);
   const proposal = proposals.find((p) => {
@@ -84,7 +83,6 @@ const JobDetailsPanel = ({
       headers: { "Content-Type": "application" },
     });
     const _res = await res.json();
-    console.log(_res,"this is the proposal data");
     if (_res.msg == "unauthorized") {
       window.location.href = "/account";
     } else if (_res.msg === "successful") {
@@ -112,7 +110,6 @@ const JobDetailsPanel = ({
         titleen: job?.titleEn,
         salary_range: job?.salary_range,
       };
-      console.log(p,fullProposal,"this is the full proposal");
             
       setProposal_ids((prev) => [job.id, ...prev]);
       setProposals(prev=>[fullProposal,...prev])
@@ -175,7 +172,7 @@ const JobDetailsPanel = ({
           </div>
         </form>
       )}
-      <div className="w-full flex justify-between md:pr-4 pt-4 pl-6">
+      <div className="w-full flex justify-between md:pr-4 pt-4 md:pl-6">
         <button
           onClick={handleClose}
           className={`py-2 cursor-pointer text-${textColor} w-10 h-10 flex justify-start`}
@@ -213,7 +210,7 @@ const JobDetailsPanel = ({
           </button>
         )}
       </div>
-      <div className="w-full flex justify-between md:pr-4 pl-12">
+      <div className="w-full flex justify-between md:pr-4 md:pl-12">
         <div
           className={` text-sm flex items-center font-medium text-${lightDark} flex-wrap flex-2`}
         >
@@ -233,15 +230,15 @@ const JobDetailsPanel = ({
           {date[0]}
         </span>
       </div>
-      <h1 className="text-2xl font-medium mb-4 mt-8 ml-12">
+      <h1 className="text-2xl font-medium mb-4 mt-8 md:ml-12">
         {job[`title${lang}`] as string}
       </h1>
-      <h3 className={`text-xl font-medium text-${textColor} mb-2 ml-12`}>
+      <h3 className={`text-xl font-medium text-${textColor} mb-2 md:ml-12`}>
         {content.aboutJob}
       </h3>
       <div className="flex flex-col overflow-y-auto">
         <article
-          className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 pl-12 text-${textColor}`}
+          className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 md:pl-12 text-${textColor}`}
         >
           <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
         </article>
@@ -335,7 +332,7 @@ const EmployeePage = () => {
   }
 
   useEffect(() => {
-    const fethJobs = async () => {
+    const fetchJobs = async () => {
       const jobCount = await fetch("/api/jobs", { cache: "no-store" });
       const { count } = await jobCount.json();
       const jobs_: jobType[] = [];
@@ -347,9 +344,9 @@ const EmployeePage = () => {
           cache: "no-store",
         });
         const job = await res.json();
+        setJobs(prev=>[job.jobData,...prev])
         jobs_.unshift(job.jobData);
       }
-      setJobs(jobs_);
       // eslint-disable-next-line react-hooks/rules-of-hooks
       let props;
       try {
@@ -360,37 +357,33 @@ const EmployeePage = () => {
           return;
         }
         props = await prop_res.json();
-        const proposalIds: number[] = [];
-        const approved: { id: number; approval: string }[] = [];
-        const fullProposal = props.data.map((p: proposalType) => {
-          approved.unshift({
+       props.data.forEach((p: proposalType) => {
+          setApprovals(prev=>[...prev,{
             id: Number(p.career_id),
             approval: String(p.approval),
-          });
-          proposalIds.unshift(Number(p.career_id));
+          }]);
+          setProposal_ids(prev=>[...prev,Number(p.career_id)])
           const career = jobs_.find((j) => j.id == Number(p.career_id));
-          return {
+          const fullData = {
             id: Number(p.career_id),
             career_owner: p.career_owner,
             created_at: p.created_at,
             name: p.name,
             seenstatus: p.seenstatus,
             approval: p.approval,
-            detailAm: p?.amproposal,
-            detailEn: p?.enproposal,
+            detailAm: String(p?.amproposal),
+            detailEn: String(p?.enproposal),
             sender: p.sender,
             senderlocen: p?.senderlocen,
             senderlocam: p?.senderlocam,
-            AmJobtype: career?.AmJobtype,
-            EnJobtype: career?.EnJobtype,
-            titleam: career?.titleAm,
-            titleen: career?.titleEn,
-            salary_range: career?.salary_range,
+            AmJobtype: String(career?.AmJobtype),
+            EnJobtype: String(career?.EnJobtype),
+            titleam: String(career?.titleAm),
+            titleen: String(career?.titleEn),
+            salary_range: String(career?.salary_range),
           };
+          setProposals(prev=>[...prev,fullData]);
         });
-        setProposal_ids(proposalIds);
-        setProposals(fullProposal);
-        setApprovals(approved);
       } catch (err) {
         return;
       }
@@ -406,12 +399,11 @@ const EmployeePage = () => {
       setSavedJobs(data);
     };
     fetchSaved();
-    fethJobs();
+    fetchJobs();
   }, []);
 
   function handleFilter(filterType: string, option: string, status: boolean) {
     if (!option || !filterType) return;
-    console.log(option, filterType, status, filteredJobs, _jobs);
     setFilteredJobs((prev) => {
       if (status) {
         return [

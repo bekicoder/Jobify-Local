@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  FormEvent,
-  use,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import React, { FormEvent, use, useEffect, useState, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { Route } from "next/";
@@ -19,8 +13,14 @@ import {
   proposalType,
   createJobsParamsType,
 } from "../interfaces";
-import {categories as categoriesAm,jobTypes as jobTypesAm} from "@/lib/languages/am.json"
-import {categories as categoriesEn,jobTypes as jobTypesEn} from "@/lib/languages/en.json"
+import {
+  categories as categoriesAm,
+  jobTypes as jobTypesAm,
+} from "@/lib/languages/am.json";
+import {
+  categories as categoriesEn,
+  jobTypes as jobTypesEn,
+} from "@/lib/languages/en.json";
 
 const JobDetailsPanel = ({
   option,
@@ -33,27 +33,42 @@ const JobDetailsPanel = ({
   setSelectedJt,
   setSelectedCt,
 }: DetailsPanelType) => {
-  console.log(incomeRanges,"this is the checking test")
   const [approval, setApproval] = useState<string>(job.approval as string);
   const [opend, setOpend] = useState<boolean>(false);
   const date = job.created_at.split(" ");
   const proposal = option === "proposal";
-  const { content, lang,lightDark,grayText,bgColor,textColor,mode,jobTypes,jobCategories } = useSharedState();
+  const {
+    content,
+    lang,
+    lightDark,
+    grayText,
+    borderColor,
+    textColor,
+    mode,
+    jobTypes,
+    jobCategories,
+  } = useSharedState();
   const handleEdit = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const jt = jobTypes.find(t=>{return t.name == job.EnJobtype})
-    const ct = jobCategories.find(c=>{return c.name == job.EnCategory})
-    const i = incomeRanges.find(i=>{return i.label == job.salary_range})
-    if(ct&&jt){
-      setSelectedCt(ct.id)
-      setSelectedJt(jt.id)
+    const jt = jobTypes.find((t) => {
+      return t.name == job.EnJobtype;
+    });
+    const ct = jobCategories.find((c) => {
+      return c.name == job.EnCategory;
+    });
+    const i = incomeRanges.find((i) => {
+      return i.label == job.salary_range;
+    });
+    if (ct && jt) {
+      setSelectedCt(ct.id);
+      setSelectedJt(jt.id);
     }
     setFd({
       title: job[`title${lang}`] as string,
       detail: job[`detail${lang}`] as string,
-      salary_range:job.salary_range,
-      EnCategory: job.EnCategory,
-      AmCategory: job.AmCategory,
+      salary_range: String(job.salary_range),
+      EnCategory: String(job.EnCategory),
+      AmCategory: String(job.AmCategory),
       EnJobType: job.EnJobtype,
       AmJobType: job.AmJobtype,
     });
@@ -73,9 +88,10 @@ const JobDetailsPanel = ({
     }
   }
   return (
-    <div className={`w-full pl-4 md:pl-12 h-full md:h-[calc(100vh-5rem)] md:rounded-2xl  overflow-y-auto bg-${lightDark} text-${textColor}`}>
-
-      <div className="w-full flex justify-between pr-4 pt-4">
+    <div
+      className={`w-full px-4 h-full md:h-[calc(100vh-5rem)] md:rounded-2xl  overflow-y-auto bg-${lightDark} text-${textColor}`}
+    >
+      <div className="w-full flex justify-between md:pr-4 pt-4 md:pl-6">
         <button
           onClick={() => setJobdetail(null)}
           className="py-2 cursor-pointer"
@@ -118,24 +134,35 @@ const JobDetailsPanel = ({
         )}
       </div>
       {/* job title */}
-      <div className="w-full flex justify-between pr-4">
-        <span className={`text-sm flex items-center font-medium text-${grayText}`}>
-          {proposal ? job.name : job.salary_range} {proposal && " • " + job[`senderloc${lang.toLowerCase()}`]}{!proposal && " • " + job[`${lang}Jobtype`]}
+      <div className="w-full flex justify-between pr-4 md:pl-12">
+        <span
+          className={`text-sm flex items-center font-medium text-${grayText}`}
+        >
+          {proposal ? job.name : job.salary_range}{" "}
+          {proposal && " • " + job[`senderloc${lang.toLowerCase()}`]}
+          {!proposal && " • " + job[`${lang}Jobtype`]}
         </span>
         <span className="text-sm">
-          <i className={`fa-solid fa-calendar-day mr-2 text-${grayText}`}/>
+          <i className={`fa-solid fa-calendar-day mr-2 text-${grayText}`} />
           {date[0]}
         </span>
       </div>
-        <h1 className="text-2xl font-medium mb-4 mt-8">{job[`title${lang}`]}</h1>
-      {proposal && <p className="text-sm  mt-1">{job.sender}</p>}
-      <h3 className={`text-xl font-medium mb-2 text-${grayText}`}>
+      <h1 className="text-2xl font-medium mb-4 mt-8 md:ml-12">{job[`title${lang}`]}</h1>
+      <h3 className={`text-xl font-medium mb-2 md:pl-12 text-${grayText}`}>
         {content.aboutJob}
       </h3>
-      <article className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} max-h-full flex-1 mb-16`}>
-        <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
-        <div className="w-full h-12"></div>
-      </article>
+      <div className="flex flex-col overflow-y-auto">
+        <article
+          className={`prose lg:prose-l prose-${mode == "dark" ? "invert" : "slate"} flex-1 mb-12 md:pl-12 text-${textColor}`}
+        >
+          <ReactMarkdown>{job[`detail${lang}`] as string}</ReactMarkdown>
+        </article>
+        <p
+          className={`w-full h-32 md:h-fit p-4 text-right border-t border-t-${borderColor} font-medium`}
+        >
+          {job.sender}
+        </p>
+      </div>
     </div>
   );
 };
@@ -156,8 +183,17 @@ const CreateJobs = ({
   const [openedMenu, setOpenedMenu] = useState<string | null>();
 
   const { jobCategories } = useSharedState();
-  const { content, lang,bgColor,textColor,grayText,lightDark,mode,jobTypes } = useSharedState();
-  
+  const {
+    content,
+    lang,
+    bgColor,
+    textColor,
+    grayText,
+    lightDark,
+    mode,
+    jobTypes,
+  } = useSharedState();
+
   function toggleMenu(
     e:
       | React.FocusEvent<HTMLDivElement, Element>
@@ -172,39 +208,41 @@ const CreateJobs = ({
   }
   async function handleSumit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const tempStore = fd
-    console.log(tempStore)
+    const tempStore = fd;
+    console.log(tempStore);
     setFd({
-          title: "",
-          detail: "",
-          salary_range: "",
-          EnCategory: "",
-          AmCategory: "",
-          EnJobType: "",
-          AmJobType: "",
-        });
-      const res = await fetch("/api/createJob", {
-        body: JSON.stringify({ fd:tempStore, editId: edit }),
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+      title: "",
+      detail: "",
+      salary_range: "",
+      EnCategory: "",
+      AmCategory: "",
+      EnJobType: "",
+      AmJobType: "",
+    });
+    const res = await fetch("/api/createJob", {
+      body: JSON.stringify({ fd: tempStore, editId: edit }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    const data = await res.json();
+    console.log(data, "this is response");
+    if (data.status == "successful" && edit) {
+      setMyjobs((prev) =>
+        prev.map((j) => (j.id === data.data.id ? data.data : j)),
+      );
+      setEdit(null);
+      setSelectedCt(null);
+      setSelectedJt(null);
+    } else if (data.status == "successful" && !edit) {
+      setMyjobs((prev) => {
+        return [data.data, ...prev];
       });
-      const data = await res.json();
-      console.log(data,"this is response")
-      if (data.status == "successful"&&edit) {
-        setMyjobs(prev=>(
-          prev.map(j=>j.id === data.data.id ? data.data:j)
-        ))
-        setEdit(null)
-        setSelectedCt(null)
-        setSelectedJt(null)
-      }else if(data.status == "successful"&&!edit){
-        setMyjobs(prev=>{return[data.data,...prev]})
-      }else{
-        console.log(data,tempStore)
-        setFd(tempStore)
-        alert("Failed to create job try again later!")
-      }
+    } else {
+      console.log(data, tempStore);
+      setFd(tempStore);
+      alert("Failed to create job try again later!");
+    }
   }
   function handleChange(id: number, option: string) {
     const languages = ["En", "Am"];
@@ -229,8 +267,8 @@ const CreateJobs = ({
         option === "categories" ? `${lang}Category` : `${lang}JobType`;
 
       const found = options[keyName]?.find((o) => o.id === id);
-      if (found && option=="Jobtypes") setSelectedJt(found?.id);
-      if (found && option=="categories") setSelectedCt(found?.id);
+      if (found && option == "Jobtypes") setSelectedJt(found?.id);
+      if (found && option == "categories") setSelectedCt(found?.id);
 
       if (found) {
         newTranslations[stateKey] = found.name;
@@ -247,16 +285,14 @@ const CreateJobs = ({
       <h1 className="text-2xl font-bold text-center mb-1">
         {content.writeProposal}
       </h1>
-      <p className="text-center text-sm mb-4">
-        {content.markdownSupport}
-      </p>
+      <p className="text-center text-sm mb-4">{content.markdownSupport}</p>
       <div className="flex w-full flex-col gap-3 mb-4 font-medium md:flex-row md:justify-between">
         {/* job type */}
         <div
           onClick={(e) => toggleMenu(e, "Job_type")}
           onBlur={(e) => toggleMenu(e, "Job_type")}
           tabIndex={0}
-          className={`p-3 relative rounded-lg bg-${mode=="light"?"white":bgColor}  hover:bg-gray-100 md:shadow-lg hover:${mode=="dark"&&"text-gray-700"} flex items-center cursor-pointer flex-1`}
+          className={`p-3 relative rounded-lg bg-${mode == "light" ? "white" : bgColor}  hover:bg-gray-100 md:shadow-lg hover:${mode == "dark" && "text-gray-700"} flex items-center cursor-pointer flex-1`}
         >
           <i className="fa-solid fa-briefcase mr-2" />
           {content.jobType}&nbsp;
@@ -265,7 +301,7 @@ const CreateJobs = ({
             name="Job_type"
             value={fd.EnJobType}
             className="sr-only"
-            onChange={()=>{}}
+            onChange={() => {}}
             required
           />
           {openedMenu == "Job_type" && (
@@ -297,7 +333,7 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Job_catagories")}
           onBlur={(e) => toggleMenu(e, "Job_catagories")}
           tabIndex={0}
-          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-100 md:shadow-lg flex items-center cursor-pointer flex-1`}
+          className={`p-2 relative rounded-lg bg-${mode == "light" ? lightDark : bgColor} hover:${mode == "dark" && "text-gray-700"} hover:bg-gray-100 md:shadow-lg flex items-center cursor-pointer flex-1`}
         >
           <i className="fas fa-layer-group mr-2"></i>
           {content.categories}
@@ -306,7 +342,7 @@ const CreateJobs = ({
             name={content.categories}
             value={fd.EnCategory}
             className="sr-only"
-            onChange={()=>{}}
+            onChange={() => {}}
             required
           />
           {openedMenu == "Job_catagories" && (
@@ -338,7 +374,7 @@ const CreateJobs = ({
           onClick={(e) => toggleMenu(e, "Income_range")}
           onBlur={(e) => toggleMenu(e, "Income_range")}
           tabIndex={0}
-          className={`p-2 relative rounded-lg bg-${mode=="light"?lightDark:bgColor} hover:${mode=="dark"&&"text-gray-700"} hover:bg-gray-100 md:shadow-lg flex items-center cursor-pointer flex-1`}
+          className={`p-2 relative rounded-lg bg-${mode == "light" ? lightDark : bgColor} hover:${mode == "dark" && "text-gray-700"} hover:bg-gray-100 md:shadow-lg flex items-center cursor-pointer flex-1`}
         >
           <i className="fas fa-sack-dollar mr-2"></i>
           {content.salary}
@@ -347,7 +383,7 @@ const CreateJobs = ({
             name="range"
             value={fd.salary_range}
             className="sr-only"
-            onChange={()=>{}}
+            onChange={() => {}}
             required
           />
           {openedMenu == "Income_range" && (
@@ -407,12 +443,24 @@ const Employer = () => {
   const [jobs, setJobs] = useState<_jobs[]>([]);
   const [myJobs, setMyjobs] = useState<_myjobsType[]>([]);
   const [edit, setEdit] = useState<number | null>(null);
-  const [proposals, setProposals] = useState([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [proposals, setProposals] = useState<any[]>([]);
   const [proposal_ids, setProposal_ids] = useState([]);
-  const { content, lang,lightDark,bgColor,textColor,grayText,mode,borderColor } = useSharedState();
-  const [approvals, setApprovals] = useState<{ id: number; approval: string }[]>([]);
-  const [selectedJt, setSelectedJt] = useState<number|null>(null);
-  const [selectedCt, setSelectedCt] = useState<number|null>(null);
+  const {
+    content,
+    lang,
+    lightDark,
+    bgColor,
+    textColor,
+    grayText,
+    mode,
+    borderColor,
+  } = useSharedState();
+  const [approvals, setApprovals] = useState<
+    { id: number; approval: string }[]
+  >([]);
+  const [selectedJt, setSelectedJt] = useState<number | null>(null);
+  const [selectedCt, setSelectedCt] = useState<number | null>(null);
   const [fd, setFd] = useState({
     title: "",
     detail: "",
@@ -421,23 +469,28 @@ const Employer = () => {
     AmCategory: "",
     EnJobType: "",
     AmJobType: "",
-  }); 
-  console.log(content.below,"dose this is show the full course while this is the ")
-  const incomeRanges: income_range[] =useMemo(()=>[
-    { id: 1, label: `${content.below} $500` },
-    { id: 2, label: "$500 – $1,000" },
-    { id: 3, label: "$1,000 – $2,000" },
-    { id: 4, label: "$2,000 – $3,000" },
-    { id: 5, label: "$3,000 – $5,000" },
-    { id: 6, label: "$5,000 – $7,000" },
-    { id: 7, label: "$7,000 – $10,000" },
-    { id: 8, label: "$10,000+" },
-  ],[content])
+  });
+  console.log(
+    content.below,
+    "dose this is show the full course while this is the ",
+  );
+  const incomeRanges: income_range[] = useMemo(
+    () => [
+      { id: 1, label: `${content.below} $500` },
+      { id: 2, label: "$500 – $1,000" },
+      { id: 3, label: "$1,000 – $2,000" },
+      { id: 4, label: "$2,000 – $3,000" },
+      { id: 5, label: "$3,000 – $5,000" },
+      { id: 6, label: "$5,000 – $7,000" },
+      { id: 7, label: "$7,000 – $10,000" },
+      { id: 8, label: "$10,000+" },
+    ],
+    [content],
+  );
   useEffect(() => {
     const fetchData = async () => {
       const job_res = await fetch("/api/myJobs");
       const { resData } = await job_res.json();
-      console.log(resData)
       setMyjobs(resData);
       //fetch proposals
       const prop_res = await fetch("/api/proposal/?role=employer", {
@@ -445,36 +498,36 @@ const Employer = () => {
       });
       const props = await prop_res.json();
       if (props.data.legth == 0) return;
-      console.log(props)
-      const fullProposal = props.data.map(
-        (p: Record<string, string | number>) => {
+      props.data.forEach(
+        (p:proposalType) => {
           const proposed_job = resData.filter(
             (j: Record<string, string | number>) => {
               return j.id == Number(p.career_id);
             },
           );
-
-          return {
+          const fullData = {
             id: Number(p.career_id),
             career_owner: p.career_owner,
             created_at: p.created_at,
             name: p.name,
-            detailAm: p?.amproposal,
-            detailEn: p?.enproposal,
+            detailAm: String(p?.amproposal),
+            detailEn: String(p?.enproposal),
             sender: p.sender,
             senderlocen: p?.senderlocen,
             senderlocam: p?.senderlocam,
-            AmJobtype: proposed_job[0]?.AmJobtype,
-            EnJobtype: proposed_job[0]?.EnJobtype,
-            titleam: proposed_job[0]?.titleAm,
-            titleen: proposed_job[0]?.titleEn,
+            AmJobtype: String(proposed_job[0]?.AmJobtype),
+            EnJobtype: String(proposed_job[0]?.EnJobtype),
+            titleam: String(proposed_job[0]?.titleAm),
+            titleen: String(proposed_job[0]?.titleEn),
             approval: p.approval,
             seenstatus: p.seenstatus,
             propId: p.id,
           };
+          
+          setProposals(prev=>[...prev,fullData]);
         },
       );
-      setProposals(fullProposal);
+      
     };
 
     fetchData();
@@ -494,53 +547,67 @@ const Employer = () => {
   }
 
   const [rowsColor, setRcolor] = useState("gray-100");
-    const [rowshoverColor, setRHovcolor] = useState("zinc-950");
-    useEffect(() => {
-      if (mode == "dark") {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setRcolor("zinc-900");
-        setRHovcolor("zinc-950");
-      }
-      if (mode == "light") {
-        setRcolor("gray-100");
-        setRHovcolor("gray-200");
-      }
-    }, [mode]);
+  const [rowshoverColor, setRHovcolor] = useState("zinc-950");
+  useEffect(() => {
+    if (mode == "dark") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRcolor("zinc-900");
+      setRHovcolor("zinc-950");
+    }
+    if (mode == "light") {
+      setRcolor("gray-100");
+      setRHovcolor("gray-200");
+    }
+  }, [mode]);
   return (
-    <div className={`w-full md:h-full pt-16 min-h-screen flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} md:fixed`}>
-      <aside className={`w-full md:w-72 h-full bg-${bgColor} md:rounded md:shadow-2xl md:border-r border-${borderColor}`}>
-  <div className="md:hidden flex items-center justify-center h-14 bg-linear-to-r from-sky-600 to-sky-500 text-white text-lg font-semibold tracking-wide shadow-md">
-    {content.headline}
-  </div>
-  <div className="hidden md:flex items-center justify-center py-3 bg-sky-600 text-white text-2xl font-semibold rounded-t">
-    {content.headline}
-  </div>
-  <div className={`flex md:flex-col flex-row md:gap-5 gap-3 md:p-4 p-3 justify-around md:justify-start  text-${textColor} md:bg-transparent`}>
     <div
-      onClick={() => setPage("myJobs")}
-      className={`flex hover:scale-105 flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} active:scale-95 w-full md:w-auto`}
+      className={`w-full md:h-full pt-16 min-h-screen flex flex-col md:flex-row overflow-auto bg-${bgColor} text-${textColor} md:fixed`}
     >
-      <i className="fa-solid fa-layer-group text-lg md:text-xl"></i>
-      <span className="max-md:text-sm md:text-base font-medium">{content.myJobs}</span>
-    </div>
-    <div
-      onClick={() => setPage("createJob")}
-      className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95  w-full md:w-auto`}
-    >
-      <i className="fa-solid fa-wand-magic-sparkles text-lg md:text-xl"></i>
-      <span className="max-md:text-sm md:text-base font-medium">{content.createJob}</span>
-    </div>
+      <aside
+        className={`w-full md:w-72 h-full bg-${bgColor} md:rounded md:shadow-2xl md:border-r border-${borderColor}`}
+      >
+        <div className="md:hidden flex items-center justify-center h-14 bg-linear-to-r from-sky-600 to-sky-500 text-white text-lg font-semibold tracking-wide shadow-md">
+          {content.headline}
+        </div>
+        <div className="hidden md:flex items-center justify-center py-3 bg-sky-600 text-white text-2xl font-semibold rounded-t">
+          {content.headline}
+        </div>
+        <div
+          className={`flex md:flex-col flex-row md:gap-5 gap-3 md:p-4 p-3 justify-around md:justify-start  text-${textColor} md:bg-transparent`}
+        >
+          <div
+            onClick={() => setPage("myJobs")}
+            className={`flex hover:scale-105 flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} active:scale-95 w-full md:w-auto`}
+          >
+            <i className="fa-solid fa-layer-group text-lg md:text-xl"></i>
+            <span className="max-md:text-sm md:text-base font-medium">
+              {content.myJobs}
+            </span>
+          </div>
+          <div
+            onClick={() => setPage("createJob")}
+            className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95  w-full md:w-auto`}
+          >
+            <i className="fa-solid fa-wand-magic-sparkles text-lg md:text-xl"></i>
+            <span className="max-md:text-sm md:text-base font-medium">
+              {content.createJob}
+            </span>
+          </div>
 
-    <div
-      onClick={() => setPage("proposals")}
-      className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
-    >
-      <i className="fa-solid fa-handshake text-lg md:text-xl"></i>
-      <span className="max-md:text-sm md:text-base font-medium">{content.proposals}</span>
-    </div>
-  </div>
+          <div
+            onClick={() => setPage("proposals")}
+            className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-xl cursor-pointer transition-all duration-300 bg-${lightDark} hover:scale-105 active:scale-95 w-full md:w-auto`}
+          >
+            <i className="fa-solid fa-handshake text-lg md:text-xl"></i>
+            <span className="max-md:text-sm md:text-base font-medium">
+              {content.proposals}
+            </span>
+          </div>
+        </div>
       </aside>
-      <div className={` w-full min-[768]:px-12 min-[950px]:px-24 overflow-auto relative`}>
+      <div
+        className={` w-full min-[768]:px-12 min-[950px]:px-24 overflow-auto relative`}
+      >
         {page == "createJob" && (
           <CreateJobs
             setJobdetail={setJobdetail}
@@ -560,7 +627,7 @@ const Employer = () => {
         )}
 
         {page == "myJobs" && (
-          <div className={`w-full h-full ${!selectedJob &&"mb-28"}`}>
+          <div className={`w-full h-full ${!selectedJob && "mb-28"}`}>
             {selectedJob ? (
               <JobDetailsPanel
                 setEdit={setEdit}
@@ -577,7 +644,9 @@ const Employer = () => {
               />
             ) : (
               <>
-                <table className={`w-full md:shadow-2xl md:rounded-2xl bg-${lightDark} px-7 overflow-hidden pb-48`}>
+                <table
+                  className={`w-full md:shadow-2xl md:rounded-2xl bg-${lightDark} px-7 overflow-hidden pb-48`}
+                >
                   <thead className="border-b border-b-gray-300 px-7">
                     <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">
@@ -605,7 +674,6 @@ const Employer = () => {
                           {p[`title${lang}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
-          
                           {p[`${lang}Location`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">
@@ -638,7 +706,9 @@ const Employer = () => {
               />
             ) : (
               <>
-                <table className={`w-full md:shadow-2xl md:rounded-2xl  px-7 overflow-hidden bg-${lightDark}`}>
+                <table
+                  className={`w-full md:shadow-2xl md:rounded-2xl  px-7 overflow-hidden bg-${lightDark}`}
+                >
                   <thead className="border-b border-b-gray-300 px-7">
                     <tr>
                       <th className="text-left text-sm font-medium px-4 py-2">
@@ -666,7 +736,6 @@ const Employer = () => {
                           {p.name}
                         </td>
                         <td className="text-left text-sm px-4 py-2 flex items-center gap-2">
-                          
                           {p[`senderloc${lang.toLowerCase()}`]}
                         </td>
                         <td className="text-left text-sm px-4 py-1">

@@ -104,7 +104,6 @@ export interface proposalType {
             EnJobtype: string;
             titleam: string;
             titleen: string;
-            salary_range:string;
 }
 
 export interface jobType {
@@ -123,7 +122,6 @@ export interface jobType {
   salary_range: string;
   posted_by: string;
   created_at: string;
-
 }
 
 export interface job_detailsPanel {
